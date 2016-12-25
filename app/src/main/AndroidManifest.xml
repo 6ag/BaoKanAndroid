@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="tv.baokan.baokanandroid">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".app.BaoKanApp"
         android:allowBackup="true"

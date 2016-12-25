@@ -103,7 +103,7 @@ public class NewsFragment extends BaseFragment {
 
     private class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
 
-        public NewsFragmentPagerAdapter(FragmentManager fm) {
+        NewsFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

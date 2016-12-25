@@ -3,6 +3,8 @@ package tv.baokan.baokanandroid.app;
 import android.app.Application;
 import android.content.Context;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 public class BaoKanApp extends Application {
 
     private static Context mContext;
@@ -16,6 +18,7 @@ public class BaoKanApp extends Application {
         super.onCreate();
 
         mContext = this;
+        Fresco.initialize(this);
 
     }
 
