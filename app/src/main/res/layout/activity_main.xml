@@ -1,17 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="tv.baokan.baokanandroid.ui.activity.MainActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/activity_main"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="tv.baokan.baokanandroid.ui.activity.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!--内容主体-->
+    <FrameLayout
+        android:id="@+id/fl_main_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    </FrameLayout>
+
+    <!--底部分割线-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.2dp"
+        android:background="#B3B3B3"/>
+
+    <!--底部tabbar-->
+    <RadioGroup
+        android:id="@+id/rg_tabbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
-</RelativeLayout>
+        android:background="#F9F9F9"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <RadioButton
+            android:id="@+id/rb_news_item"
+            style="@style/tabbar_style"
+            android:drawableTop="@drawable/tabbar_item_selector_news"
+            android:text="资讯"/>
+
+        <RadioButton
+            android:id="@+id/rb_photo_item"
+            style="@style/tabbar_style"
+            android:drawableTop="@drawable/tabbar_item_selector_photo"
+            android:text="图秀"/>
+
+        <RadioButton
+            android:id="@+id/rb_hot_item"
+            style="@style/tabbar_style"
+            android:drawableTop="@drawable/tabbar_item_selector_hot"
+            android:text="热门"/>
+
+        <RadioButton
+            android:id="@+id/rb_profile_item"
+            style="@style/tabbar_style"
+            android:drawableTop="@drawable/tabbar_item_selector_profile"
+            android:text="我"/>
+
+    </RadioGroup>
+
+
+</LinearLayout>
