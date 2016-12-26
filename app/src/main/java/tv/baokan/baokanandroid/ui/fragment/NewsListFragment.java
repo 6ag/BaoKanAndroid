@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,11 +56,10 @@ public class NewsListFragment extends BaseFragment {
     private int pageIndex = 1; // 页码
     private TwinklingRefreshLayout refreshLayout;
     private RecyclerView mNewsListRecyclerView;
-    private Banner banner;
     private NewsListAdapter newsListAdapter;
     private List<ArticleListBean> articleListBeans = new ArrayList<>(); // 列表数据
     private List<ArticleListBean> isGoodArticleBeans = new ArrayList<>(); // 幻灯片数据
-    private int headerCount = 0;
+    private int headerCount = 3;
 
     public static NewsListFragment newInstance(String classid) {
         NewsListFragment newFragment = new NewsListFragment();
@@ -74,7 +74,6 @@ public class NewsListFragment extends BaseFragment {
         View view = View.inflate(mContext, R.layout.fragment_news_list, null);
         mNewsListRecyclerView = (RecyclerView) view.findViewById(R.id.rv_news_list_recyclerview);
         refreshLayout = (TwinklingRefreshLayout) view.findViewById(R.id.srl_news_list_refresh);
-        LogUtils.d("NewsListFragment", this.toString());
         return view;
     }
 
@@ -85,7 +84,6 @@ public class NewsListFragment extends BaseFragment {
         Bundle args = getArguments();
         if (args != null) {
             classid = args.getString("classid");
-            LogUtils.d("NewsListFragment", "classid = " + classid);
         }
 
         mNewsListRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -94,9 +92,6 @@ public class NewsListFragment extends BaseFragment {
 
         // 设置刷新监听器
         setupRefresh();
-
-        // 加载网络数据
-        refreshLayout.startRefresh();
     }
 
     /**
@@ -120,7 +115,6 @@ public class NewsListFragment extends BaseFragment {
                     @Override
                     public void run() {
                         loadNewsFromNetwork(classid, 1, 0);
-                        loadIsGoodFromNetwork(classid);
                     }
                 }, 500);
             }
@@ -136,61 +130,9 @@ public class NewsListFragment extends BaseFragment {
                 }, 500);
             }
         });
-    }
 
-    /**
-     * 加载幻灯片数据
-     *
-     * @param classid 分类id
-     */
-    private void loadIsGoodFromNetwork(String classid) {
-        OkHttpUtils
-                .get()
-                .url(APIs.ARTICLE_LIST)
-                .addParams("table", "news")
-                .addParams("classid", classid)
-                .addParams("query", "isgood")
-                .addParams("pageSize", String.valueOf(3))
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        LogUtils.d(TAG, "更新头部失败");
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray jsonArray = jsonObject.getJSONArray("data");
-                            List<ArticleListBean> tempListBeans = new ArrayList<>();
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                                tempListBeans.add(bean);
-                            }
-
-                            // 幻灯片数据
-                            isGoodArticleBeans = tempListBeans;
-
-                            List<String> images = new ArrayList<>();
-                            List<String> titles = new ArrayList<>();
-
-                            for (ArticleListBean bean :
-                                    tempListBeans) {
-                                images.add(bean.getTitlepic());
-                                titles.add(bean.getTitle());
-                            }
-
-                            if (tempListBeans.size() > 0) {
-                                // 配置轮播器并设置recyclerView头部
-                                setupRecyclerViewHeader(images, titles);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+        // 默认第一次加载网络数据
+        refreshLayout.startRefresh();
     }
 
     /**
@@ -233,6 +175,15 @@ public class NewsListFragment extends BaseFragment {
                                 // 下拉刷新
                                 if (maxId.compareTo(tempListBeans.get(0).getId()) <= -1) {
                                     articleListBeans = tempListBeans;
+
+                                    // 幻灯片数据
+                                    if (tempListBeans.size() >= 3) {
+                                        isGoodArticleBeans = new ArrayList<>();
+                                        isGoodArticleBeans.add(tempListBeans.get(0));
+                                        isGoodArticleBeans.add(tempListBeans.get(1));
+                                        isGoodArticleBeans.add(tempListBeans.get(2));
+                                    }
+
                                     // 刷新列表数据
                                     newsListAdapter.notifyDataSetChanged();
                                 }
@@ -265,17 +216,23 @@ public class NewsListFragment extends BaseFragment {
 
     /**
      * 配置recyclerView头部轮播
-     *
-     * @param images 图片url
-     * @param titles 标题
      */
-    private void setupRecyclerViewHeader(List<String> images, List<String> titles) {
-        banner = new Banner(mContext);
+    private void setupRecyclerViewHeader(Banner banner) {
+
+        List<String> images = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
+
+        for (ArticleListBean bean :
+                isGoodArticleBeans) {
+            images.add(bean.getTitlepic());
+            titles.add(bean.getTitle());
+        }
+
         banner.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (BaoKanApp.WINDOW_HEIGHT * 0.3)));
 
         // 配置banner
         banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
-                .setImageLoader(new GlideImageLoader())
+                .setImageLoader(new FrescoImageLoader())
                 .setImages(images)
                 .setBannerTitles(titles)
                 .isAutoPlay(true)
@@ -283,12 +240,6 @@ public class NewsListFragment extends BaseFragment {
                 .setBannerAnimation(Transformer.Default)
                 .setIndicatorGravity(BannerConfig.RIGHT)
                 .start();
-
-        // 头部数量 为了方便管理item下标
-        headerCount = 1;
-
-        // 更新banner数据
-        newsListAdapter.notifyItemChanged(0);
 
         // 监听banner点击事件
         banner.setOnBannerClickListener(new OnBannerClickListener() {
@@ -301,7 +252,7 @@ public class NewsListFragment extends BaseFragment {
     }
 
     // 轮播图片加载器
-    public class GlideImageLoader extends ImageLoader {
+    public class FrescoImageLoader extends ImageLoader {
 
         @Override
         public void displayImage(Context context, Object path, ImageView imageView) {
@@ -327,15 +278,21 @@ public class NewsListFragment extends BaseFragment {
 
         @Override
         public int getItemCount() {
-            return articleListBeans.size() + headerCount;
+            if (articleListBeans.size() <= 3) {
+                return 0;
+            } else if (articleListBeans.size() > 3) {
+                return articleListBeans.size() - 2;
+            }
+            return 0;
         }
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0 && headerCount != 0) {
+            if (position == 0) {
                 return NEWS_ITEM_TYPE.HEADER_VIEW.ordinal();
             }
-            ArticleListBean bean = articleListBeans.get(position - headerCount);
+
+            ArticleListBean bean = articleListBeans.get(position);
             if (!TextUtils.isEmpty(bean.getTitlepic()) && bean.getMorepic().length == 0) {
                 return NEWS_ITEM_TYPE.ONE_PIC.ordinal();
             } else if (bean.getMorepic().length == 3) {
@@ -351,9 +308,8 @@ public class NewsListFragment extends BaseFragment {
             RecyclerView.ViewHolder holder;
 
             if (viewType == NEWS_ITEM_TYPE.HEADER_VIEW.ordinal()) {
-                view = banner == null ? new View(mContext) : banner;
-                LogUtils.d(TAG, "banner = " + banner);
-                holder = new HEADERViewHolder(view);
+                view = LayoutInflater.from(mContext).inflate(R.layout.header_cell_news_list_banner, parent, false);
+                holder = new HeaderViewHolder(view);
             } else if (viewType == NEWS_ITEM_TYPE.NO_PIC.ordinal()) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_list_nopic, parent, false);
                 holder = new NoPicViewHolder(view);
@@ -371,11 +327,13 @@ public class NewsListFragment extends BaseFragment {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
             // 头部视图则直接返回
-            if (holder instanceof HEADERViewHolder) {
+            if (holder instanceof HeaderViewHolder) {
+                HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
+                setupRecyclerViewHeader(headerViewHolder.banner);
                 return;
             }
 
-            ArticleListBean bean = articleListBeans.get(position - headerCount);
+            ArticleListBean bean = articleListBeans.get(position);
             BaseViewHolder viewHolder = (BaseViewHolder) holder;
             viewHolder.titleTextView.setText(bean.getTitle());
             try {
@@ -389,7 +347,7 @@ public class NewsListFragment extends BaseFragment {
             if (holder instanceof OnePicViewHolder) {
                 OnePicViewHolder onePicViewHolder = (OnePicViewHolder) holder;
                 onePicViewHolder.imageView1.setImageURI(Uri.parse(bean.getTitlepic()));
-            } else {
+            } else if (holder instanceof MorePicViewHolder) {
                 MorePicViewHolder morePicViewHolder = (MorePicViewHolder) holder;
                 morePicViewHolder.imageView1.setImageURI(Uri.parse(bean.getMorepic()[0]));
                 morePicViewHolder.imageView2.setImageURI(Uri.parse(bean.getMorepic()[1]));
@@ -417,10 +375,13 @@ public class NewsListFragment extends BaseFragment {
         }
 
         // 头部视图
-        class HEADERViewHolder extends RecyclerView.ViewHolder {
+        class HeaderViewHolder extends RecyclerView.ViewHolder {
 
-            HEADERViewHolder(View itemView) {
+            Banner banner;
+
+            HeaderViewHolder(View itemView) {
                 super(itemView);
+                banner = (Banner) itemView.findViewById(R.id.b_news_list_banner);
             }
         }
 

@@ -2,6 +2,7 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -45,6 +46,11 @@ public class MainActivity extends BaseActivity {
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // super.onSaveInstanceState(outState);
     }
 
     /**

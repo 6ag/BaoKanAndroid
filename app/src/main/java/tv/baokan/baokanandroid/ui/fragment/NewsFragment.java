@@ -4,8 +4,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -69,9 +71,9 @@ public class NewsFragment extends BaseFragment {
             }
         });
 
-     }
+    }
 
-     /**
+    /**
      * 初始化新闻栏目数据 - 这里数据存数据库
      */
     private void initNewsColumn() {
@@ -105,6 +107,11 @@ public class NewsFragment extends BaseFragment {
 
         NewsFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            return super.instantiateItem(container, position);
         }
 
         @Override

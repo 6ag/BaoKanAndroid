@@ -35,8 +35,8 @@ public class BaoKanApp extends Application {
         Fresco.initialize(this);
 
         // 初始化app异常处理器
-        CrashHandler handler = CrashHandler.getInstance();
-        handler.init(getApplicationContext());
+//        CrashHandler handler = CrashHandler.getInstance();
+//        handler.init(getApplicationContext());
 
         // 获取屏幕尺寸
         Resources resources = getResources();

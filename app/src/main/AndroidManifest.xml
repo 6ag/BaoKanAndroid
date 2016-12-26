@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="tv.baokan.baokanandroid">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".app.BaoKanApp"
@@ -25,7 +25,8 @@
             android:name=".ui.activity.MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
-
+        <activity android:name=".ui.activity.NewsDetailActivity">
+        </activity>
     </application>
 
 </manifest>
