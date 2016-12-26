@@ -48,6 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_news_title_bar"
+        android:overScrollMode="never"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

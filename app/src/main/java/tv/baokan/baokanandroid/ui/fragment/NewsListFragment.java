@@ -44,22 +44,21 @@ import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.ArticleListBean;
+import tv.baokan.baokanandroid.ui.activity.NewsDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
 
 public class NewsListFragment extends BaseFragment {
 
-    private static final String TAG = "NewsListFragment";
+    private String classid;     // 栏目id
+    private int pageIndex = 1;  // 当前页码
 
-    private String classid; // 栏目id
-    private int pageIndex = 1; // 页码
-    private TwinklingRefreshLayout refreshLayout;
-    private RecyclerView mNewsListRecyclerView;
-    private NewsListAdapter newsListAdapter;
+    private TwinklingRefreshLayout refreshLayout;  // 上下拉刷新
+    private RecyclerView mNewsListRecyclerView;    // 列表视图
+    private NewsListAdapter newsListAdapter;       // 列表视图的适配器
     private List<ArticleListBean> articleListBeans = new ArrayList<>(); // 列表数据
     private List<ArticleListBean> isGoodArticleBeans = new ArrayList<>(); // 幻灯片数据
-    private int headerCount = 3;
 
     public static NewsListFragment newInstance(String classid) {
         NewsListFragment newFragment = new NewsListFragment();
@@ -131,8 +130,11 @@ public class NewsListFragment extends BaseFragment {
             }
         });
 
-        // 默认第一次加载网络数据
-        refreshLayout.startRefresh();
+        // 默认加载一次数据
+        if (articleListBeans.size() == 0) {
+            refreshLayout.startRefresh();
+        }
+
     }
 
     /**
@@ -243,9 +245,11 @@ public class NewsListFragment extends BaseFragment {
 
         // 监听banner点击事件
         banner.setOnBannerClickListener(new OnBannerClickListener() {
+            // position 从1开始
             @Override
             public void OnBannerClick(int position) {
-                Toast.makeText(mContext, isGoodArticleBeans.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                // 进入文章详情
+                openArticleDetail(isGoodArticleBeans.get(position - 1));
             }
         });
 
@@ -265,6 +269,15 @@ public class NewsListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * 打开文章详情页面
+     *
+     * @param articleBean 文章模型
+     */
+    private void openArticleDetail(ArticleListBean articleBean) {
+        NewsDetailActivity.start(mContext, articleBean.getClassid(), articleBean.getId());
+    }
+
     // item类型枚举
     public enum NEWS_ITEM_TYPE {
         HEADER_VIEW, // 头部视图
@@ -276,23 +289,26 @@ public class NewsListFragment extends BaseFragment {
     // 新闻列表数据适配器
     private class NewsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        // 真实的item位置
+        private int getRealPosition(int position) {
+            return position - 1;
+        }
+
         @Override
         public int getItemCount() {
-            if (articleListBeans.size() <= 3) {
-                return 0;
-            } else if (articleListBeans.size() > 3) {
-                return articleListBeans.size() - 2;
-            }
-            return 0;
+            return articleListBeans.size() + 1;
         }
 
         @Override
         public int getItemViewType(int position) {
+
+            // 头部轮播
             if (position == 0) {
                 return NEWS_ITEM_TYPE.HEADER_VIEW.ordinal();
             }
 
-            ArticleListBean bean = articleListBeans.get(position);
+            // 内容
+            ArticleListBean bean = articleListBeans.get(getRealPosition(position));
             if (!TextUtils.isEmpty(bean.getTitlepic()) && bean.getMorepic().length == 0) {
                 return NEWS_ITEM_TYPE.ONE_PIC.ordinal();
             } else if (bean.getMorepic().length == 3) {
@@ -307,10 +323,14 @@ public class NewsListFragment extends BaseFragment {
             View view;
             RecyclerView.ViewHolder holder;
 
+            // 头部轮播
             if (viewType == NEWS_ITEM_TYPE.HEADER_VIEW.ordinal()) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.header_cell_news_list_banner, parent, false);
-                holder = new HeaderViewHolder(view);
-            } else if (viewType == NEWS_ITEM_TYPE.NO_PIC.ordinal()) {
+                return new HeaderViewHolder(view);
+            }
+
+            // 内容
+            if (viewType == NEWS_ITEM_TYPE.NO_PIC.ordinal()) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_list_nopic, parent, false);
                 holder = new NoPicViewHolder(view);
             } else if (viewType == NEWS_ITEM_TYPE.ONE_PIC.ordinal()) {
@@ -320,20 +340,33 @@ public class NewsListFragment extends BaseFragment {
                 view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_list_morepic, parent, false);
                 holder = new MorePicViewHolder(view);
             }
+
+            // cell点击事件
+            final BaseViewHolder baseViewHolder = (BaseViewHolder) holder;
+            baseViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getRealPosition(baseViewHolder.getAdapterPosition());
+                    // 进入文章详情
+                    openArticleDetail(articleListBeans.get(position));
+                }
+            });
+
             return holder;
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-            // 头部视图则直接返回
+            // 头部轮播
             if (holder instanceof HeaderViewHolder) {
                 HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
                 setupRecyclerViewHeader(headerViewHolder.banner);
                 return;
             }
 
-            ArticleListBean bean = articleListBeans.get(position);
+            // 内容区域
+            ArticleListBean bean = articleListBeans.get(getRealPosition(position));
             BaseViewHolder viewHolder = (BaseViewHolder) holder;
             viewHolder.titleTextView.setText(bean.getTitle());
             try {
