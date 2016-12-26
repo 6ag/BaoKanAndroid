@@ -4,6 +4,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <!--android:fitsSystemWindows="true"
+        android:clipToPadding="true"
+        让状态栏颜色一致-->
     <LinearLayout
         android:id="@+id/ll_news_title_bar"
         android:layout_width="match_parent"
@@ -11,6 +14,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:background="@color/colorPrimary"
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true"
         android:orientation="horizontal">
 
         <android.support.design.widget.TabLayout
@@ -24,15 +29,16 @@
             app:tabIndicatorHeight="0dp"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="#FFFFFF"
+            app:tabTextAppearance="@style/NewsTabLayoutTextAppearance"
             app:tabTextColor="#dfe1e1"/>
 
         <ImageButton
             android:id="@+id/ib_news_class_add"
-            android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:layout_gravity="center_vertical"
             android:background="@null"
+            android:padding="10dp"
             android:src="@drawable/title_nav_plus_normal"/>
 
     </LinearLayout>

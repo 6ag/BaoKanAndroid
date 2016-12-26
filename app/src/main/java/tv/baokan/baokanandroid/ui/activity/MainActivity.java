@@ -1,9 +1,13 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RadioGroup;
 
 import java.util.ArrayList;
@@ -32,6 +36,14 @@ public class MainActivity extends BaseActivity {
         prepareUI();
         prepareFragments();
         setItemListener();
+
+        // 透明状态栏
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window window = getWindow();
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
 
     }
 
@@ -111,6 +123,29 @@ public class MainActivity extends BaseActivity {
             }
             transaction.commit();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exit();
+        }
+        return true;
+    }
+
+    private long time = 0;
+
+    /**
+     * 2秒内连续点击返回2次back才退出app
+     */
+    private void exit() {
+        if (System.currentTimeMillis() - time > 2000) {
+            time = System.currentTimeMillis();
+            showToast("再点击一次退出应用程序");
+        } else {
+            removeAllActivity();
+        }
+
     }
 
 }

@@ -20,4 +20,10 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <!--新闻顶部标签字体-->
+    <style name="NewsTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>

@@ -30,4 +30,6 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.12.0'
     compile 'com.facebook.fresco:animated-gif:0.12.0'
     compile 'com.zhy:okhttputils:2.6.2'
+    compile 'com.youth.banner:banner:1.4.5'
+    compile 'com.lcodecorex:tkrefreshlayout:1.0.5'
 }
