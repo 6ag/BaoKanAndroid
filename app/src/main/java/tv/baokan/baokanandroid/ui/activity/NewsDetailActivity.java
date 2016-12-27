@@ -5,10 +5,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -19,18 +25,21 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.DateUtils;
+import tv.baokan.baokanandroid.utils.ImageCacheUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.SizeUtils;
 import tv.baokan.baokanandroid.utils.StatusUtils;
 import tv.baokan.baokanandroid.utils.StreamUtils;
 
 
-public class NewsDetailActivity extends BaseActivity {
+public class NewsDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "NewsDetailActivity";
 
@@ -81,7 +90,14 @@ public class NewsDetailActivity extends BaseActivity {
         mBackButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_back);
         mEditButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_edit);
         mFontButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_font);
-        mCollectionButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_share);
+        mCollectionButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_collection);
+        mShareButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_share);
+
+        mBackButton.setOnClickListener(this);
+        mEditButton.setOnClickListener(this);
+        mFontButton.setOnClickListener(this);
+        mCollectionButton.setOnClickListener(this);
+        mShareButton.setOnClickListener(this);
     }
 
     /**
@@ -96,8 +112,58 @@ public class NewsDetailActivity extends BaseActivity {
 
         WebSettings webSettings = mContentWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        mContentWebView.addJavascriptInterface(new ArticleContent(), "ARTICLE");
+        mContentWebView.setWebChromeClient(new WebChromeClient() {
+        });
+        mContentWebView.setWebViewClient(new WebViewClient() {
 
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                LogUtils.d(TAG, url + "页面加载完成");
+                getImageFromDownloaderOrDiskByImageUrlArray();
+            }
+
+        });
+
+        // 加载网络数据
         loadNewsDetailFromNetwork();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ib_news_detail_bottom_bar_back:
+                finish();
+                overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
+                break;
+            case R.id.ib_news_detail_bottom_bar_edit:
+                Toast.makeText(this, "弹出评论", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.ib_news_detail_bottom_bar_font:
+                Toast.makeText(this, "弹出设置字体视图", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.ib_news_detail_bottom_bar_collection:
+                Toast.makeText(this, "收藏", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.ib_news_detail_bottom_bar_share:
+                Toast.makeText(this, "弹出分享", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    /**
+     * 修改了正文字体大小
+     */
+    private void didChangedFontSize(int fontSize) {
+        mContentWebView.loadUrl("javascript:setFontSize(" + fontSize + ")");
+    }
+
+    /**
+     * 修改了正文字体
+     */
+    private void didChangedFontName(String fontName) {
+        mContentWebView.loadUrl("javascript:setFontName('" + fontName + "');");
     }
 
     /**
@@ -151,9 +217,17 @@ public class NewsDetailActivity extends BaseActivity {
      */
     private void setupWebViewData() {
 
+        // 发布时间
+        String newstime = "";
+        try {
+            newstime = DateUtils.timestampToDateString(detailBean.getNewstime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         String html = "";
-        html += "<div class=\"title\">" + detailBean.getTitle() + "</div>";
-        html += "<div class=\"time\">" + detailBean.getBefrom() + "&nbsp;&nbsp;&nbsp;&nbsp;" + detailBean.getNewstime() + "</div>";
+        html += "<div class=\"title\">" + detailBean.getTitle() + "</div>\n";
+        html += "<div class=\"time\">" + detailBean.getBefrom() + "&nbsp;&nbsp;&nbsp;&nbsp;" + newstime + "</div>\n";
 
         // 新闻正文html
         String tempNewstext = detailBean.getNewstext();
@@ -181,21 +255,17 @@ public class NewsDetailActivity extends BaseActivity {
                 // 图片url
                 String imgUrl = insetPhotoBean.getUrl();
                 // 图片标签
-                String imgTag = "<img onclick='didTappedImage(" + i + ", \"" + imgUrl + "\");' src='" + placeholderImage + "' id='" + imgUrl + "' width='" + width + "' height='" + height + "' />";
+                String imgTag = "<img onclick='didTappedImage(" + i + ", '" + imgUrl + "');' src='" + placeholderImage + "' id='" + imgUrl + "' width='" + width + "' height='" + height + "' />";
 
                 // 将返回的html正文里的图片占位图替换成自定义的img标签
                 tempNewstext = tempNewstext.replace(placeholderString, imgTag);
 
             }
 
-            // 加载图片 - 从缓存中获取图片的本地绝对路径，发送给webView显示
-            getImageFromDownloaderOrDiskByImageUrlArray();
-
         }
 
         String fontSize = "18";
         String fontName = "";
-
         html += "<div id=\"content\" style=\"font-size: " + fontSize + "px; font-family: '" + fontName + "';\">" + tempNewstext + "</div>";
 
         String localHtml = null;
@@ -216,6 +286,8 @@ public class NewsDetailActivity extends BaseActivity {
         // 加载页面
         mContentWebView.loadDataWithBaseURL("file:///android_asset/www/html/article.html", filterHtml(html), "text/html", "utf-8", null);
 
+        LogUtils.d(TAG, html);
+
     }
 
     /**
@@ -225,10 +297,27 @@ public class NewsDetailActivity extends BaseActivity {
 
         for (ArticleDetailBean.InsetPhotoBean insetPhotoBean :
                 detailBean.getAllPhotoList()) {
-            final Uri uri = Uri.parse(insetPhotoBean.getUrl());
+
+            // 插图的url
+            final String url = insetPhotoBean.getUrl();
+            // 插图的占位字符
+            final String ref = insetPhotoBean.getRef();
 
             // 判断本地磁盘是否已经缓存
+            ImageCacheUtils.checkCacheInDisk(url, new ImageCacheUtils.OnCheckCacheInDiskListener() {
+                @Override
+                public void checkCacheInDisk(boolean isExist, String filePath) {
+                    LogUtils.d(TAG, isExist ? url + " " + filePath + " 存在" : url + " 不存在");
+                    if (isExist && filePath != null) {
+                        // 直接扔给js
+                        String sendData = "replaceimage" + url + "~" + filePath;
+                        mContentWebView.loadUrl("javascript:replaceContentImage('" + sendData + "');");
+                    } else {
+                        // 先去下载
 
+                    }
+                }
+            });
 
 
         }
@@ -251,12 +340,25 @@ public class NewsDetailActivity extends BaseActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // 返回时直接处理返回事件
             finish();
             overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private final class ArticleContent {
+
+        @JavascriptInterface
+        public void didTappedImage(final String jsonString) {
+            LogUtils.d(TAG, "线程 = " + Thread.currentThread().getName());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LogUtils.d(TAG, jsonString);
+                }
+            });
+        }
     }
 
 
