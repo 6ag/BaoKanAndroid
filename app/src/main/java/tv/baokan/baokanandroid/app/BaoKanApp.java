@@ -7,11 +7,25 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.facebook.binaryresource.BinaryResource;
+import com.facebook.binaryresource.FileBinaryResource;
+import com.facebook.cache.common.CacheKey;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.core.ImagePipelineFactory;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +33,6 @@ public class BaoKanApp extends Application {
 
     // 用于存放所有启动的Activity的集合
     private List<Activity> mActivityList;
-
-    public static float WINDOW_DENSITY; // 屏幕密度 dpi
-    public static int WINDOW_WIDTH;     // 屏幕宽度 px
-    public static int WINDOW_HEIGHT;    // 屏幕高度 px
 
     @Override
     public void onCreate() {
@@ -38,12 +48,6 @@ public class BaoKanApp extends Application {
 //        CrashHandler handler = CrashHandler.getInstance();
 //        handler.init(getApplicationContext());
 
-        // 获取屏幕尺寸
-        Resources resources = getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        WINDOW_DENSITY = dm.density;
-        WINDOW_WIDTH = dm.widthPixels;
-        WINDOW_HEIGHT = dm.heightPixels;
     }
 
     @Override

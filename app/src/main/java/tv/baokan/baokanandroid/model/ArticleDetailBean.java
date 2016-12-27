@@ -1,7 +1,10 @@
 package tv.baokan.baokanandroid.model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleDetailBean {
@@ -55,7 +58,66 @@ public class ArticleDetailBean {
     private List<ArticleDetailPhotoBean> morePicsList;
 
     public ArticleDetailBean(JSONObject article) {
+        try {
+            top = article.getString("top");
+            down = article.getString("down");
+            title = article.getString("title");
+            newstime = article.getString("newstime");
+            newstext = article.getString("newstext");
+            titleurl = article.getString("titleurl");
+            id = article.getString("id");
+            classid = article.getString("classid");
+            plnum = article.getString("plnum");
+            havefava = article.getString("havefava");
+            smalltext = article.getString("smalltext");
+            titlepic = article.getString("titlepic");
+            befrom = article.getString("befrom");
 
+            // 正文插图
+            allPhotoList = new ArrayList<>();
+            JSONArray allPhotoJsonArray = article.getJSONArray("allphoto");
+            for (int i = 0; i < allPhotoJsonArray.length(); i++) {
+                allPhotoList.add(new InsetPhotoBean(allPhotoJsonArray.getJSONObject(i)));
+            }
+
+            // 相关链接
+            otherLinks = new ArrayList<>();
+            JSONArray otherLinksJsonArray = article.getJSONArray("otherLink");
+            for (int i = 0; i < allPhotoJsonArray.length(); i++) {
+                otherLinks.add(new ArticleDetailLinkBean(otherLinksJsonArray.getJSONObject(i)));
+            }
+
+            // 图库图片
+            morePicsList = new ArrayList<>();
+            JSONArray morePicsListJsonArray = article.getJSONArray("morepic");
+            for (int i = 0; i < allPhotoJsonArray.length(); i++) {
+                morePicsList.add(new ArticleDetailPhotoBean(morePicsListJsonArray.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ArticleDetailBean{" +
+                "top='" + top + '\'' +
+                ", down='" + down + '\'' +
+                ", title='" + title + '\'' +
+                ", newstime='" + newstime + '\'' +
+                ", newstext='" + newstext + '\'' +
+                ", titleurl='" + titleurl + '\'' +
+                ", id='" + id + '\'' +
+                ", classid='" + classid + '\'' +
+                ", plnum='" + plnum + '\'' +
+                ", havefava='" + havefava + '\'' +
+                ", smalltext='" + smalltext + '\'' +
+                ", titlepic='" + titlepic + '\'' +
+                ", befrom='" + befrom + '\'' +
+                ", allPhotoList=" + allPhotoList +
+                ", otherLinks=" + otherLinks +
+                ", morePicsList=" + morePicsList +
+                '}';
     }
 
     public String getTop() {
@@ -141,7 +203,15 @@ public class ArticleDetailBean {
         private int heightPixel;
 
         InsetPhotoBean(JSONObject photo) {
-
+            try {
+                ref = photo.getString("ref");
+                caption = photo.getString("caption");
+                url = photo.getString("url");
+                widthPixel = photo.getJSONObject("pixel").getInt("width");
+                heightPixel = photo.getJSONObject("pixel").getInt("height");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         public String getRef() {
@@ -173,11 +243,20 @@ public class ArticleDetailBean {
         // 图片描述
         private String caption;
 
+        private String smallpic;
+
         // 图片url
         private String bigpic;
 
         ArticleDetailPhotoBean(JSONObject photo) {
-
+            try {
+                title = photo.getString("title");
+                caption = photo.getString("caption");
+                smallpic = photo.getString("smallpic");
+                bigpic = photo.getString("bigpic");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         public String getTitle() {
@@ -190,6 +269,10 @@ public class ArticleDetailBean {
 
         public String getBigpic() {
             return bigpic;
+        }
+
+        public String getSmallpic() {
+            return smallpic;
         }
     }
 
@@ -211,7 +294,15 @@ public class ArticleDetailBean {
         private String classname;
 
         ArticleDetailLinkBean(JSONObject linkArticle) {
-
+            try {
+                classid = linkArticle.getString("classid");
+                id = linkArticle.getString("id");
+                onclick = linkArticle.getString("onclick");
+                title = linkArticle.getString("title");
+                classname = linkArticle.getString("classname");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         public String getClassid() {

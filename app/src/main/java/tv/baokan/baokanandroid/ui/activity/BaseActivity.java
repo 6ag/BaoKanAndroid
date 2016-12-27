@@ -1,7 +1,9 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import tv.baokan.baokanandroid.app.BaoKanApp;
@@ -21,6 +23,11 @@ public class BaseActivity extends AppCompatActivity {
 
         // 添加当前activity
         addActivity();
+
+        // 透明状态栏
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
     }
 
     @Override

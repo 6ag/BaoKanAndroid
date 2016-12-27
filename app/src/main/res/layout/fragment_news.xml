@@ -49,6 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_news_title_bar"
         android:overScrollMode="never"
+        android:scrollbars="none"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

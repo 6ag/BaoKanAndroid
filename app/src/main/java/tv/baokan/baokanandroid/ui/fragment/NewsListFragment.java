@@ -4,8 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -15,12 +13,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.lcodecore.tkrefreshlayout.Footer.BottomProgressView;
-import com.lcodecore.tkrefreshlayout.IHeaderView;
-import com.lcodecore.tkrefreshlayout.OnAnimEndListener;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.header.SinaRefreshView;
@@ -48,6 +43,7 @@ import tv.baokan.baokanandroid.ui.activity.NewsDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.SizeUtils;
 
 public class NewsListFragment extends BaseFragment {
 
@@ -88,6 +84,28 @@ public class NewsListFragment extends BaseFragment {
         mNewsListRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         newsListAdapter = new NewsListAdapter();
         mNewsListRecyclerView.setAdapter(newsListAdapter);
+
+        // 监听滚动
+        mNewsListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                switch (newState) {
+                    // 拖拽的时候停止加载图片
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                        if (!Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().pause();
+                        }
+                        break;
+                    // 松开手后恢复加载
+                    case RecyclerView.SCROLL_STATE_SETTLING:
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        if (Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().resume();
+                        }
+                        break;
+                }
+            }
+        });
 
         // 设置刷新监听器
         setupRefresh();
@@ -230,7 +248,7 @@ public class NewsListFragment extends BaseFragment {
             titles.add(bean.getTitle());
         }
 
-        banner.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (BaoKanApp.WINDOW_HEIGHT * 0.3)));
+        banner.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (SizeUtils.getScreenHeightPx(getActivity()) * 0.3)));
 
         // 配置banner
         banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
@@ -276,6 +294,7 @@ public class NewsListFragment extends BaseFragment {
      */
     private void openArticleDetail(ArticleListBean articleBean) {
         NewsDetailActivity.start(mContext, articleBean.getClassid(), articleBean.getId());
+        getActivity().overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
     }
 
     // item类型枚举
