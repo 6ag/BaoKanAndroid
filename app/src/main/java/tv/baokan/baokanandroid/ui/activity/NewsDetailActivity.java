@@ -481,7 +481,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            RecyclerView.ViewHolder holder;
+            final RecyclerView.ViewHolder holder;
             View view;
             if (viewType == LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal()) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_notitlepic, parent, false);
@@ -490,6 +490,15 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_titlepic, parent, false);
                 holder = new TitlePicViewHolder(view);
             }
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    // 进入相关链接的
+                    NewsDetailActivity.start(mContext, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
+                    NewsDetailActivity.this.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
+                }
+            });
             return holder;
         }
 
@@ -524,9 +533,11 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             TextView classNameTextView;
             TextView onclickTextView;
             View lineView;
+            View itemView;
 
             LinkBaseViewHolder(View itemView) {
                 super(itemView);
+                this.itemView = itemView;
                 titleTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_title);
                 classNameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_classname);
                 onclickTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_onclick);
