@@ -9,23 +9,303 @@
     tools:context="tv.baokan.baokanandroid.ui.activity.NewsDetailActivity">
 
     <!--滚动区域-->
-    <ScrollView
+    <tv.baokan.baokanandroid.widget.BounceScrollView
         android:id="@+id/sv_news_detail_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:background="#ffffff"
         android:overScrollMode="never"
-        android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:scrollbars="vertical">
 
-        <!--正文-->
-        <WebView
-            android:id="@+id/wv_news_detail_webview"
+        <!--内容页整个滚动区域-->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
-        </WebView>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    </ScrollView>
+            <!--正文-->
+            <WebView
+                android:id="@+id/wv_news_detail_webview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+            </WebView>
+
+            <!--文章来源-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文章来源："
+                    android:textColor="#969696"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="爆侃网文综合整理"
+                    android:textColor="#969696"/>
+            </LinearLayout>
+
+            <!--分享横线-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="#ccc"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="分享"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="#ccc"/>
+
+            </LinearLayout>
+
+            <!--3个分享按钮-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/news_content_share_button_shape"
+                    android:drawableStart="@drawable/article_content_qq_normal"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="30dp"
+                    android:text="QQ"
+                    android:textColor="#BEBEBE"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/news_content_share_button_shape"
+                    android:drawableStart="@drawable/article_content_share_weixin"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="30dp"
+                    android:text="微信"
+                    android:textColor="#BEBEBE"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/news_content_share_button_shape"
+                    android:drawableStart="@drawable/article_content_share_pyq"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="30dp"
+                    android:text="朋友圈"
+                    android:textColor="#BEBEBE"/>
+
+            </LinearLayout>
+
+            <!--推荐横线-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="#ccc"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="推荐"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="#ccc"/>
+
+            </LinearLayout>
+
+            <!--二维码广告-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/news_detail_ad"/>
+
+
+            <!--相关阅读-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <!--相关阅读组头-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#efefef">
+
+                    <View
+                        android:layout_width="3dp"
+                        android:layout_height="match_parent"
+                        android:background="#d70606"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="6dp"
+                        android:text="相关阅读"/>
+
+                </LinearLayout>
+
+                <!--相关阅读内容列表-->
+                <android.support.v7.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+            <!--最近评论-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <!--评论组头-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#efefef">
+
+                    <View
+                        android:layout_width="3dp"
+                        android:layout_height="match_parent"
+                        android:background="#d70606"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="6dp"
+                        android:text="最近评论"/>
+
+                </LinearLayout>
+
+                <!--最近评论内容列表-->
+                <android.support.v7.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <!--更多评论 在超过10条评论后才显示-->
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:text="更多评论"/>
+
+            </LinearLayout>
+
+            <!--上拉动画返回视图 2层 hide show-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!--上拉关闭当前页-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/newscontent_drag_arrow"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="上拉关闭当前页"/>
+
+                </LinearLayout>
+
+                <!--释放关闭当前页-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/newscontent_drag_return"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="释放关闭当前页"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </tv.baokan.baokanandroid.widget.BounceScrollView>
 
     <!--顶部白色透明条-->
     <View
@@ -50,12 +330,13 @@
             android:layout_height="0.1dp"
             android:background="#cccccc"/>
 
+        <!--5个功能按钮-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp">
+            android:paddingBottom="9dp"
+            android:paddingTop="9dp">
 
             <ImageButton
                 android:id="@+id/ib_news_detail_bottom_bar_back"
@@ -98,7 +379,18 @@
                 android:src="@drawable/bottom_bar_share_selected"/>
 
         </LinearLayout>
-
     </LinearLayout>
+
+    <!--修改字体的视图-->
+    <RelativeLayout
+        android:id="@+id/rl_news_detail_bottom_font_bar"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#ccc"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

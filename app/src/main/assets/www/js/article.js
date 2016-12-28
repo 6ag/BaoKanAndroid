@@ -1,4 +1,3 @@
-
 // 图片点击事件
 function didTappedImage(index, url) {
     var image = document.getElementById(url);
@@ -10,8 +9,8 @@ function didTappedImage(index, url) {
     y = y + document.documentElement.scrollTop;
 
     var json = {'index' : index, 'x' : x, 'y' : y, 'width' : width, 'height' : height, 'url' : url};
-    var jsonString = json.toJSONString();
-    window.ARTICLE.didTappedImage(jsonString);
+    var jsonString = JSON.stringify(json);
+    ARTICLE.didTappedImage(jsonString);
 }
 
 // 设置字体
@@ -41,9 +40,9 @@ function replaceContentImage(message) {
         var messagepath = message.substring(index + 1);
         messagereplace = messagereplace.replace(/replaceimage/, "");
 
-        var element = document.getElementById(messagereplace);
 
         // 保证只替换一次
+        var element = document.getElementById(messagereplace);
         if (element.src.match("loading")) {
             element.src = messagepath;
         }

@@ -3,6 +3,8 @@ package tv.baokan.baokanandroid.app;
 import android.app.Activity;
 import android.app.Application;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,11 @@ public class BaoKanApp extends Application {
         // 存放所有activity的集合
         mActivityList = new ArrayList<>();
 
-        // 初始化Fresco
-        Fresco.initialize(this);
+        // 渐进式图片
+        ImagePipelineConfig config=ImagePipelineConfig.newBuilder(this)
+                .setProgressiveJpegConfig(new SimpleProgressiveJpegConfig())
+                .build();
+        Fresco.initialize(this,config);
 
         // 初始化app异常处理器
 //        CrashHandler handler = CrashHandler.getInstance();
