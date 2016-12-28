@@ -83,14 +83,14 @@ public class ArticleDetailBean {
             // 相关链接
             otherLinks = new ArrayList<>();
             JSONArray otherLinksJsonArray = article.getJSONArray("otherLink");
-            for (int i = 0; i < allPhotoJsonArray.length(); i++) {
+            for (int i = 0; i < otherLinksJsonArray.length(); i++) {
                 otherLinks.add(new ArticleDetailLinkBean(otherLinksJsonArray.getJSONObject(i)));
             }
 
             // 图库图片
             morePicsList = new ArrayList<>();
             JSONArray morePicsListJsonArray = article.getJSONArray("morepic");
-            for (int i = 0; i < allPhotoJsonArray.length(); i++) {
+            for (int i = 0; i < morePicsListJsonArray.length(); i++) {
                 morePicsList.add(new ArticleDetailPhotoBean(morePicsListJsonArray.getJSONObject(i)));
             }
         } catch (JSONException e) {
@@ -290,6 +290,8 @@ public class ArticleDetailBean {
         // 标题
         private String title;
 
+        private String titlepic;
+
         // 分类名称
         private String classname;
 
@@ -299,6 +301,7 @@ public class ArticleDetailBean {
                 id = linkArticle.getString("id");
                 onclick = linkArticle.getString("onclick");
                 title = linkArticle.getString("title");
+                titlepic = linkArticle.getString("titlepic");
                 classname = linkArticle.getString("classname");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -319,6 +322,10 @@ public class ArticleDetailBean {
 
         public String getTitle() {
             return title;
+        }
+
+        public String getTitlepic() {
+            return titlepic;
         }
 
         public String getClassname() {

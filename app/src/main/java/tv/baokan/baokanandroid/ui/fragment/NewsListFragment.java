@@ -401,9 +401,9 @@ public class NewsListFragment extends BaseFragment {
                 onePicViewHolder.imageView1.setImageURI(Uri.parse(bean.getTitlepic()));
             } else if (holder instanceof MorePicViewHolder) {
                 MorePicViewHolder morePicViewHolder = (MorePicViewHolder) holder;
-                morePicViewHolder.imageView1.setImageURI(Uri.parse(bean.getMorepic()[0]));
-                morePicViewHolder.imageView2.setImageURI(Uri.parse(bean.getMorepic()[1]));
-                morePicViewHolder.imageView3.setImageURI(Uri.parse(bean.getMorepic()[2]));
+                morePicViewHolder.imageView1.setImageURI(bean.getMorepic()[0]);
+                morePicViewHolder.imageView2.setImageURI(bean.getMorepic()[1]);
+                morePicViewHolder.imageView3.setImageURI(bean.getMorepic()[2]);
             }
         }
 

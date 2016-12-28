@@ -10,7 +10,7 @@
 
     <!--滚动区域-->
     <tv.baokan.baokanandroid.widget.BounceScrollView
-        android:id="@+id/sv_news_detail_scrollview"
+        android:id="@+id/bsv_news_detail_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="10dp"
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:orientation="horizontal"
-                android:padding="5dp">
+                android:padding="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -171,10 +171,9 @@
 
             <!--相关阅读-->
             <LinearLayout
+                android:id="@+id/ll_news_detail_links"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
                 android:orientation="vertical">
 
                 <!--相关阅读组头-->
@@ -200,6 +199,7 @@
 
                 <!--相关阅读内容列表-->
                 <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_news_detail_links_recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -212,7 +212,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
                 android:orientation="vertical">
 
                 <!--评论组头-->

@@ -2,24 +2,28 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -29,6 +33,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.List;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
@@ -46,19 +51,24 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
     private static final String TAG = "NewsDetailActivity";
 
-    private String classid;   // 栏目id
-    private String id;        // 文章id
-    private ScrollView mScrollView;
-    private WebView mContentWebView;
-    private ImageButton mBackButton;
-    private ImageButton mEditButton;
-    private ImageButton mFontButton;
-    private ImageButton mCollectionButton;
-    private ImageButton mShareButton;
-    private ArticleDetailBean detailBean;
+    private String classid;                 // 栏目id
+    private String id;                      // 文章id
+    private ArticleDetailBean detailBean;   // 新闻详情模型
 
-    RelativeLayout mFontBar;
-    BottomSheetBehavior mFontBarBehavior;
+    private ScrollView mScrollView;         // 内容载体 scrollView
+    private WebView mContentWebView;        // 正文载体 webView
+    private ImageButton mBackButton;        // 底部条 返回
+    private ImageButton mEditButton;        // 底部条 编辑发布评论信息
+    private ImageButton mFontButton;        // 底部条 设置字体
+    private ImageButton mCollectionButton;  // 收藏
+    private ImageButton mShareButton;       // 分享
+
+    private LinearLayout mLinkLayout;       // 相关阅读
+    private RecyclerView mLinkRecyclerView; // 相关阅读列表
+    private LinkRecyclerViewAdapter mLinkRecyclerViewAdapter;
+
+    RelativeLayout mFontBar;                // 设置字体的布局载体
+    BottomSheetBehavior mFontBarBehavior;   // 设置字体的行为
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +101,24 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      * 准备UI
      */
     private void prepareUI() {
-        mScrollView = (ScrollView) findViewById(R.id.sv_news_detail_scrollview);
+        mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
         mContentWebView = (WebView) findViewById(R.id.wv_news_detail_webview);
         mBackButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_back);
         mEditButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_edit);
         mFontButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_font);
         mCollectionButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_collection);
         mShareButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_share);
+        mLinkLayout = (LinearLayout) findViewById(R.id.ll_news_detail_links);
+        mLinkRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_links_recyclerview);
 
+        // 底部工具条按钮点击事件
+        mBackButton.setOnClickListener(this);
+        mEditButton.setOnClickListener(this);
+        mFontButton.setOnClickListener(this);
+        mCollectionButton.setOnClickListener(this);
+        mShareButton.setOnClickListener(this);
+
+        // 底部字体设置视图
         mFontBar = (RelativeLayout) findViewById(R.id.rl_news_detail_bottom_font_bar);
         mFontBarBehavior = BottomSheetBehavior.from(mFontBar);
         mFontBarBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -113,11 +133,15 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             }
         });
 
-        mBackButton.setOnClickListener(this);
-        mEditButton.setOnClickListener(this);
-        mFontButton.setOnClickListener(this);
-        mCollectionButton.setOnClickListener(this);
-        mShareButton.setOnClickListener(this);
+        // 相关链接列表
+        mLinkRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mLinkRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
     }
 
     /**
@@ -226,9 +250,13 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         // 加载webView
         setupWebViewData();
 
-        // 更新收藏状态
-
         // 更新相关链接
+        if (detailBean.getOtherLinks() != null) {
+            mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
+            mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
+        }
+
+        // 更新收藏状态
 
     }
 
@@ -425,5 +453,106 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    // 相关链接item类型枚举
+    enum LINK_ITEM_TYPE {
+        NO_TITLE_PIC, // 无图
+        TITLE_PIC     // 有图
+    }
+
+    // 相关链接适配器
+    private class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+        List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList;
+        Context mContext;
+
+        LinkRecyclerViewAdapter(List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList, Context mContext) {
+            this.linkBeanList = linkBeanList;
+            this.mContext = mContext;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (linkBeanList.get(position).getTitlepic() == null) {
+                return LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal();
+            } else {
+                return LINK_ITEM_TYPE.TITLE_PIC.ordinal();
+            }
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            RecyclerView.ViewHolder holder;
+            View view;
+            if (viewType == LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal()) {
+                view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_notitlepic, parent, false);
+                holder = new NoTitlePicViewHolder(view);
+            } else {
+                view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_titlepic, parent, false);
+                holder = new TitlePicViewHolder(view);
+            }
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            ArticleDetailBean.ArticleDetailLinkBean linkBean = linkBeanList.get(position);
+            LinkBaseViewHolder baseViewHolder = (LinkBaseViewHolder) holder;
+            baseViewHolder.titleTextView.setText(linkBean.getTitle());
+            baseViewHolder.classNameTextView.setText(linkBean.getClassname());
+            baseViewHolder.onclickTextView.setText(linkBean.getOnclick());
+            if (holder instanceof TitlePicViewHolder) {
+                TitlePicViewHolder titlePicViewHolder = (TitlePicViewHolder) holder;
+                titlePicViewHolder.titlePicView.setImageURI(linkBean.getTitlepic());
+            }
+            // 最后一个分割线隐藏
+            if (position == linkBeanList.size() - 1) {
+                baseViewHolder.lineView.setVisibility(View.INVISIBLE);
+            } else {
+                baseViewHolder.lineView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return linkBeanList.size();
+        }
+
+        // 相关链接item基类
+        class LinkBaseViewHolder extends RecyclerView.ViewHolder {
+
+            TextView titleTextView;
+            TextView classNameTextView;
+            TextView onclickTextView;
+            View lineView;
+
+            LinkBaseViewHolder(View itemView) {
+                super(itemView);
+                titleTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_title);
+                classNameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_classname);
+                onclickTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_onclick);
+                lineView = itemView.findViewById(R.id.v_cell_news_detail_link_line);
+            }
+        }
+
+        // 无图的item
+        class NoTitlePicViewHolder extends LinkBaseViewHolder {
+
+            NoTitlePicViewHolder(View itemView) {
+                super(itemView);
+            }
+        }
+
+        // 有图的item
+        class TitlePicViewHolder extends LinkBaseViewHolder {
+
+            SimpleDraweeView titlePicView;
+
+            TitlePicViewHolder(View itemView) {
+                super(itemView);
+                titlePicView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_link_pic);
+            }
+        }
+
+    }
 
 }
