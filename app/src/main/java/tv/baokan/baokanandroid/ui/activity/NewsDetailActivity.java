@@ -2,7 +2,6 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,10 +28,6 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -94,28 +89,20 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
     private AlertDialog setFontDialog;      // 设置字体的会话框
     private int fontSize;                   // 修改后的字体大小
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 将MIUI/魅族的状态栏改成暗色
-        if (!StatusUtils.setMiuiStatusBarDarkMode(this, true)) {
-            StatusUtils.setMeizuStatusBarDarkMode(this, true);
+        if (!StatusUtils.setMiuiStatusBarDarkMode(this, true) && !StatusUtils.setMeizuStatusBarDarkMode(this, true)) {
+            LogUtils.d(TAG, "修改状态栏没有作用");
         }
         setContentView(R.layout.activity_news_detail);
-
         mContext = this;
 
         prepareUI();
         prepareData();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
     }
 
     /**
@@ -477,7 +464,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private void setupCommentData() {
 
         // 加载评论数据
-        if (commentBeanList != null) {
+        if (commentBeanList != null && commentBeanList.size() > 0) {
             mCommentLayout.setVisibility(View.VISIBLE);
             mCommentRecyclerViewAdapter = new CommentRecyclerViewAdapter(commentBeanList, this);
             mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
@@ -498,12 +485,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private void setupWebViewData() {
 
         // 发布时间
-        String newstime = "";
-        try {
-            newstime = DateUtils.timestampToDateString(detailBean.getNewstime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        String newstime = newstime = DateUtils.getStringTime(detailBean.getNewstime());;
 
         String html = "";
         html += "<div class=\"title\">" + detailBean.getTitle() + "</div>\n";
@@ -527,7 +509,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                     width = (int) ((float) width * rate);
                     height = (int) ((float) height * rate);
                 }
-
+                
                 // 占位图
                 String placeholderImage = "file:///android_asset/www/images/loading.jpg";
                 // 占位字符串
@@ -634,42 +616,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             return true;
         }
         return super.onKeyDown(keyCode, event);
-    }
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("NewsDetail Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
     }
 
     // java调用js需要在主线程调用

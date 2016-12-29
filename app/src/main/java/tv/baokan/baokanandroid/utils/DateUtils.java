@@ -15,9 +15,17 @@ public class DateUtils {
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
         Date date = simpleDateFormat.parse(timestamp);
-        long ts = date.getTime();
+        long ts = date.getTime() / 1000;
         res = String.valueOf(ts);
         return res;
     }
 
+    // 将时间戳转为字符串
+    public static String getStringTime(String cc_time) {
+        String re_StrTime = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        long lcc_time = Long.valueOf(cc_time);
+        re_StrTime = sdf.format(new Date(lcc_time * 1000L));
+        return re_StrTime;
+    }
 }

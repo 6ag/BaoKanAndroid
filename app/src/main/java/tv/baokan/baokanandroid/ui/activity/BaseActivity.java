@@ -1,11 +1,14 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class BaseActivity extends AppCompatActivity {

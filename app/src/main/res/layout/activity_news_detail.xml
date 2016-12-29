@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            
+
             <!--正文-->
             <WebView
                 android:id="@+id/wv_news_detail_webview"
@@ -75,7 +75,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
-                    android:text="分享"/>
+                    android:text="分享"
+                    android:textColor="#969696"
+                    android:textSize="12sp"/>
 
                 <View
                     android:layout_width="0dp"
@@ -152,7 +154,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
-                    android:text="推荐"/>
+                    android:text="推荐"
+                    android:textColor="#969696"
+                    android:textSize="12sp"/>
 
                 <View
                     android:layout_width="0dp"

@@ -386,11 +386,7 @@ public class NewsListFragment extends BaseFragment {
             ArticleListBean bean = articleListBeans.get(getRealPosition(position));
             BaseViewHolder viewHolder = (BaseViewHolder) holder;
             viewHolder.titleTextView.setText(bean.getTitle());
-            try {
-                viewHolder.timeTextView.setText(DateUtils.timestampToDateString(bean.getNewstime()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            viewHolder.timeTextView.setText(DateUtils.getStringTime(bean.getNewstime()));
             viewHolder.plnumTextView.setText(bean.getPlnum());
             viewHolder.onclickTextView.setText(bean.getOnclick());
 
