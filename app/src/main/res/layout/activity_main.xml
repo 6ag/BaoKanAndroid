@@ -9,6 +9,9 @@
 
     <!--内容主体-->
     <FrameLayout
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true"
+        android:background="@color/colorPrimary"
         android:id="@+id/fl_main_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"

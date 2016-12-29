@@ -1,14 +1,10 @@
 package tv.baokan.baokanandroid.ui.activity;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.RadioGroup;
 
 import java.util.ArrayList;
@@ -20,7 +16,6 @@ import tv.baokan.baokanandroid.ui.fragment.HotFragment;
 import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
 import tv.baokan.baokanandroid.ui.fragment.PhotoFragment;
 import tv.baokan.baokanandroid.ui.fragment.ProfileFragment;
-import tv.baokan.baokanandroid.utils.LogUtils;
 
 public class MainActivity extends BaseActivity {
 

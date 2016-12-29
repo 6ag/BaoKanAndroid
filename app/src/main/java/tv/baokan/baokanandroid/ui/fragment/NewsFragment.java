@@ -4,7 +4,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class NewsFragment extends BaseFragment {
         }
 
         for (int i = 0; i < selectedList.size(); i++) {
-            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).get("classid"));
+            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).get("classid"), true);
             newsListFragments.add(newsListFragment);
         }
 

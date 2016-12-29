@@ -6,7 +6,7 @@
                 android:background="@color/colorAllBackgroundColor">
 
     <LinearLayout
-        android:id="@+id/ll_news_title_bar"
+        android:id="@+id/ll_photo_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -15,10 +15,9 @@
         android:orientation="horizontal">
 
         <android.support.design.widget.TabLayout
-            android:id="@+id/tl_news_tabLayout"
-            android:layout_width="0dp"
+            android:id="@+id/tl_photo_tabLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:background="@color/colorPrimary"
             app:tabGravity="fill"
             app:tabIndicatorColor="#FFFFFF"
@@ -28,22 +27,13 @@
             app:tabTextAppearance="@style/NewsTabLayoutTextAppearance"
             app:tabTextColor="#dfe1e1"/>
 
-        <ImageButton
-            android:id="@+id/ib_news_class_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@null"
-            android:padding="10dp"
-            android:src="@drawable/title_nav_plus_normal"/>
-
     </LinearLayout>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/vp_news_viewPager"
+        android:id="@+id/vp_photo_viewPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ll_news_title_bar"
+        android:layout_below="@+id/ll_photo_title_bar"
         android:layout_centerHorizontal="true"
         android:overScrollMode="never"
         android:scrollbars="none"/>

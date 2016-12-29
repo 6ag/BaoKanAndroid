@@ -4,5 +4,10 @@
     <color name="colorPrimary">#D23F42</color>
     <color name="colorPrimaryDark">#D23F42</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorGray">#ccc</color>
+
+    <!--导航栏灰色-->
+    <color name="colorGray">#F4F4F4</color>
+
+    <!--所有界面背景颜色-->
+    <color name="colorAllBackgroundColor">#fff</color>
 </resources>

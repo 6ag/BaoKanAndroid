@@ -47,8 +47,9 @@ import tv.baokan.baokanandroid.utils.SizeUtils;
 
 public class NewsListFragment extends BaseFragment {
 
-    private String classid;     // 栏目id
-    private int pageIndex = 1;  // 当前页码
+    private String classid;      // 栏目id
+    private boolean isShowBanner; // 是否显示banner
+    private int pageIndex = 1;   // 当前页码
 
     private TwinklingRefreshLayout refreshLayout;  // 上下拉刷新
     private RecyclerView mNewsListRecyclerView;    // 列表视图
@@ -56,10 +57,11 @@ public class NewsListFragment extends BaseFragment {
     private List<ArticleListBean> articleListBeans = new ArrayList<>(); // 列表数据
     private List<ArticleListBean> isGoodArticleBeans = new ArrayList<>(); // 幻灯片数据
 
-    public static NewsListFragment newInstance(String classid) {
+    public static NewsListFragment newInstance(String classid, boolean isShowBanner) {
         NewsListFragment newFragment = new NewsListFragment();
         Bundle bundle = new Bundle();
         bundle.putString("classid", classid);
+        bundle.putBoolean("isShowBanner", isShowBanner);
         newFragment.setArguments(bundle);
         return newFragment;
     }
@@ -79,6 +81,7 @@ public class NewsListFragment extends BaseFragment {
         Bundle args = getArguments();
         if (args != null) {
             classid = args.getString("classid");
+            isShowBanner = args.getBoolean("isShowBanner");
         }
 
         mNewsListRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -201,12 +204,9 @@ public class NewsListFragment extends BaseFragment {
                                         isGoodArticleBeans.add(tempListBeans.get(1));
                                         isGoodArticleBeans.add(tempListBeans.get(2));
                                     }
-
                                     // 刷新列表数据
                                     newsListAdapter.notifyDataSetChanged();
                                 }
-                                // 停止刷新
-                                refreshLayout.finishRefreshing();
                             } else {
                                 // 上拉加载
                                 if (minId.compareTo(tempListBeans.get(0).getId()) >= 1) {
@@ -214,12 +214,17 @@ public class NewsListFragment extends BaseFragment {
                                     // 刷新列表数据
                                     newsListAdapter.notifyDataSetChanged();
                                 }
-                                // 停止刷新
-                                refreshLayout.finishLoadmore();
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } finally {
+                            // 结束刷新
+                            if (method == 0) {
+                                refreshLayout.finishRefreshing();
+                            } else {
+                                refreshLayout.finishLoadmore();
+                            }
                         }
 
                     }
@@ -308,19 +313,26 @@ public class NewsListFragment extends BaseFragment {
 
         // 真实的item位置
         private int getRealPosition(int position) {
-            return position - 1;
+            if (isShowBanner) {
+                return position - 1;
+            }
+            return position;
         }
 
         @Override
         public int getItemCount() {
-            return articleListBeans.size() + 1;
+            if (isShowBanner) {
+                return articleListBeans.size() + 1;
+            } else {
+                return articleListBeans.size();
+            }
         }
 
         @Override
         public int getItemViewType(int position) {
 
             // 头部轮播
-            if (position == 0) {
+            if (position == 0 && isShowBanner) {
                 return NEWS_ITEM_TYPE.HEADER_VIEW.ordinal();
             }
 

@@ -8,7 +8,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class BaseActivity extends AppCompatActivity {
@@ -27,7 +26,7 @@ public class BaseActivity extends AppCompatActivity {
         // 添加当前activity
         addActivity();
 
-        // 透明状态栏
+        // 沉浸式
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }

@@ -90,6 +90,20 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private AlertDialog setFontDialog;      // 设置字体的会话框
     private int fontSize;                   // 修改后的字体大小
 
+    /**
+     * 便捷启动当前activity
+     *
+     * @param context 上下文
+     * @param classid 栏目id
+     * @param id      文章id
+     */
+    public static void start(Context context, String classid, String id) {
+        Intent intent = new Intent(context, NewsDetailActivity.class);
+        intent.putExtra("classid_key", classid);
+        intent.putExtra("id_key", id);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,20 +117,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         prepareUI();
         prepareData();
 
-    }
-
-    /**
-     * 便捷启动当前activity
-     *
-     * @param context 上下文
-     * @param classid 栏目id
-     * @param id      文章id
-     */
-    public static void start(Context context, String classid, String id) {
-        Intent intent = new Intent(context, NewsDetailActivity.class);
-        intent.putExtra("classid_key", classid);
-        intent.putExtra("id_key", id);
-        context.startActivity(intent);
     }
 
     /**
@@ -509,7 +509,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                     width = (int) ((float) width * rate);
                     height = (int) ((float) height * rate);
                 }
-                
+
                 // 占位图
                 String placeholderImage = "file:///android_asset/www/images/loading.jpg";
                 // 占位字符串
