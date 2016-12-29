@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="20dp">
+
+    <EditText
+        android:id="@+id/et_comment_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/shape_comment_edittext"
+        android:gravity="start|top"
+        android:hint="来一发呗!"
+        android:padding="5dp"
+        android:textColor="#000"
+        android:textColorHint="#ccc"
+        android:textSize="14sp"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_set_font_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:background="@drawable/selector_red_button"
+            android:text="取消"
+            android:textColor="#fff"/>
+
+        <Button
+            android:id="@+id/btn_set_font_send"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/selector_red_button"
+            android:text="发送"
+            android:textColor="#fff"/>
+    </LinearLayout>
+
+</LinearLayout>

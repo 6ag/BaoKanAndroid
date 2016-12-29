@@ -2,10 +2,12 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -26,20 +29,27 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
+import tv.baokan.baokanandroid.model.CommentBean;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.ImageCacheUtils;
@@ -59,6 +69,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private String classid;                 // 栏目id
     private String id;                      // 文章id
     private ArticleDetailBean detailBean;   // 新闻详情模型
+    private List<CommentBean> commentBeanList; // 评论模型集合
 
     private ProgressBar mProgressBar;       // 进度圈
     private ScrollView mScrollView;         // 内容载体 scrollView
@@ -73,8 +84,21 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private RecyclerView mLinkRecyclerView; // 相关阅读列表
     private LinkRecyclerViewAdapter mLinkRecyclerViewAdapter;
 
+    private LinearLayout mCommentLayout;       // 评论
+    private RecyclerView mCommentRecyclerView; // 评论列表
+    private CommentRecyclerViewAdapter mCommentRecyclerViewAdapter;
+    private Button mMoreCommentButton;          // 更多评论
+
+    private AlertDialog commentDialog;      // 评论会话框
+    private EditText commentEditText;       // 评论文本框
+
     private AlertDialog setFontDialog;      // 设置字体的会话框
     private int fontSize;                   // 修改后的字体大小
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +113,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
         prepareUI();
         prepareData();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     /**
@@ -119,9 +146,33 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mShareButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_share);
         mLinkLayout = (LinearLayout) findViewById(R.id.ll_news_detail_links);
         mLinkRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_links_recyclerview);
+        mCommentLayout = (LinearLayout) findViewById(R.id.ll_news_detail_comment);
+        mCommentRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_comment_recyclerview);
+        mMoreCommentButton = (Button) findViewById(R.id.btn_news_detail_comment_more);
 
         // view硬件加速
         mScrollView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+        // 新闻正文
+        WebSettings webSettings = mContentWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        mContentWebView.addJavascriptInterface(new ArticleJavascriptInterface(), "ARTICLE");
+        mContentWebView.setWebChromeClient(new WebChromeClient() {
+        });
+        mContentWebView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // 隐藏加载进度条
+                mProgressBar.setVisibility(View.INVISIBLE);
+                // 网页加载完成才去加载其他UI
+                setupDetailData();
+                // 加载网页缓存图片
+                getImageFromDownloaderOrDiskByImageUrlArray();
+            }
+
+        });
 
         // 底部工具条按钮点击事件
         mBackButton.setOnClickListener(this);
@@ -151,6 +202,36 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             }
         });
 
+        // 评论列表
+        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mCommentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_SETTLING:
+                        if (!Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().pause();
+                        }
+                        break;
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        if (Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().resume();
+                        }
+                        break;
+                }
+            }
+        });
+
+        // 更多评论
+        mMoreCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到评论列表
+
+            }
+        });
+
     }
 
     /**
@@ -162,26 +243,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         Intent intent = getIntent();
         classid = intent.getStringExtra("classid_key");
         id = intent.getStringExtra("id_key");
-
-        WebSettings webSettings = mContentWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        mContentWebView.addJavascriptInterface(new ArticleJavascriptInterface(), "ARTICLE");
-        mContentWebView.setWebChromeClient(new WebChromeClient() {
-        });
-        mContentWebView.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                // 隐藏加载进度条
-                mProgressBar.setVisibility(View.INVISIBLE);
-                // 网页加载完成才去加载其他UI
-                setupDetailData();
-                // 加载网页缓存图片
-                getImageFromDownloaderOrDiskByImageUrlArray();
-            }
-
-        });
 
         // 加载网络数据
         loadNewsDetailFromNetwork();
@@ -195,10 +256,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
                 break;
             case R.id.ib_news_detail_bottom_bar_edit:
-                Toast.makeText(this, "弹出评论", Toast.LENGTH_SHORT).show();
+                showCommentDialog();
                 break;
             case R.id.ib_news_detail_bottom_bar_font:
-                // 弹出修改字体的视图
                 showSetFontDialog();
                 break;
             case R.id.ib_news_detail_bottom_bar_collection:
@@ -208,6 +268,42 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 Toast.makeText(this, "弹出分享", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    /**
+     * 弹出评论的会话框
+     */
+    private void showCommentDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.dialog_comment, null);
+        builder.setView(view);
+        builder.setCancelable(true);
+        commentDialog = builder.create();
+        commentDialog.show();
+
+        commentEditText = (EditText) view.findViewById(R.id.et_comment_edittext);
+        Button cancelButton = (Button) view.findViewById(R.id.btn_set_font_cancel);
+        Button sendButton = (Button) view.findViewById(R.id.btn_set_font_send);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentDialog.dismiss();
+            }
+        });
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String comment = commentEditText.getText().toString();
+                if (!TextUtils.isEmpty(comment)) {
+                    // 发布评论
+
+                    commentDialog.dismiss();
+                } else {
+                    Toast.makeText(mContext, "请输入评论内容", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 
     /**
@@ -288,7 +384,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void loadNewsDetailFromNetwork() {
 
-        LogUtils.d(TAG, APIs.ARTICLE_DETAIL);
         OkHttpUtils
                 .get()
                 .url(APIs.ARTICLE_DETAIL)
@@ -298,7 +393,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-
+                        Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -308,6 +403,45 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                             detailBean = new ArticleDetailBean(jsonObject);
                             // 加载webView
                             setupWebViewData();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+    }
+
+    /**
+     * 加载评论数据
+     */
+    private void loadCommentFromNetwork() {
+        OkHttpUtils
+                .get()
+                .url(APIs.GET_COMMENT)
+                .addParams("classid", classid)
+                .addParams("id", id)
+                .addParams("pageIndex", "1")
+                .addParams("pageSize", "10")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            List<CommentBean> tempBeanList = new ArrayList<>();
+                            JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                CommentBean commentBean = new CommentBean(jsonArray.getJSONObject(i));
+                                tempBeanList.add(commentBean);
+                            }
+                            commentBeanList = tempBeanList;
+
+                            // 配置评论数据
+                            setupCommentData();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -333,6 +467,29 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
         // 更新收藏状态
 
+        // 页面加载完才去请求评论数据
+        loadCommentFromNetwork();
+    }
+
+    /**
+     * 配置评论数据
+     */
+    private void setupCommentData() {
+
+        // 加载评论数据
+        if (commentBeanList != null) {
+            mCommentLayout.setVisibility(View.VISIBLE);
+            mCommentRecyclerViewAdapter = new CommentRecyclerViewAdapter(commentBeanList, this);
+            mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
+
+            // 评论数量不低于10条才显示更多评论
+            if (commentBeanList.size() <= 10) {
+                mMoreCommentButton.setVisibility(View.GONE);
+            } else {
+                mMoreCommentButton.setVisibility(View.VISIBLE);
+            }
+
+        }
     }
 
     /**
@@ -479,6 +636,42 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("NewsDetail Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
+
     // java调用js需要在主线程调用
     private final class ArticleJavascriptInterface {
 
@@ -568,7 +761,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onClick(View v) {
                     int position = holder.getAdapterPosition();
-                    // 进入相关链接的
+                    // 进入相关链接的正文页面
                     NewsDetailActivity.start(mContext, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
                     NewsDetailActivity.this.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
                 }
@@ -635,6 +828,79 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             TitlePicViewHolder(View itemView) {
                 super(itemView);
                 titlePicView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_link_pic);
+            }
+        }
+
+    }
+
+    // 相关链接适配器
+    private class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
+
+        List<CommentBean> commentBeanList;
+        Context mContext;
+
+        CommentRecyclerViewAdapter(List<CommentBean> commentBeanList, Context mContext) {
+            this.commentBeanList = commentBeanList;
+            this.mContext = mContext;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_comment, parent, false);
+            ViewHolder holder = new ViewHolder(view);
+            holder.starLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "点赞", Toast.LENGTH_SHORT).show();
+                }
+            });
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            CommentBean commentBean = commentBeanList.get(position);
+            holder.portraitView.setImageURI(commentBean.getUserpic());
+            holder.nicknameTextView.setText(commentBean.getPlnickname());
+            holder.commentContentTextView.setText(commentBean.getSaytext());
+            holder.timeTextView.setText(commentBean.getSaytime());
+            holder.starNumTextView.setText(commentBean.getZcnum());
+            holder.commentNumTextView.setText(commentBean.getPlstep());
+            // 最后一个分割线隐藏
+            if (position == commentBeanList.size() - 1) {
+                holder.lineView.setVisibility(View.INVISIBLE);
+            } else {
+                holder.lineView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return commentBeanList.size();
+        }
+
+        // 相关链接item基类
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            SimpleDraweeView portraitView;// 头像
+            TextView nicknameTextView;    // 昵称
+            TextView timeTextView;        // 时间
+            TextView starNumTextView;     // 点赞数
+            TextView commentNumTextView;  // 楼层
+            TextView commentContentTextView; // 评论内容
+            LinearLayout starLayout;      // 赞
+            View lineView;                // 分割线
+
+            ViewHolder(View itemView) {
+                super(itemView);
+                portraitView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_comment_portrait);
+                nicknameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_name);
+                timeTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_time);
+                starNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_star_num);
+                commentNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_num);
+                commentContentTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_content);
+                lineView = itemView.findViewById(R.id.v_cell_news_detail_comment_line);
+                starLayout = (LinearLayout) itemView.findViewById(R.id.ll_news_detail_comment_star);
             }
         }
 

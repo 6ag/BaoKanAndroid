@@ -13,6 +13,7 @@
         android:id="@+id/bsv_news_detail_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="42dp"
         android:layout_marginTop="20dp"
         android:background="#ffffff"
         android:overScrollMode="never"
@@ -24,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
+            
             <!--正文-->
             <WebView
                 android:id="@+id/wv_news_detail_webview"
@@ -174,7 +175,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible">
+                android:visibility="gone">
 
                 <!--相关阅读组头-->
                 <LinearLayout
@@ -210,11 +211,11 @@
 
             <!--最近评论-->
             <LinearLayout
+                android:id="@+id/ll_news_detail_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <!--评论组头-->
                 <LinearLayout
@@ -255,7 +256,8 @@
                     android:layout_margin="10dp"
                     android:background="@drawable/selector_red_button"
                     android:text="更多评论"
-                    android:textColor="#fff"/>
+                    android:textColor="#fff"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -283,7 +285,7 @@
     <!--新闻内容页底部条-->
     <LinearLayout
         android:id="@+id/ll_news_detail_bottom_bar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#ffffff"
@@ -300,9 +302,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingBottom="9dp"
-            android:paddingTop="9dp">
+            android:gravity="center_vertical">
 
             <ImageButton
                 android:id="@+id/ib_news_detail_bottom_bar_back"
@@ -310,6 +310,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_back_selected"/>
 
             <ImageButton
@@ -318,6 +320,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_edit_selected"/>
 
             <ImageButton
@@ -326,6 +330,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_font_selected"/>
 
             <ImageButton
@@ -334,6 +340,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_collection_normal2"/>
 
             <ImageButton
@@ -342,6 +350,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_share_selected"/>
 
         </LinearLayout>

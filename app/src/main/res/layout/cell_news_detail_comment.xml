@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:fresco="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/sdv_cell_news_detail_comment_portrait"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        fresco:placeholderImage="@drawable/default_portrait"
+        fresco:roundedCornerRadius="12.5dp"/>
+
+    <TextView
+        android:id="@+id/tv_cell_news_detail_comment_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@id/sdv_cell_news_detail_comment_portrait"
+        android:text="手机网友 ip:113.108.213.*"
+        android:textColor="#3988D3"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@id/tv_cell_news_detail_comment_name"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="楼层:"
+            android:textColor="#BCBCBC"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/tv_cell_news_detail_comment_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12"
+            android:textColor="#BCBCBC"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_cell_news_detail_comment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/tv_cell_news_detail_comment_name"
+        android:layout_below="@id/tv_cell_news_detail_comment_name"
+        android:text="2016-12-29 13:42:46"
+        />
+
+    <TextView
+        android:id="@+id/tv_cell_news_detail_comment_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_cell_news_detail_comment_time"
+        android:layout_margin="12dp"
+        android:text="这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势这很强势"
+        />
+
+    <View
+        android:id="@+id/v_cell_news_detail_comment_line"
+        android:layout_width="match_parent"
+        android:layout_height="0.2dp"
+        android:layout_below="@id/tv_cell_news_detail_comment_content"
+        android:background="#ccc"/>
+
+    <LinearLayout
+        android:id="@+id/ll_news_detail_comment_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_cell_news_detail_star_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="3"
+            android:textColor="#BCBCBC"
+            android:textSize="12sp"/>
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="3dp"
+            android:src="@drawable/comment_support"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
