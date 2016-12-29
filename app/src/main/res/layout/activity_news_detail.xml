@@ -9,14 +9,15 @@
     tools:context="tv.baokan.baokanandroid.ui.activity.NewsDetailActivity">
 
     <!--滚动区域-->
-    <tv.baokan.baokanandroid.widget.BounceScrollView
+    <tv.baokan.baokanandroid.widget.CustomerScrollView
         android:id="@+id/bsv_news_detail_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
         android:background="#ffffff"
         android:overScrollMode="never"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        android:visibility="invisible">
 
         <!--内容页整个滚动区域-->
         <LinearLayout
@@ -28,8 +29,7 @@
             <WebView
                 android:id="@+id/wv_news_detail_webview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_height="wrap_content">
             </WebView>
 
             <!--文章来源-->
@@ -168,13 +168,13 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/news_detail_ad"/>
 
-
             <!--相关阅读-->
             <LinearLayout
                 android:id="@+id/ll_news_detail_links"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="invisible">
 
                 <!--相关阅读组头-->
                 <LinearLayout
@@ -201,7 +201,8 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_news_detail_links_recyclerview"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
 
                 </android.support.v7.widget.RecyclerView>
 
@@ -211,8 +212,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:orientation="vertical">
+                android:layout_marginBottom="40dp"
+                android:orientation="vertical"
+                android:visibility="visible">
 
                 <!--评论组头-->
                 <LinearLayout
@@ -238,7 +240,8 @@
                 <!--最近评论内容列表-->
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
 
                 </android.support.v7.widget.RecyclerView>
 
@@ -252,59 +255,9 @@
 
             </LinearLayout>
 
-            <!--上拉动画返回视图 2层 hide show-->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!--上拉关闭当前页-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:src="@drawable/newscontent_drag_arrow"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:text="上拉关闭当前页"/>
-
-                </LinearLayout>
-
-                <!--释放关闭当前页-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="invisible">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:src="@drawable/newscontent_drag_return"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:text="释放关闭当前页"/>
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
         </LinearLayout>
 
-    </tv.baokan.baokanandroid.widget.BounceScrollView>
+    </tv.baokan.baokanandroid.widget.CustomerScrollView>
 
     <!--顶部白色透明条-->
     <View
@@ -312,6 +265,16 @@
         android:layout_height="20dp"
         android:alpha="0.8"
         android:background="#ffffff"/>
+
+    <!--进度圈-->
+    <ProgressBar
+        android:id="@+id/pb_news_detail_progressbar"
+        style="@android:style/Widget.Holo.ProgressBar.Large"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="100dp"
+        android:max="100"
+        android:progress="20"/>
 
     <!--新闻内容页底部条-->
     <LinearLayout

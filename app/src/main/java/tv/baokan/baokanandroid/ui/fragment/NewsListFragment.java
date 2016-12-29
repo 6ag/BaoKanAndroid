@@ -90,14 +90,12 @@ public class NewsListFragment extends BaseFragment {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 switch (newState) {
-                    // 拖拽的时候停止加载图片
-                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                    case RecyclerView.SCROLL_STATE_SETTLING:
                         if (!Fresco.getImagePipeline().isPaused()) {
                             Fresco.getImagePipeline().pause();
                         }
                         break;
-                    // 松开手后恢复加载
-                    case RecyclerView.SCROLL_STATE_SETTLING:
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
                     case RecyclerView.SCROLL_STATE_IDLE:
                         if (Fresco.getImagePipeline().isPaused()) {
                             Fresco.getImagePipeline().resume();

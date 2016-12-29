@@ -18,11 +18,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -55,6 +57,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private String id;                      // 文章id
     private ArticleDetailBean detailBean;   // 新闻详情模型
 
+    private ProgressBar mProgressBar;       // 进度圈
     private ScrollView mScrollView;         // 内容载体 scrollView
     private WebView mContentWebView;        // 正文载体 webView
     private ImageButton mBackButton;        // 底部条 返回
@@ -101,6 +104,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      * 准备UI
      */
     private void prepareUI() {
+        mProgressBar = (ProgressBar) findViewById(R.id.pb_news_detail_progressbar);
         mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
         mContentWebView = (WebView) findViewById(R.id.wv_news_detail_webview);
         mBackButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_back);
@@ -110,6 +114,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mShareButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_share);
         mLinkLayout = (LinearLayout) findViewById(R.id.ll_news_detail_links);
         mLinkRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_links_recyclerview);
+
+        // view硬件加速
+        mScrollView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         // 底部工具条按钮点击事件
         mBackButton.setOnClickListener(this);
@@ -138,7 +145,19 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mLinkRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_SETTLING:
+                        if (!Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().pause();
+                        }
+                        break;
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        if (Fresco.getImagePipeline().isPaused()) {
+                            Fresco.getImagePipeline().resume();
+                        }
+                        break;
+                }
             }
         });
 
@@ -164,6 +183,11 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                // 隐藏加载进度条
+                mProgressBar.setVisibility(View.INVISIBLE);
+                // 网页加载完成才去加载其他UI
+                setupDetailData();
+                // 加载网页缓存图片
                 getImageFromDownloaderOrDiskByImageUrlArray();
             }
 
@@ -233,7 +257,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                         try {
                             JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
                             detailBean = new ArticleDetailBean(jsonObject);
-                            setupDetailData();
+                            // 加载webView
+                            setupWebViewData();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -247,11 +272,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void setupDetailData() {
 
-        // 加载webView
-        setupWebViewData();
+        // 加载页面
+        mScrollView.setVisibility(View.VISIBLE);
 
-        // 更新相关链接
+        // 加载相关链接
         if (detailBean.getOtherLinks() != null) {
+            mLinkLayout.setVisibility(View.VISIBLE);
             mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
             mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
         }
