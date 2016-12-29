@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:background="@drawable/news_content_share_button_shape"
+                    android:background="@drawable/shape_news_content_share_button"
                     android:drawableStart="@drawable/article_content_qq_normal"
                     android:paddingEnd="20dp"
                     android:paddingStart="30dp"
@@ -111,7 +111,7 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/news_content_share_button_shape"
+                    android:background="@drawable/shape_news_content_share_button"
                     android:drawableStart="@drawable/article_content_share_weixin"
                     android:paddingEnd="20dp"
                     android:paddingStart="30dp"
@@ -122,7 +122,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:background="@drawable/news_content_share_button_shape"
+                    android:background="@drawable/shape_news_content_share_button"
                     android:drawableStart="@drawable/article_content_share_pyq"
                     android:paddingEnd="20dp"
                     android:paddingStart="30dp"
@@ -212,7 +212,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="50dp"
                 android:orientation="vertical"
                 android:visibility="visible">
 
@@ -225,7 +225,7 @@
                     <View
                         android:layout_width="3dp"
                         android:layout_height="match_parent"
-                        android:background="#d70606"/>
+                        android:background="@color/colorPrimary"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -239,6 +239,7 @@
 
                 <!--最近评论内容列表-->
                 <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_news_detail_comment_recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none">
@@ -247,11 +248,14 @@
 
                 <!--更多评论 在超过10条评论后才显示-->
                 <Button
+                    android:id="@+id/btn_news_detail_comment_more"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="35dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_margin="5dp"
-                    android:text="更多评论"/>
+                    android:layout_margin="10dp"
+                    android:background="@drawable/selector_red_button"
+                    android:text="更多评论"
+                    android:textColor="#fff"/>
 
             </LinearLayout>
 
@@ -342,17 +346,5 @@
 
         </LinearLayout>
     </LinearLayout>
-
-    <!--修改字体的视图-->
-    <RelativeLayout
-        android:id="@+id/rl_news_detail_bottom_font_bar"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="#ccc"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="0dp"
-        app:layout_behavior="@string/bottom_sheet_behavior">
-
-    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

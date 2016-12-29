@@ -26,4 +26,10 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <!--新闻内容页底部视图的弹出框动画-->
+    <style name="detail_popup_anim" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/popup_exit</item>
+    </style>
+
 </resources>

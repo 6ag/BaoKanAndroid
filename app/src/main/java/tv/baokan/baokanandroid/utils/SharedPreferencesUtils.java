@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 
 public class SharedPreferencesUtils {
 
+    // 新闻详情字体
+    public static final String DETAIL_FONT = "font_key";
+
     // 配置文件名称
     private static final String CONFIG_FILE_NAME = "config";
 

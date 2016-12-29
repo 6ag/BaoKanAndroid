@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="20dp">
+
+    <RadioGroup
+        android:id="@+id/rg_set_font_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_set_font_verybig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="特大号字体"/>
+
+        <RadioButton
+            android:id="@+id/rb_set_font_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="大号字体"/>
+
+        <RadioButton
+            android:id="@+id/rb_set_font_middle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="中号字体"/>
+
+        <RadioButton
+            android:id="@+id/rb_set_font_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="小号字体"/>
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_set_font_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:background="@drawable/selector_red_button"
+            android:text="取消"
+            android:textColor="#fff"/>
+
+        <Button
+            android:id="@+id/btn_set_font_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/selector_red_button"
+            android:text="确定"
+            android:textColor="#fff"/>
+    </LinearLayout>
+
+</LinearLayout>

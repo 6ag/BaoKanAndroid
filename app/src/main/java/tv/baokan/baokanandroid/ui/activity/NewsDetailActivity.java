@@ -3,8 +3,7 @@ package tv.baokan.baokanandroid.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -16,10 +15,11 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +44,7 @@ import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.ImageCacheUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
 import tv.baokan.baokanandroid.utils.SizeUtils;
 import tv.baokan.baokanandroid.utils.StatusUtils;
 import tv.baokan.baokanandroid.utils.StreamUtils;
@@ -52,6 +53,8 @@ import tv.baokan.baokanandroid.utils.StreamUtils;
 public class NewsDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "NewsDetailActivity";
+
+    private Context mContext;
 
     private String classid;                 // 栏目id
     private String id;                      // 文章id
@@ -70,8 +73,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private RecyclerView mLinkRecyclerView; // 相关阅读列表
     private LinkRecyclerViewAdapter mLinkRecyclerViewAdapter;
 
-    RelativeLayout mFontBar;                // 设置字体的布局载体
-    BottomSheetBehavior mFontBarBehavior;   // 设置字体的行为
+    private AlertDialog setFontDialog;      // 设置字体的会话框
+    private int fontSize;                   // 修改后的字体大小
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             StatusUtils.setMeizuStatusBarDarkMode(this, true);
         }
         setContentView(R.layout.activity_news_detail);
+
+        mContext = this;
 
         prepareUI();
         prepareData();
@@ -124,21 +129,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mFontButton.setOnClickListener(this);
         mCollectionButton.setOnClickListener(this);
         mShareButton.setOnClickListener(this);
-
-        // 底部字体设置视图
-        mFontBar = (RelativeLayout) findViewById(R.id.rl_news_detail_bottom_font_bar);
-        mFontBarBehavior = BottomSheetBehavior.from(mFontBar);
-        mFontBarBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
-        });
 
         // 相关链接列表
         mLinkRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -209,7 +199,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.ib_news_detail_bottom_bar_font:
                 // 弹出修改字体的视图
-                mFontBarBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                showSetFontDialog();
                 break;
             case R.id.ib_news_detail_bottom_bar_collection:
                 Toast.makeText(this, "收藏", Toast.LENGTH_SHORT).show();
@@ -221,17 +211,76 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
+     * 弹出显示选择字体的会话框
+     */
+    private void showSetFontDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.dialog_set_font, null);
+        builder.setView(view);
+        builder.setCancelable(true);
+        setFontDialog = builder.create();
+        setFontDialog.show();
+
+        RadioGroup setFontGroup = (RadioGroup) view.findViewById(R.id.rg_set_font_group);
+        // 根据缓存的字体选择默认的item
+        switch (SharedPreferencesUtils.getInt(mContext, SharedPreferencesUtils.DETAIL_FONT, 18)) {
+            case 16:
+                setFontGroup.check(R.id.rb_set_font_small);
+                break;
+            case 18:
+                setFontGroup.check(R.id.rb_set_font_middle);
+                break;
+            case 20:
+                setFontGroup.check(R.id.rb_set_font_big);
+                break;
+            case 22:
+                setFontGroup.check(R.id.rb_set_font_verybig);
+                break;
+        }
+        setFontGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // 不会直接修改，而是先存储起来，点击确认的时候才修改
+                switch (checkedId) {
+                    case R.id.rb_set_font_verybig:
+                        fontSize = 22;
+                        break;
+                    case R.id.rb_set_font_big:
+                        fontSize = 20;
+                        break;
+                    case R.id.rb_set_font_middle:
+                        fontSize = 18;
+                        break;
+                    case R.id.rb_set_font_small:
+                        fontSize = 16;
+                        break;
+                }
+            }
+        });
+        Button cancelButton = (Button) view.findViewById(R.id.btn_set_font_cancel);
+        Button confirmButton = (Button) view.findViewById(R.id.btn_set_font_confirm);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFontDialog.dismiss();
+            }
+        });
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 修改字体
+                SharedPreferencesUtils.setInt(mContext, SharedPreferencesUtils.DETAIL_FONT, fontSize);
+                didChangedFontSize(fontSize);
+                setFontDialog.dismiss();
+            }
+        });
+    }
+
+    /**
      * 修改了正文字体大小
      */
     private void didChangedFontSize(int fontSize) {
         mContentWebView.loadUrl("javascript:setFontSize(" + fontSize + ")");
-    }
-
-    /**
-     * 修改了正文字体
-     */
-    private void didChangedFontName(String fontName) {
-        mContentWebView.loadUrl("javascript:setFontName('" + fontName + "');");
     }
 
     /**
@@ -339,9 +388,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         }
 
         // 从本地缓存获取字体大小和字体名称
-        String fontSize = "18";
-        String fontName = "";
-        html += "<div id=\"content\" style=\"font-size: " + fontSize + "px; font-family: '" + fontName + "';\">" + tempNewstext + "</div>";
+        int fontSize = SharedPreferencesUtils.getInt(mContext, SharedPreferencesUtils.DETAIL_FONT, 18);
+        html += "<div id=\"content\" style=\"font-size: " + fontSize + "px;\">" + tempNewstext + "</div>";
 
         String localHtml = null;
         try {
