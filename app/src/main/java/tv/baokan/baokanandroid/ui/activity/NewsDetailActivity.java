@@ -399,7 +399,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * 加载评论数据
+     * 加载最新10条评论数据
      */
     private void loadCommentFromNetwork() {
         OkHttpUtils
