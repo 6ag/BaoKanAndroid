@@ -153,7 +153,9 @@
                 android:layout_height="10dp"
                 android:background="#ECECF2"/>
 
+            <!--清除缓存-->
             <RelativeLayout
+                android:id="@+id/rl_profile_clear_cache_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -173,6 +175,7 @@
                     android:text="清除缓存"/>
 
                 <TextView
+                    android:id="@+id/tv_profile_cache"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -186,11 +189,14 @@
                     android:layout_height="0.1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginStart="50dp"
+                    android:alpha="0.5"
                     android:background="#ccc"/>
 
             </RelativeLayout>
 
+            <!--设置正文字体-->
             <RelativeLayout
+                android:id="@+id/rl_profile_set_font_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -226,7 +232,9 @@
                 android:layout_height="10dp"
                 android:background="#ECECF2"/>
 
+            <!--意见反馈-->
             <RelativeLayout
+                android:id="@+id/rl_profile_feekback_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -259,11 +267,14 @@
                     android:layout_height="0.1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginStart="50dp"
+                    android:alpha="0.5"
                     android:background="#ccc"/>
 
             </RelativeLayout>
 
+            <!--关于我们-->
             <RelativeLayout
+                android:id="@+id/rl_profile_aboutme_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -297,11 +308,14 @@
                     android:layout_height="0.1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginStart="50dp"
+                    android:alpha="0.5"
                     android:background="#ccc"/>
 
             </RelativeLayout>
 
+            <!--推荐给好友-->
             <RelativeLayout
+                android:id="@+id/rl_profile_commend_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -334,11 +348,14 @@
                     android:layout_height="0.1dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginStart="50dp"
+                    android:alpha="0.5"
                     android:background="#ccc"/>
 
             </RelativeLayout>
 
+            <!--当前版本-->
             <RelativeLayout
+                android:id="@+id/rl_profile_version_layout"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="#fff">
@@ -358,6 +375,7 @@
                     android:text="当前版本"/>
 
                 <TextView
+                    android:id="@+id/tv_profile_current_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"

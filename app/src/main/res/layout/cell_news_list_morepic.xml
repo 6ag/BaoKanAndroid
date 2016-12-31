@@ -37,9 +37,9 @@
             android:id="@+id/iv_cell_news_list_pic2"
             android:layout_width="0dp"
             android:layout_height="82dp"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
             fresco:placeholderImage="@drawable/placeholder_logo"/>
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -104,9 +104,10 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.1dp"
+        android:layout_height="0.2dp"
         android:layout_below="@id/ll_news_list_bottom"
         android:layout_marginTop="12dp"
+        android:alpha="0.5"
         android:background="#cccccc"/>
 
 </RelativeLayout>

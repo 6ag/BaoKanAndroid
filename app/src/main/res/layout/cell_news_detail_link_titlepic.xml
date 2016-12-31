@@ -66,6 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.2dp"
         android:layout_below="@id/sdv_cell_news_detail_link_pic"
+        android:alpha="0.5"
         android:background="#ccc"/>
 
 </RelativeLayout>
