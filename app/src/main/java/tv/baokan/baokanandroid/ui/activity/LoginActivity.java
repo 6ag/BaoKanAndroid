@@ -3,6 +3,7 @@ package tv.baokan.baokanandroid.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -14,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
-import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +25,6 @@ import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
-import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
@@ -34,6 +32,10 @@ import tv.baokan.baokanandroid.widget.NavigationViewRed;
 public class LoginActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
 
     private static final String TAG = "LoginActivity";
+
+    // 注册的启动请求码
+    public static final int REQUEST_CODE_REGISTER = 0;
+    public static final int REQUEST_CODE_FORGOT = 1;
 
     private NavigationViewRed mNavigationViewRed;    // 导航栏
     private EditText mUsernameEditText;               // 账号
@@ -117,7 +119,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
      */
     private void loginButtonStateChange() {
         // 账号和密码都不为空才能点击
-        if (!TextUtils.isEmpty(mUsernameEditText.getText().toString()) && !TextUtils.isEmpty(mPasswordEditText.getText().toString())) {
+        if (!TextUtils.isEmpty(mUsernameEditText.getText().toString())
+                && !TextUtils.isEmpty(mPasswordEditText.getText().toString())) {
             mLoginButton.setEnabled(true);
         } else {
             mLoginButton.setEnabled(false);
@@ -175,10 +178,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         String username = mUsernameEditText.getText().toString();
         String password = mPasswordEditText.getText().toString();
         if (TextUtils.isEmpty(username)) {
-            Toast.makeText(this, "账号不能为空", Toast.LENGTH_SHORT).show();
+            ProgressHUD.showInfo(LoginActivity.this, "账号不能为空");
+            return;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
+            ProgressHUD.showInfo(LoginActivity.this, "密码不能为空");
+            return;
         }
 
         // 登录进度条
@@ -192,27 +197,39 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             @Override
             public void onError(Call call, Exception e, int id) {
                 hud.dismiss();
-                Toast.makeText(LoginActivity.this, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+                ProgressHUD.showInfo(LoginActivity.this, "您的网络不给力哦");
             }
 
             @Override
             public void onResponse(String response, int id) {
-                hud.dismiss();
+
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     if (jsonObject.getString("err_msg").equals("success")) {
+                        ProgressHUD.showInfo(LoginActivity.this, "登录成功");
+
+                        // 编码登录信息
                         UserBean userBean = new UserBean(jsonObject.getJSONObject("data"));
-                        // 将登录信息保存到数据库
                         userBean.updateUserInfoFromLocal();
-                        // 销毁登录activity
-                        finish();
+
+                        // 延迟1秒退出activity
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                hud.dismiss();
+                                finish();
+                            }
+                        }, 1000);
+
                     } else {
+                        hud.dismiss();
                         String info = jsonObject.getString("info");
                         Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(LoginActivity.this, "数据解析异常", Toast.LENGTH_SHORT).show();
+                    hud.dismiss();
+                    ProgressHUD.showInfo(LoginActivity.this, "数据解析异常");
                 }
             }
         });
@@ -247,4 +264,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         ForgotActivity.start(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_REGISTER:
+                if (resultCode == RESULT_OK) {
+                    String username = data.getStringExtra("username");
+                    String password = data.getStringExtra("password");
+                    mUsernameEditText.setText(username);
+                    mPasswordEditText.setText(password);
+                    // 登录
+                    login();
+                }
+                break;
+            case REQUEST_CODE_FORGOT:
+                if (resultCode == RESULT_OK) {
+                    finish();
+                }
+                break;
+        }
+    }
 }

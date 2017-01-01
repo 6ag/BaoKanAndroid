@@ -3,6 +3,7 @@ package tv.baokan.baokanandroid.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -11,11 +12,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.kaopiz.kprogresshud.KProgressHUD;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
+
+    private static final String TAG = "RegisterActivity";
 
     private NavigationViewRed mNavigationViewRed;     // 导航栏
     private EditText mUsernameEditText;               // 账号
@@ -31,7 +46,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
      */
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, RegisterActivity.class);
-        activity.startActivity(intent);
+        // 注册成功后回调账号密码给来源activity
+        activity.startActivityForResult(intent, LoginActivity.REQUEST_CODE_REGISTER);
         activity.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
     }
 
@@ -98,7 +114,70 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
      * 注册
      */
     private void register() {
+        final String username = mUsernameEditText.getText().toString();
+        final String password = mPasswordEditText.getText().toString();
+        String email = mEmailEditText.getText().toString();
 
+        if (TextUtils.isEmpty(username)) {
+            ProgressHUD.showInfo(this, "账号不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(password)) {
+            ProgressHUD.showInfo(this, "密码不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(email)) {
+            ProgressHUD.showInfo(this, "邮箱不能为空");
+            return;
+        }
+
+        final KProgressHUD hud = ProgressHUD.show(this, "注册中...");
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("username", username);
+        parameters.put("password", password);
+        parameters.put("email", email);
+
+        NetworkUtils.shared.post(APIs.REGISTER, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                hud.dismiss();
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (jsonObject.getString("err_msg").equals("success")) {
+
+                        ProgressHUD.showInfo(RegisterActivity.this, "注册成功");
+
+                        // 延迟1秒退出activity
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                hud.dismiss();
+
+                                // 回调注册的账号密码给登录activity - 需要在finish()前设置
+                                Intent intent = new Intent();
+                                intent.putExtra("username", username);
+                                intent.putExtra("password", password);
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+                        }, 1000);
+                    } else {
+                        hud.dismiss();
+                        String info = jsonObject.getString("info");
+                        Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    hud.dismiss();
+                    ProgressHUD.showInfo(RegisterActivity.this, "数据解析异常");
+                }
+            }
+        });
     }
 
     /**
