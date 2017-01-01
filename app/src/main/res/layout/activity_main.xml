@@ -9,13 +9,13 @@
 
     <!--内容主体-->
     <FrameLayout
-        android:clipToPadding="true"
-        android:fitsSystemWindows="true"
-        android:background="@color/colorPrimary"
         android:id="@+id/fl_main_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@color/colorPrimary"
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true">
 
     </FrameLayout>
 
@@ -37,24 +37,28 @@
         <RadioButton
             android:id="@+id/rb_news_item"
             style="@style/tabbar_style"
+            android:background="@null"
             android:drawableTop="@drawable/tabbar_item_selector_news"
             android:text="资讯"/>
 
         <RadioButton
             android:id="@+id/rb_photo_item"
             style="@style/tabbar_style"
+            android:background="@null"
             android:drawableTop="@drawable/tabbar_item_selector_photo"
             android:text="图秀"/>
 
         <RadioButton
             android:id="@+id/rb_hot_item"
             style="@style/tabbar_style"
+            android:background="@null"
             android:drawableTop="@drawable/tabbar_item_selector_hot"
             android:text="热门"/>
 
         <RadioButton
             android:id="@+id/rb_profile_item"
             style="@style/tabbar_style"
+            android:background="@null"
             android:drawableTop="@drawable/tabbar_item_selector_profile"
             android:text="我"/>
 

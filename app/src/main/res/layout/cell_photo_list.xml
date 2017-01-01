@@ -10,15 +10,15 @@
         android:layout_height="match_parent"
         android:src="@drawable/launch_screen"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_alignParentBottom="true"
-        android:alpha="0.5"
-        android:background="#000"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp">
-    </View>
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:alpha="0.5"-->
+        <!--android:background="#000"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--android:paddingTop="8dp">-->
+    <!--</View>-->
 
     <TextView
         android:id="@+id/tv_cell_photo_list_title"
@@ -27,6 +27,7 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:maxLines="1"
+        android:background="@color/colorPhotoBackground"
         android:text="第十届作家榜颁奖典礼"
         android:textColor="#fff"/>
 

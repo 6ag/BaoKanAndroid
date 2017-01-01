@@ -7,4 +7,90 @@
     android:layout_height="match_parent"
     tools:context="tv.baokan.baokanandroid.ui.activity.PhotoDetailActivity">
 
+    <!--滚动区域-->
+
+
+    <!--进度圈-->
+    <ProgressBar
+        android:id="@+id/pb_photo_detail_progressbar"
+        style="@android:style/Widget.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_centerInParent="true"
+        android:indeterminateDrawable="@anim/progressbar_rotate"/>
+
+    <!--新闻内容页底部条-->
+    <LinearLayout
+        android:id="@+id/ll_photo_detail_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPhotoBackground"
+        android:orientation="vertical">
+
+        <!--分割线-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="#cccccc"/>
+
+        <!--5个功能按钮-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/ib_photo_detail_bottom_bar_back"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/bottom_bar_back_normal"/>
+
+            <ImageButton
+                android:id="@+id/ib_photo_detail_bottom_bar_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/bottom_bar_edit_normal"/>
+
+            <ImageButton
+                android:id="@+id/ib_photo_detail_bottom_bar_comment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/bottom_bar_comment_normal"/>
+
+            <ImageButton
+                android:id="@+id/ib_photo_detail_bottom_bar_collection"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/bottom_bar_collection_normal1"/>
+
+            <ImageButton
+                android:id="@+id/ib_photo_detail_bottom_bar_share"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/bottom_bar_share_normal"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
 </RelativeLayout>

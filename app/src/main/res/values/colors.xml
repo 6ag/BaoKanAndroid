@@ -13,9 +13,12 @@
     <color name="colorAllBackgroundColor">#fff</color>
 
     <!--红色按钮深色颜色-->
-    <drawable name="colorTextDark">#ccc</drawable>
+    <color name="colorTextDark">#ccc</color>
 
     <!--红色按钮默认颜色-->
-    <drawable name="colorTextNormal">#fff</drawable>
+    <color name="colorTextNormal">#fff</color>
+
+    <!--图片详情黑色透明背景颜色 70%透明度-->
+    <color name="colorPhotoBackground">#B21C1A1C</color>
 
 </resources>

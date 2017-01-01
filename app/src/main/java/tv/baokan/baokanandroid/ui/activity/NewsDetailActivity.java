@@ -532,7 +532,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         NetworkUtils.shared.get(APIs.ARTICLE_DETAIL, parameters, new NetworkUtils.StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
             }
 
             @Override
@@ -544,6 +544,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                     setupWebViewData();
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    ProgressHUD.showInfo(mContext, "数据解析异常");
                 }
             }
         });

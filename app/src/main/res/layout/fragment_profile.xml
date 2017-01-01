@@ -51,19 +51,11 @@
                     android:textColor="#fff"/>
             </LinearLayout>
 
-            <!--底部透明遮罩-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_alignParentBottom="true"
-                android:alpha="0.1"
-                android:background="#fff">
-            </LinearLayout>
-
             <!--遮罩上面的视图-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:background="#19ffffff"
                 android:layout_alignParentBottom="true"
                 android:orientation="horizontal">
 
