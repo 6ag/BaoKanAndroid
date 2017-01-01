@@ -47,11 +47,13 @@ import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.CommentBean;
+import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.ImageCacheUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
 import tv.baokan.baokanandroid.utils.SizeUtils;
 import tv.baokan.baokanandroid.utils.StatusUtils;
@@ -285,15 +287,61 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             public void onClick(View v) {
                 String comment = commentEditText.getText().toString();
                 if (!TextUtils.isEmpty(comment)) {
-                    // 发布评论
-
+                    sendComment(comment);
                     commentDialog.dismiss();
                 } else {
                     Toast.makeText(mContext, "请输入评论内容", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+    }
+
+    /**
+     * 发布评论
+     *
+     * @param comment 评论信息
+     */
+    private void sendComment(String comment) {
+
+        LogUtils.d(TAG, "评论内容 = " + comment);
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("classid", classid);
+        parameters.put("id", id);
+        parameters.put("saytext", comment);
+        if (UserBean.isLogin()) {
+            parameters.put("nomember", "0");
+            parameters.put("username", UserBean.shared().getUsername());
+            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("token", UserBean.shared().getToken());
+        } else {
+            parameters.put("nomember", "1");
+        }
+
+        NetworkUtils.shared.post(APIs.SUBMIT_COMMENT, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                ProgressHUD.showInfo(NewsDetailActivity.this, "您的网络不给力哦");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                LogUtils.d(TAG, response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (jsonObject.getString("err_msg").equals("success")) {
+                        // 评论成功后，去重新加载评论信息
+                        loadCommentFromNetwork();
+                        ProgressHUD.showInfo(NewsDetailActivity.this, "评论成功");
+                    } else {
+                        ProgressHUD.showInfo(NewsDetailActivity.this, jsonObject.getString("info"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    ProgressHUD.showInfo(NewsDetailActivity.this, "数据解析异常");
+                }
+            }
+        });
+
     }
 
     /**
@@ -453,7 +501,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
         }
 
-        // 更新收藏状态
+        // 1已经收藏过
+        if (detailBean.getHavefava().equals("1")) {
+            mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_selected);
+        } else {
+            mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal2);
+        }
 
         // 页面加载完才去请求评论数据
         loadCommentFromNetwork();
@@ -769,7 +822,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
     }
 
-    // 相关链接适配器
+    // 评论适配器
     private class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
 
         List<CommentBean> commentBeanList;

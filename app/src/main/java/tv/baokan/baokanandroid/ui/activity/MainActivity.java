@@ -127,6 +127,7 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    // 记录两次点击退出时的第一次有效点击时间
     private long time = 0;
 
     /**
