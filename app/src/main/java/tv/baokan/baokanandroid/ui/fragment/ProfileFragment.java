@@ -3,10 +3,12 @@ package tv.baokan.baokanandroid.ui.fragment;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
@@ -67,20 +69,54 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
     }
 
+    /**
+     * onResume前调用 马上显示
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // 更新头像
+        if (UserBean.isLogin()) {
+            portraitImageView.setImageURI(UserBean.shared().getAvatarUrl());
+            nicknameTextView.setText(UserBean.shared().getNickname());
+        } else {
+            portraitImageView.setImageURI("");
+            nicknameTextView.setText("登录账号");
+        }
+
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_profile_portrait_layout:
-                LoginActivity.start(getActivity());
+                if (UserBean.isLogin()) {
+                    Toast.makeText(mContext, "修改头像", Toast.LENGTH_SHORT).show();
+                } else {
+                    LoginActivity.start(getActivity());
+                }
                 break;
             case R.id.ll_profile_collection_layout:
-
+                if (UserBean.isLogin()) {
+                    Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
+                } else {
+                    LoginActivity.start(getActivity());
+                }
                 break;
             case R.id.ll_profile_comment_layout:
-
+                if (UserBean.isLogin()) {
+                    Toast.makeText(mContext, "评论", Toast.LENGTH_SHORT).show();
+                } else {
+                    LoginActivity.start(getActivity());
+                }
                 break;
             case R.id.ll_profile_info_layout:
-
+                if (UserBean.isLogin()) {
+                    Toast.makeText(mContext, "资料", Toast.LENGTH_SHORT).show();
+                } else {
+                    LoginActivity.start(getActivity());
+                }
                 break;
             case R.id.rl_profile_clear_cache_layout:
 
