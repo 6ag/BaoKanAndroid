@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity {
     private void exit() {
         if (System.currentTimeMillis() - time > 2000) {
             time = System.currentTimeMillis();
-            showToast("再次点击将退出爆侃网文");
+            showToast("再次点击将退出");
         } else {
             removeAllActivity();
         }

@@ -76,7 +76,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
+        // 不是退出应用才执行返回动画
+        if (!(this instanceof MainActivity)) {
+            overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
+        }
     }
 
     // 返回true则是不继续传播事件，自己处理。返回false则系统继续传播处理
