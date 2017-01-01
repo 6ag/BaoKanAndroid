@@ -1,6 +1,7 @@
 package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
@@ -81,6 +85,16 @@ public class ForgotActivity extends BaseActivity implements TextWatcher {
         mUsernameEditText.addTextChangedListener(this);
         mEmailEditText.addTextChangedListener(this);
 
+        // 自动弹出键盘
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) mUsernameEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(mUsernameEditText, 0);
+            }
+
+        }, 500);
     }
 
     /**
@@ -126,28 +140,31 @@ public class ForgotActivity extends BaseActivity implements TextWatcher {
 
             @Override
             public void onResponse(String response, int id) {
-                hud.dismiss();
+
                 LogUtils.d(TAG, response);
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     String info = jsonObject.getJSONObject("data").getString("info");
                     if (info.equals("邮件已发送，请登录邮箱认证并取回密码")) {
 
-                        ProgressHUD.showInfo(ForgotActivity.this, "邮件已发送，请登录邮箱认证并取回密码");
-
                         // 延迟1秒退出activity
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                hud.dismiss();
+                                ProgressHUD.showInfo(ForgotActivity.this, "邮件已发送，请登录邮箱认证并取回密码");
+
                                 setResult(RESULT_OK);
                                 finish();
                             }
                         }, 1000);
                     } else {
+                        hud.dismiss();
                         Toast.makeText(ForgotActivity.this, info, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    hud.dismiss();
                     ProgressHUD.showInfo(ForgotActivity.this, "数据解析异常");
                 }
             }

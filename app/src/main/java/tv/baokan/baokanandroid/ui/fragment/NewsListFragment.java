@@ -179,6 +179,12 @@ public class NewsListFragment extends BaseFragment {
             @Override
             public void onError(Call call, Exception e, int id) {
                 Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+                // 结束刷新
+                if (method == 0) {
+                    refreshLayout.finishRefreshing();
+                } else {
+                    refreshLayout.finishLoadmore();
+                }
             }
 
             @Override

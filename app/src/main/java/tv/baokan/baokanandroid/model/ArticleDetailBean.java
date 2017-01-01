@@ -105,7 +105,6 @@ public class ArticleDetailBean {
                 ", down='" + down + '\'' +
                 ", title='" + title + '\'' +
                 ", newstime='" + newstime + '\'' +
-                ", newstext='" + newstext + '\'' +
                 ", titleurl='" + titleurl + '\'' +
                 ", id='" + id + '\'' +
                 ", classid='" + classid + '\'' +
@@ -117,6 +116,7 @@ public class ArticleDetailBean {
                 ", allPhotoList=" + allPhotoList +
                 ", otherLinks=" + otherLinks +
                 ", morePicsList=" + morePicsList +
+                ", newstext='" + newstext + '\'' +
                 '}';
     }
 

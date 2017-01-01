@@ -2,8 +2,10 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -29,6 +32,9 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringSystem;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -42,6 +48,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
@@ -254,12 +262,91 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 showSetFontDialog();
                 break;
             case R.id.ib_news_detail_bottom_bar_collection:
-                Toast.makeText(this, "收藏", Toast.LENGTH_SHORT).show();
+                collectArticle();
                 break;
             case R.id.ib_news_detail_bottom_bar_share:
                 Toast.makeText(this, "弹出分享", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    /**
+     * 收藏文章
+     */
+    private void collectArticle() {
+        if (UserBean.isLogin()) {
+            HashMap<String, String> parameters = new HashMap<>();
+            parameters.put("username", UserBean.shared().getUsername());
+            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("token", UserBean.shared().getToken());
+            parameters.put("classid", classid);
+            parameters.put("id", id);
+            NetworkUtils.shared.post(APIs.ADD_DEL_FAVA, parameters, new NetworkUtils.StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    ProgressHUD.showInfo(NewsDetailActivity.this, "您的网络不给力哦");
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    LogUtils.d(TAG, response);
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        String tipString = jsonObject.getString("info");
+                        if (jsonObject.getString("err_msg").equals("success")) {
+                            if (jsonObject.getJSONObject("result").getInt("status") == 1) {
+                                // 收藏成功
+                                tipString = "收藏成功";
+                                mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_selected);
+                            } else {
+                                // 取消收藏成功
+                                tipString = "取消收藏";
+                                mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal2);
+                            }
+                        }
+                        ProgressHUD.showInfo(NewsDetailActivity.this, tipString);
+                        collectionButtonSpringAnimation();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        ProgressHUD.showInfo(NewsDetailActivity.this, "数据解析异常");
+                    }
+                }
+            });
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setIcon(R.mipmap.ic_launcher);
+            builder.setTitle("您还未登录");
+            builder.setMessage("登录以后才能收藏文章哦！");
+            builder.setPositiveButton("登录", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    LoginActivity.start(NewsDetailActivity.this);
+                }
+            });
+            builder.setNegativeButton("以后再说", null);
+            builder.show();
+        }
+    }
+
+    /**
+     * 收藏按钮弹簧动画
+     */
+    private void collectionButtonSpringAnimation() {
+        SpringSystem springSystem = SpringSystem.create();
+        Spring spring = springSystem.createSpring();
+        spring.addListener(new SimpleSpringListener() {
+
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                float value = (float) spring.getCurrentValue();
+                float scale = value * 2f;
+                mCollectionButton.setScaleX(scale);
+                mCollectionButton.setScaleY(scale);
+            }
+        });
+
+        spring.setEndValue(0.5);
     }
 
     /**
@@ -290,10 +377,21 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                     sendComment(comment);
                     commentDialog.dismiss();
                 } else {
-                    Toast.makeText(mContext, "请输入评论内容", Toast.LENGTH_SHORT).show();
+                    ProgressHUD.showInfo(NewsDetailActivity.this, "请输入评论内容");
                 }
             }
         });
+
+        // 自动弹出键盘
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) commentEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(commentEditText, 0);
+            }
+
+        }, 500);
     }
 
     /**
@@ -425,6 +523,11 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("classid", classid);
         parameters.put("id", id);
+        if (UserBean.isLogin()) {
+            parameters.put("username", UserBean.shared().getUsername());
+            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("token", UserBean.shared().getToken());
+        }
 
         NetworkUtils.shared.get(APIs.ARTICLE_DETAIL, parameters, new NetworkUtils.StringCallback() {
             @Override
@@ -491,21 +594,27 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void setupDetailData() {
 
-        // 加载页面
-        mScrollView.setVisibility(View.VISIBLE);
-
-        // 加载相关链接
-        if (detailBean.getOtherLinks() != null) {
-            mLinkLayout.setVisibility(View.VISIBLE);
-            mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
-            mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
-        }
+        // webView渲染有点慢，延迟100毫秒显示页面展示数据的UI
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 加载页面
+                mScrollView.setVisibility(View.VISIBLE);
+            }
+        }, 100);
 
         // 1已经收藏过
         if (detailBean.getHavefava().equals("1")) {
             mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_selected);
         } else {
             mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal2);
+        }
+
+        // 加载相关链接
+        if (detailBean.getOtherLinks() != null) {
+            mLinkLayout.setVisibility(View.VISIBLE);
+            mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
+            mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
         }
 
         // 页面加载完才去请求评论数据

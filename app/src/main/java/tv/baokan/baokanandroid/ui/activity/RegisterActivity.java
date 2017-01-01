@@ -1,6 +1,7 @@
 package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
@@ -82,6 +86,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         mPasswordEditText.addTextChangedListener(this);
         mEmailEditText.addTextChangedListener(this);
 
+        // 自动弹出键盘
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) mUsernameEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(mUsernameEditText, 0);
+            }
+
+        }, 500);
     }
 
     /**
@@ -150,13 +164,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     JSONObject jsonObject = new JSONObject(response);
                     if (jsonObject.getString("err_msg").equals("success")) {
 
-                        ProgressHUD.showInfo(RegisterActivity.this, "注册成功");
-
                         // 延迟1秒退出activity
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 hud.dismiss();
+                                ProgressHUD.showInfo(RegisterActivity.this, "注册成功");
 
                                 // 回调注册的账号密码给登录activity - 需要在finish()前设置
                                 Intent intent = new Intent();

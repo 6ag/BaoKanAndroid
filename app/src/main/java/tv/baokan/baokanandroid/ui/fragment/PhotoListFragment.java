@@ -32,6 +32,7 @@ import tv.baokan.baokanandroid.ui.activity.PhotoDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 
 public class PhotoListFragment extends BaseFragment {
 
@@ -159,7 +160,13 @@ public class PhotoListFragment extends BaseFragment {
 
             @Override
             public void onError(Call call, Exception e, int id) {
-
+                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+                // 结束刷新
+                if (method == 0) {
+                    refreshLayout.finishRefreshing();
+                } else {
+                    refreshLayout.finishLoadmore();
+                }
             }
 
             @Override
