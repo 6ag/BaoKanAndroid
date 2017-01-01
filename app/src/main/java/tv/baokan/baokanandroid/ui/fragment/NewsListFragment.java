@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -33,16 +34,19 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
+import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.ArticleListBean;
 import tv.baokan.baokanandroid.ui.activity.NewsDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.SizeUtils;
 
 public class NewsListFragment extends BaseFragment {
@@ -164,77 +168,75 @@ public class NewsListFragment extends BaseFragment {
      * @param method    加载方式 0下拉 1上拉
      */
     private void loadNewsFromNetwork(final String classid, int pageIndex, final int method) {
-        OkHttpUtils
-                .get()
-                .url(APIs.ARTICLE_LIST)
-                .addParams("table", "news")
-                .addParams("classid", classid)
-                .addParams("pageIndex", String.valueOf(pageIndex))
-                .addParams("pageSize", String.valueOf(20))
-                .build()
-                .execute(new StringCallback() {
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray jsonArray = jsonObject.getJSONArray("data");
-                            List<ArticleListBean> tempListBeans = new ArrayList<>();
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                                tempListBeans.add(bean);
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("table", "news");
+        parameters.put("classid", classid);
+        parameters.put("pageIndex", String.valueOf(pageIndex));
+        parameters.put("pageSize", String.valueOf(20));
+
+        NetworkUtils.shared.get(APIs.ARTICLE_LIST, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("data");
+                    List<ArticleListBean> tempListBeans = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
+                        tempListBeans.add(bean);
+                    }
+
+                    String maxId = "0";
+                    String minId = "0";
+                    if (articleListBeans.size() > 0) {
+                        maxId = articleListBeans.get(0).getId();
+                        minId = articleListBeans.get(articleListBeans.size() - 1).getId();
+                    }
+
+                    if (method == 0) {
+                        // 下拉刷新
+                        if (maxId.compareTo(tempListBeans.get(0).getId()) <= -1) {
+                            articleListBeans = tempListBeans;
+
+                            // 幻灯片数据
+                            if (tempListBeans.size() >= 3) {
+                                isGoodArticleBeans = new ArrayList<>();
+                                isGoodArticleBeans.add(tempListBeans.get(0));
+                                isGoodArticleBeans.add(tempListBeans.get(1));
+                                isGoodArticleBeans.add(tempListBeans.get(2));
                             }
-
-                            String maxId = "0";
-                            String minId = "0";
-                            if (articleListBeans.size() > 0) {
-                                maxId = articleListBeans.get(0).getId();
-                                minId = articleListBeans.get(articleListBeans.size() - 1).getId();
-                            }
-
-                            if (method == 0) {
-                                // 下拉刷新
-                                if (maxId.compareTo(tempListBeans.get(0).getId()) <= -1) {
-                                    articleListBeans = tempListBeans;
-
-                                    // 幻灯片数据
-                                    if (tempListBeans.size() >= 3) {
-                                        isGoodArticleBeans = new ArrayList<>();
-                                        isGoodArticleBeans.add(tempListBeans.get(0));
-                                        isGoodArticleBeans.add(tempListBeans.get(1));
-                                        isGoodArticleBeans.add(tempListBeans.get(2));
-                                    }
-                                    // 刷新列表数据
-                                    newsListAdapter.notifyDataSetChanged();
-                                }
-                            } else {
-                                // 上拉加载
-                                if (minId.compareTo(tempListBeans.get(0).getId()) >= 1) {
-                                    articleListBeans.addAll(tempListBeans);
-                                    // 刷新列表数据
-                                    newsListAdapter.notifyDataSetChanged();
-                                }
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } finally {
-                            // 结束刷新
-                            if (method == 0) {
-                                refreshLayout.finishRefreshing();
-                            } else {
-                                refreshLayout.finishLoadmore();
-                            }
+                            // 刷新列表数据
+                            newsListAdapter.notifyDataSetChanged();
                         }
-
+                    } else {
+                        // 上拉加载
+                        if (minId.compareTo(tempListBeans.get(0).getId()) >= 1) {
+                            articleListBeans.addAll(tempListBeans);
+                            // 刷新列表数据
+                            newsListAdapter.notifyDataSetChanged();
+                        }
                     }
 
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        LogUtils.d("loadNewsFromNetwork 失败", e.getMessage());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } finally {
+                    // 结束刷新
+                    if (method == 0) {
+                        refreshLayout.finishRefreshing();
+                    } else {
+                        refreshLayout.finishLoadmore();
                     }
+                }
 
-                });
+            }
+        });
+
     }
 
     /**
@@ -296,8 +298,7 @@ public class NewsListFragment extends BaseFragment {
      * @param articleBean 文章模型
      */
     private void openArticleDetail(ArticleListBean articleBean) {
-        NewsDetailActivity.start(mContext, articleBean.getClassid(), articleBean.getId());
-        getActivity().overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
+        NewsDetailActivity.start(getActivity(), articleBean.getClassid(), articleBean.getId());
     }
 
     // item类型枚举

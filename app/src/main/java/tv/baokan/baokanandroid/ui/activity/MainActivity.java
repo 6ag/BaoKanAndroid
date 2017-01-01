@@ -35,6 +35,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    // 从其他应用返回回来 会重新添加fragment，这是个bug 得修复
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // super.onSaveInstanceState(outState);

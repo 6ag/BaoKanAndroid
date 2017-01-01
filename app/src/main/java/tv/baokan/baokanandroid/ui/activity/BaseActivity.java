@@ -1,13 +1,13 @@
 package tv.baokan.baokanandroid.ui.activity;
 
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class BaseActivity extends AppCompatActivity {
@@ -30,6 +30,7 @@ public class BaseActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
+
     }
 
     @Override
@@ -69,4 +70,22 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 重写finish方法，增加返回动画
+     */
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
+    }
+
+    // 返回true则是不继续传播事件，自己处理。返回false则系统继续传播处理
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

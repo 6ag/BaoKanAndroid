@@ -21,17 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activity.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".ui.activity.MainActivity">
         </activity>
-        <activity
-            android:name=".ui.activity.NewsDetailActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".ui.activity.NewsDetailActivity">
         </activity>
-        <activity
-            android:name=".ui.activity.PhotoDetailActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".ui.activity.PhotoDetailActivity">
+        </activity>
+        <activity android:name=".ui.activity.LoginActivity">
+        </activity>
+        <activity android:name=".ui.activity.RegisterActivity">
+        </activity>
+        <activity android:name=".ui.activity.ForgotActivity">
         </activity>
     </application>
 

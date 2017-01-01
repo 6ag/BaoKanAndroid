@@ -30,7 +30,7 @@
             android:layout_height="35dp"
             android:background="@drawable/selector_red_button"
             android:text="取消"
-            android:textColor="#fff"/>
+            android:textColor="@drawable/selector_red_button_text"/>
 
         <Button
             android:id="@+id/btn_set_font_send"
@@ -39,7 +39,7 @@
             android:layout_marginStart="10dp"
             android:background="@drawable/selector_red_button"
             android:text="发送"
-            android:textColor="#fff"/>
+            android:textColor="@drawable/selector_red_button_text"/>
     </LinearLayout>
 
 </LinearLayout>

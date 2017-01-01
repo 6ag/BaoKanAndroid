@@ -3,11 +3,19 @@
     <!--主色调-->
     <color name="colorPrimary">#D03332</color>
     <color name="colorPrimaryDark">#D03332</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--强调颜色-->
+    <color name="colorAccent">#D03332</color>
 
     <!--导航栏灰色-->
     <color name="colorGray">#F4F4F4</color>
 
     <!--所有界面背景颜色-->
     <color name="colorAllBackgroundColor">#fff</color>
+
+    <!--红色按钮深色颜色-->
+    <drawable name="colorTextDark">#ccc</drawable>
+
+    <!--红色按钮默认颜色-->
+    <drawable name="colorTextNormal">#fff</drawable>
+
 </resources>

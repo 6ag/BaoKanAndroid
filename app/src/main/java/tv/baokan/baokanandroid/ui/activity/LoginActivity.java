@@ -1,0 +1,250 @@
+package tv.baokan.baokanandroid.ui.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.kaopiz.kprogresshud.KProgressHUD;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+import okhttp3.Call;
+import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.model.UserBean;
+import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
+import tv.baokan.baokanandroid.widget.NavigationViewRed;
+
+public class LoginActivity extends BaseActivity implements View.OnClickListener, TextWatcher {
+
+    private static final String TAG = "LoginActivity";
+
+    private NavigationViewRed mNavigationViewRed;    // 导航栏
+    private EditText mUsernameEditText;               // 账号
+    private EditText mPasswordEditText;               // 密码
+    private ImageView mShowPassword;                  // 显示密码
+    private Button mLoginButton;                      // 登录
+    private View mSinaView;                           // 新浪
+    private View mQqView;                             // QQ
+    private View mRegisterView;                       // 注册
+    private View mForgotPasswordView;                 // 忘记密码
+
+    /**
+     * 便捷启动当前activity
+     *
+     * @param activity 启动当前activity的activity
+     */
+    public static void start(Activity activity) {
+        Intent intent = new Intent(activity, LoginActivity.class);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        mNavigationViewRed = (NavigationViewRed) findViewById(R.id.nav_login);
+        mUsernameEditText = (EditText) findViewById(R.id.et_login_username);
+        mPasswordEditText = (EditText) findViewById(R.id.et_login_password);
+        mShowPassword = (ImageView) findViewById(R.id.iv_login_showpassword);
+        mLoginButton = (Button) findViewById(R.id.btn_login_login);
+        mSinaView = findViewById(R.id.ll_login_sina);
+        mQqView = findViewById(R.id.ll_login_qq);
+        mRegisterView = findViewById(R.id.rl_login_register);
+        mForgotPasswordView = findViewById(R.id.rl_login_forgotpassword);
+
+        // 配置导航栏
+        mNavigationViewRed.setupNavigationView(true, false, "登录", new NavigationViewRed.OnClickListener() {
+            @Override
+            public void onBackClick(View v) {
+                finish();
+            }
+        });
+
+        // 监听点击事件
+        mShowPassword.setOnClickListener(this);
+        mLoginButton.setOnClickListener(this);
+        mSinaView.setOnClickListener(this);
+        mQqView.setOnClickListener(this);
+        mRegisterView.setOnClickListener(this);
+        mForgotPasswordView.setOnClickListener(this);
+
+        // 改变登录按钮的状态
+        loginButtonStateChange();
+
+        // 文本框改变监听
+        mUsernameEditText.addTextChangedListener(this);
+        mPasswordEditText.addTextChangedListener(this);
+
+    }
+
+    // 下面3个方法是监听文本框改变
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        loginButtonStateChange();
+    }
+
+    /**
+     * 改变登录按钮的状态
+     */
+    private void loginButtonStateChange() {
+        // 账号和密码都不为空才能点击
+        if (!TextUtils.isEmpty(mUsernameEditText.getText().toString()) && !TextUtils.isEmpty(mPasswordEditText.getText().toString())) {
+            mLoginButton.setEnabled(true);
+        } else {
+            mLoginButton.setEnabled(false);
+        }
+    }
+
+    /**
+     * 处理各种点击事件
+     *
+     * @param v 被点击的view
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_login_showpassword:
+                showOrHidePassword();
+                break;
+            case R.id.btn_login_login:
+                login();
+                break;
+            case R.id.ll_login_sina:
+                sinaLogin();
+                break;
+            case R.id.ll_login_qq:
+                qqLogin();
+                break;
+            case R.id.rl_login_register:
+                register();
+                break;
+            case R.id.rl_login_forgotpassword:
+                forgotPassword();
+                break;
+        }
+    }
+
+    /**
+     * 明文密文切换
+     */
+    private void showOrHidePassword() {
+        if (mShowPassword.getTag() == null) {
+            mShowPassword.setTag("show");
+            mShowPassword.setImageResource(R.drawable.login_icon_viewcode_selected);
+            mPasswordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        } else {
+            mShowPassword.setTag(null);
+            mShowPassword.setImageResource(R.drawable.login_icon_viewcode_normal);
+            mPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+    }
+
+    /**
+     * 登录
+     */
+    private void login() {
+        String username = mUsernameEditText.getText().toString();
+        String password = mPasswordEditText.getText().toString();
+        if (TextUtils.isEmpty(username)) {
+            Toast.makeText(this, "账号不能为空", Toast.LENGTH_SHORT).show();
+        }
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
+        }
+
+        // 登录进度条
+        final KProgressHUD hud = ProgressHUD.show(this, "登录中...");
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("username", username);
+        parameters.put("password", password);
+
+        NetworkUtils.shared.post(APIs.LOGIN, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                hud.dismiss();
+                Toast.makeText(LoginActivity.this, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                hud.dismiss();
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (jsonObject.getString("err_msg").equals("success")) {
+                        UserBean userBean = new UserBean(jsonObject.getJSONObject("data"));
+                        // 将登录信息保存到数据库
+                        userBean.updateUserInfoFromLocal();
+                        // 销毁登录activity
+                        finish();
+                    } else {
+                        String info = jsonObject.getString("info");
+                        Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(LoginActivity.this, "数据解析异常", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
+    /**
+     * 新浪登录
+     */
+    private void sinaLogin() {
+
+    }
+
+    /**
+     * qq登录
+     */
+    private void qqLogin() {
+
+    }
+
+    /**
+     * 注册
+     */
+    private void register() {
+        RegisterActivity.start(this);
+    }
+
+    /**
+     * 找回密码
+     */
+    private void forgotPassword() {
+        ForgotActivity.start(this);
+    }
+
+}

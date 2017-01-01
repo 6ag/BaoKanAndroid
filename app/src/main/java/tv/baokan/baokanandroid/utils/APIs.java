@@ -3,7 +3,7 @@ package tv.baokan.baokanandroid.utils;
 public class APIs {
 
     /// 基础url
-    public static final String BASE_URL = "http://www.baokan.name/";
+    public static final String BASE_URL = "http://www.baokan.tv/";
 
     /// 基础url
     public static final String API_URL = BASE_URL + "e/bpi/";

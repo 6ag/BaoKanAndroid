@@ -3,6 +3,9 @@ package tv.baokan.baokanandroid.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * 全局的配置信息
+ */
 public class SharedPreferencesUtils {
 
     // 新闻详情字体

@@ -1,15 +1,16 @@
 package tv.baokan.baokanandroid.app;
 
 import android.app.Activity;
-import android.app.Application;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
 
+import org.litepal.LitePalApplication;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaoKanApp extends Application {
+public class BaoKanApp extends LitePalApplication {
 
     // 用于存放所有启动的Activity的集合
     private List<Activity> mActivityList;

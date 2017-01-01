@@ -1,5 +1,6 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
@@ -49,6 +51,7 @@ import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.ImageCacheUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
 import tv.baokan.baokanandroid.utils.SizeUtils;
 import tv.baokan.baokanandroid.utils.StatusUtils;
@@ -93,21 +96,22 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     /**
      * 便捷启动当前activity
      *
-     * @param context 上下文
-     * @param classid 栏目id
-     * @param id      文章id
+     * @param activity 来源activity
+     * @param classid  栏目id
+     * @param id       文章id
      */
-    public static void start(Context context, String classid, String id) {
-        Intent intent = new Intent(context, NewsDetailActivity.class);
+    public static void start(Activity activity, String classid, String id) {
+        Intent intent = new Intent(activity, NewsDetailActivity.class);
         intent.putExtra("classid_key", classid);
         intent.putExtra("id_key", id);
-        context.startActivity(intent);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 将MIUI/魅族的状态栏改成暗色
+        // 将MIUI/魅族的状态栏文字图标改成暗色
         if (!StatusUtils.setMiuiStatusBarDarkMode(this, true) && !StatusUtils.setMeizuStatusBarDarkMode(this, true)) {
             LogUtils.d(TAG, "修改状态栏没有作用");
         }
@@ -240,7 +244,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.ib_news_detail_bottom_bar_back:
                 finish();
-                overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
                 break;
             case R.id.ib_news_detail_bottom_bar_edit:
                 showCommentDialog();
@@ -371,31 +374,29 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void loadNewsDetailFromNetwork() {
 
-        OkHttpUtils
-                .get()
-                .url(APIs.ARTICLE_DETAIL)
-                .addParams("classid", classid)
-                .addParams("id", id)
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
-                    }
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("classid", classid);
+        parameters.put("id", id);
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
-                            detailBean = new ArticleDetailBean(jsonObject);
-                            // 加载webView
-                            setupWebViewData();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        NetworkUtils.shared.get(APIs.ARTICLE_DETAIL, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+            }
 
-                    }
-                });
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
+                    detailBean = new ArticleDetailBean(jsonObject);
+                    // 加载webView
+                    setupWebViewData();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     /**
@@ -485,7 +486,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private void setupWebViewData() {
 
         // 发布时间
-        String newstime = newstime = DateUtils.getStringTime(detailBean.getNewstime());;
+        String newstime = newstime = DateUtils.getStringTime(detailBean.getNewstime());
+        ;
 
         String html = "";
         html += "<div class=\"title\">" + detailBean.getTitle() + "</div>\n";
@@ -607,17 +609,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         return tempHtml;
     }
 
-    // 返回true则是不继续传播事件，自己处理。返回false则系统继续传播处理
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            finish();
-            overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     // java调用js需要在主线程调用
     private final class ArticleJavascriptInterface {
 
@@ -708,8 +699,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 public void onClick(View v) {
                     int position = holder.getAdapterPosition();
                     // 进入相关链接的正文页面
-                    NewsDetailActivity.start(mContext, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
-                    NewsDetailActivity.this.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
+                    NewsDetailActivity.start(NewsDetailActivity.this, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
                 }
             });
             return holder;

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/activity_forgot"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/colorPrimary"
+              android:clipToPadding="true"
+              android:fitsSystemWindows="true"
+              android:orientation="vertical"
+              tools:context="tv.baokan.baokanandroid.ui.activity.ForgotActivity">
+
+    <!--导航栏-->
+    <tv.baokan.baokanandroid.widget.NavigationViewRed
+        android:id="@+id/nav_forgot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </tv.baokan.baokanandroid.widget.NavigationViewRed>
+
+    <!--页面内容主体-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ECECF2"
+        android:orientation="vertical">
+
+        <!--账号密码-->
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            app:cardCornerRadius="5dp">
+
+            <!--输入框框区域-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/login_icon_phone"/>
+
+                    <tv.baokan.baokanandroid.widget.ClearEditText
+                        android:id="@+id/et_forgot_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@null"
+                        android:fastScrollEnabled="true"
+                        android:hint="爆侃账号"
+                        android:inputType="textFilter"
+                        android:maxLines="1"
+                        android:overScrollMode="never"
+                        android:textColorHint="#ccc"
+                        android:textSize="16sp">
+                    </tv.baokan.baokanandroid.widget.ClearEditText>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.2dp"
+                    android:layout_marginStart="30dp"
+                    android:alpha="0.5"
+                    android:background="#ccc"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/login_icon_yanzhengma"/>
+
+                    <tv.baokan.baokanandroid.widget.ClearEditText
+                        android:id="@+id/et_forgot_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@null"
+                        android:fastScrollEnabled="true"
+                        android:hint="邮箱"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:overScrollMode="never"
+                        android:textColorHint="#ccc"
+                        android:textSize="16sp">
+                    </tv.baokan.baokanandroid.widget.ClearEditText>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!--登录-->
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            app:cardCornerRadius="5dp">
+
+            <Button
+                android:id="@+id/btn_forgot_send"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_red_button"
+                android:text="发送"
+                android:textColor="@drawable/selector_red_button_text"/>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</LinearLayout>

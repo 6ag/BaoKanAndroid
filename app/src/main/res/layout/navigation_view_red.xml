@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:padding="13dp"
+        android:padding="15dp"
         android:src="@drawable/top_navigation_back_normal"
         android:visibility="invisible"/>
 
@@ -33,7 +33,7 @@
         android:layout_height="50dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:padding="13dp"
+        android:padding="15dp"
         android:src="@drawable/search_icon"
         android:visibility="invisible"/>
 </RelativeLayout>
