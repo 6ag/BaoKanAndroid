@@ -44,6 +44,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -51,6 +52,7 @@ import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.adapter.PhotoDetailViewPageAdapter;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
@@ -68,7 +70,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
     private ArticleDetailBean detailBean;   // 图库详情模型
     private List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans; // 图库所有图片模型集合
 
-    private ViewPageAdapter adapter;
+    private PhotoDetailViewPageAdapter adapter;
 
     private ViewPager mViewPager;           // 图片载体
     private View mTopLayout;                // 顶部视图
@@ -234,8 +236,22 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
             mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal1);
         }
 
+        // 组合图片url集合
+        List<String> photoList = new ArrayList<>();
+        for (ArticleDetailBean.ArticleDetailPhotoBean photoBean :
+                photoBeans) {
+            photoList.add(photoBean.getBigpic());
+        }
+
         //设置ViewPager
-        adapter = new ViewPageAdapter(this, photoBeans);
+        adapter = new PhotoDetailViewPageAdapter(this, photoList);
+        adapter.setOnPhotoTapListener(new PhotoDetailViewPageAdapter.OnPhotoTapListener() {
+            @Override
+            public void onPhotoTap() {
+                // 隐藏/显示 顶部/底部视图
+                onPhotoOneTapped();
+            }
+        });
         mViewPager.setAdapter(adapter);
 
         // 默认从第一页开始浏览
@@ -493,81 +509,6 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         });
 
         spring.setEndValue(0.5);
-    }
-
-    /**
-     * 图片浏览器ViewPageAdapter
-     */
-    public class ViewPageAdapter extends PagerAdapter {
-
-        private Context context;
-        List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans;
-        private SparseArray<View> cacheView; // 缓存展示图片的View
-
-        ViewPageAdapter(Context context, List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans) {
-            this.context = context;
-            this.photoBeans = photoBeans;
-            cacheView = new SparseArray<>(photoBeans.size());
-        }
-
-        @Override
-        public Object instantiateItem(final ViewGroup container, int position) {
-            View view = cacheView.get(position);
-            if (view == null) {
-                view = LayoutInflater.from(context).inflate(R.layout.image_photo_detail, container, false);
-                final ImageView imageView = (ImageView) view.findViewById(R.id.iv_photo_detail_item_imageview);
-                final PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imageView);
-                photoViewAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
-
-                    // 单点图片内区域
-                    @Override
-                    public void onPhotoTap(View view, float x, float y) {
-                        onPhotoOneTapped();
-                        LogUtils.d(TAG, "onPhotoTap");
-                    }
-
-                    // 单点图片外区域
-                    @Override
-                    public void onOutsidePhotoTap() {
-                        onPhotoOneTapped();
-                        LogUtils.d(TAG, "onOutsidePhotoTap");
-                    }
-                });
-
-                // 使用Picasso RGB_565高效加载图片
-                Picasso.with(context).load(photoBeans.get(position).getBigpic()).config(Bitmap.Config.RGB_565).into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        // 加载成功需要更新一下 否则可能错位
-                        photoViewAttacher.update();
-                    }
-
-                    @Override
-                    public void onError() {
-                        LogUtils.d(TAG, "图片加载失败");
-                    }
-                });
-                cacheView.put(position, view);
-            }
-            container.addView(view);
-            return view;
-        }
-
-        @Override
-        public int getCount() {
-            return photoBeans.size();
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-
     }
 
 }

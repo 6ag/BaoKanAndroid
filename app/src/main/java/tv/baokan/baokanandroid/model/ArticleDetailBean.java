@@ -243,6 +243,7 @@ public class ArticleDetailBean {
         // 图片描述
         private String caption;
 
+        // 小图url
         private String smallpic;
 
         // 图片url

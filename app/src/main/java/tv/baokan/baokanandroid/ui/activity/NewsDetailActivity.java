@@ -10,10 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -27,11 +24,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -44,7 +39,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +50,8 @@ import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.CommentBean;
 import tv.baokan.baokanandroid.model.UserBean;
+import tv.baokan.baokanandroid.adapter.CommentRecyclerViewAdapter;
+import tv.baokan.baokanandroid.adapter.LinkRecyclerViewAdapter;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
 import tv.baokan.baokanandroid.utils.ImageCacheUtils;
@@ -817,191 +813,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 }
             });
         }
-    }
-
-    // 相关链接item类型枚举
-    enum LINK_ITEM_TYPE {
-        NO_TITLE_PIC, // 无图
-        TITLE_PIC     // 有图
-    }
-
-    // 相关链接适配器
-    private class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-        List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList;
-        Context mContext;
-
-        LinkRecyclerViewAdapter(List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList, Context mContext) {
-            this.linkBeanList = linkBeanList;
-            this.mContext = mContext;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if (linkBeanList.get(position).getTitlepic() == null) {
-                return LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal();
-            } else {
-                return LINK_ITEM_TYPE.TITLE_PIC.ordinal();
-            }
-        }
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            final RecyclerView.ViewHolder holder;
-            View view;
-            if (viewType == LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal()) {
-                view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_notitlepic, parent, false);
-                holder = new NoTitlePicViewHolder(view);
-            } else {
-                view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_link_titlepic, parent, false);
-                holder = new TitlePicViewHolder(view);
-            }
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    // 进入相关链接的正文页面
-                    NewsDetailActivity.start(NewsDetailActivity.this, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
-                }
-            });
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            ArticleDetailBean.ArticleDetailLinkBean linkBean = linkBeanList.get(position);
-            LinkBaseViewHolder baseViewHolder = (LinkBaseViewHolder) holder;
-            baseViewHolder.titleTextView.setText(linkBean.getTitle());
-            baseViewHolder.classNameTextView.setText(linkBean.getClassname());
-            baseViewHolder.onclickTextView.setText(linkBean.getOnclick());
-            if (holder instanceof TitlePicViewHolder) {
-                TitlePicViewHolder titlePicViewHolder = (TitlePicViewHolder) holder;
-                titlePicViewHolder.titlePicView.setImageURI(linkBean.getTitlepic());
-            }
-            // 最后一个分割线隐藏
-            if (position == linkBeanList.size() - 1) {
-                baseViewHolder.lineView.setVisibility(View.INVISIBLE);
-            } else {
-                baseViewHolder.lineView.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return linkBeanList.size();
-        }
-
-        // 相关链接item基类
-        class LinkBaseViewHolder extends RecyclerView.ViewHolder {
-
-            TextView titleTextView;
-            TextView classNameTextView;
-            TextView onclickTextView;
-            View lineView;
-            View itemView;
-
-            LinkBaseViewHolder(View itemView) {
-                super(itemView);
-                this.itemView = itemView;
-                titleTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_title);
-                classNameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_classname);
-                onclickTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_link_onclick);
-                lineView = itemView.findViewById(R.id.v_cell_news_detail_link_line);
-            }
-        }
-
-        // 无图的item
-        class NoTitlePicViewHolder extends LinkBaseViewHolder {
-
-            NoTitlePicViewHolder(View itemView) {
-                super(itemView);
-            }
-        }
-
-        // 有图的item
-        class TitlePicViewHolder extends LinkBaseViewHolder {
-
-            SimpleDraweeView titlePicView;
-
-            TitlePicViewHolder(View itemView) {
-                super(itemView);
-                titlePicView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_link_pic);
-            }
-        }
-
-    }
-
-    // 评论适配器
-    private class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
-
-        List<CommentBean> commentBeanList;
-        Context mContext;
-
-        CommentRecyclerViewAdapter(List<CommentBean> commentBeanList, Context mContext) {
-            this.commentBeanList = commentBeanList;
-            this.mContext = mContext;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_comment, parent, false);
-            ViewHolder holder = new ViewHolder(view);
-            holder.starLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(mContext, "点赞", Toast.LENGTH_SHORT).show();
-                }
-            });
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            CommentBean commentBean = commentBeanList.get(position);
-            holder.portraitView.setImageURI(commentBean.getUserpic());
-            holder.nicknameTextView.setText(commentBean.getPlnickname());
-            holder.commentContentTextView.setText(commentBean.getSaytext());
-            holder.timeTextView.setText(commentBean.getSaytime());
-            holder.starNumTextView.setText(commentBean.getZcnum());
-            holder.commentNumTextView.setText(commentBean.getPlstep());
-            // 最后一个分割线隐藏
-            if (position == commentBeanList.size() - 1) {
-                holder.lineView.setVisibility(View.INVISIBLE);
-            } else {
-                holder.lineView.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return commentBeanList.size();
-        }
-
-        // 相关链接item基类
-        class ViewHolder extends RecyclerView.ViewHolder {
-
-            SimpleDraweeView portraitView;// 头像
-            TextView nicknameTextView;    // 昵称
-            TextView timeTextView;        // 时间
-            TextView starNumTextView;     // 点赞数
-            TextView commentNumTextView;  // 楼层
-            TextView commentContentTextView; // 评论内容
-            LinearLayout starLayout;      // 赞
-            View lineView;                // 分割线
-
-            ViewHolder(View itemView) {
-                super(itemView);
-                portraitView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_comment_portrait);
-                nicknameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_name);
-                timeTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_time);
-                starNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_star_num);
-                commentNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_num);
-                commentContentTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_content);
-                lineView = itemView.findViewById(R.id.v_cell_news_detail_comment_line);
-                starLayout = (LinearLayout) itemView.findViewById(R.id.ll_news_detail_comment_star);
-            }
-        }
-
     }
 
 }

@@ -102,6 +102,7 @@ public class NewsFragment extends BaseFragment {
 
     }
 
+    // viewPager适配器
     private class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
 
         NewsFragmentPagerAdapter(FragmentManager fm) {
