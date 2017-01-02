@@ -1,29 +1,49 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,6 +55,7 @@ import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PhotoDetailActivity extends BaseActivity implements View.OnClickListener {
 
@@ -43,7 +64,20 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
     private String classid;                 // 栏目id
     private String id;                      // 文章id
     private ArticleDetailBean detailBean;   // 图库详情模型
+    private List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans; // 图库所有图片模型集合
 
+    private ViewPageAdapter adapter;
+
+    private ViewPager mViewPager;           // 图片载体
+    private View mTopLayout;                // 顶部视图
+    private TextView mPageTextView;          // 页码
+    private TextView mReportTextView;       // 举报
+
+    private ProgressBar mProgressBar;       // 进度圈
+
+    private View mBottomLayout;             // 底部视图
+    private NestedScrollView mCaptionScriollView; // 图片文字介绍父视图
+    private TextView mCaptionTextView;      // 图片文字介绍
     private ImageButton mBackButton;        // 底部条 返回
     private ImageButton mEditButton;        // 底部条 编辑发布评论信息
     private ImageButton mCommentButton;     // 底部条 评论列表
@@ -83,13 +117,22 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
      * 准备UI
      */
     private void prepareUI() {
+        mViewPager = (ViewPager) findViewById(R.id.vp_photo_detail_viewPager);
+        mTopLayout = findViewById(R.id.ll_photo_detail_top_layout);
+        mPageTextView = (TextView) findViewById(R.id.tv_photo_detail_page);
+        mReportTextView = (TextView) findViewById(R.id.tv_photo_detail_report);
+        mProgressBar = (ProgressBar) findViewById(R.id.pb_photo_detail_progressbar);
+        mBottomLayout = findViewById(R.id.ll_photo_detail_bottom_layout);
+        mCaptionScriollView = (NestedScrollView) findViewById(R.id.nsv_photo_detail_caption_scrollview);
+        mCaptionTextView = (TextView) findViewById(R.id.tv_photo_detail_caption);
         mBackButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_back);
         mEditButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_edit);
         mCommentButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_comment);
         mCollectionButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_collection);
         mShareButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_share);
 
-        // 底部工具条按钮点击事件
+        // 监听点击事件
+        mReportTextView.setOnClickListener(this);
         mBackButton.setOnClickListener(this);
         mEditButton.setOnClickListener(this);
         mCommentButton.setOnClickListener(this);
@@ -108,13 +151,16 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 showCommentDialog();
                 break;
             case R.id.ib_photo_detail_bottom_bar_comment:
-
+                ProgressHUD.showInfo(mContext, "评论");
                 break;
             case R.id.ib_photo_detail_bottom_bar_collection:
                 collectArticle();
                 break;
             case R.id.ib_photo_detail_bottom_bar_share:
-
+                ProgressHUD.showInfo(mContext, "分享");
+                break;
+            case R.id.tv_photo_detail_report:
+                ProgressHUD.showInfo(mContext, "举报成功");
                 break;
         }
     }
@@ -157,7 +203,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 try {
                     JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
                     detailBean = new ArticleDetailBean(jsonObject);
-                    setupUI();
+                    setupUI(detailBean);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     ProgressHUD.showInfo(mContext, "数据解析异常");
@@ -168,9 +214,92 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
 
     /**
      * 详情数据加载成功后 - 配置UI
+     *
+     * @param detailBean 详情模型
      */
-    private void setupUI() {
+    private void setupUI(ArticleDetailBean detailBean) {
+        photoBeans = detailBean.getMorePicsList();
 
+        // 隐藏进度条
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        // 评论数量
+
+        // 收藏状态 1已经收藏过
+        if (detailBean.getHavefava().equals("1")) {
+            mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_selected);
+        } else {
+            mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal1);
+        }
+
+        //设置ViewPager
+        adapter = new ViewPageAdapter(this, photoBeans);
+        mViewPager.setAdapter(adapter);
+
+        // 默认从第一页开始浏览
+        mViewPager.setCurrentItem(0);
+        onPageChanged(0);
+
+        // 监听viewPager的滚动
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                onPageChanged(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+    }
+
+    /**
+     * 页码发生改变 更新页码指示器和图片描述文字
+     *
+     * @param position 页码
+     */
+    private void onPageChanged(int position) {
+        mPageTextView.setText(position + 1 + "/" + photoBeans.size());
+        mCaptionTextView.setText(photoBeans.get(position).getCaption());
+    }
+
+    // 是否是展开状态 - 默认是展开
+    boolean flag = true;
+
+    /**
+     * 图片单击手势 隐藏/展开 顶部、底部视图
+     */
+    private void onPhotoOneTapped() {
+        if (flag) {
+            flag = false;
+            // 隐藏
+            setupAnimation(mBottomLayout, R.animator.bottom_hide);
+            setupAnimation(mTopLayout, R.animator.top_hide);
+        } else {
+            flag = true;
+            // 展开
+            setupAnimation(mBottomLayout, R.animator.bottom_show);
+            setupAnimation(mTopLayout, R.animator.top_show);
+        }
+    }
+
+    /**
+     * 给view添加指定属性动画
+     *
+     * @param target 需要添加动画的对象
+     * @param id     动画id
+     */
+    private void setupAnimation(View target, int id) {
+        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, id);
+        set.setTarget(target);
+        set.start();
     }
 
     /**
@@ -341,6 +470,82 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         });
 
         spring.setEndValue(0.5);
+    }
+
+    /**
+     * 图片浏览器ViewPageAdapter
+     */
+    public class ViewPageAdapter extends PagerAdapter {
+
+        private Context context;
+        List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans;
+        private SparseArray<View> cacheView; // 缓存展示图片的View
+
+        ViewPageAdapter(Context context, List<ArticleDetailBean.ArticleDetailPhotoBean> photoBeans) {
+            this.context = context;
+            this.photoBeans = photoBeans;
+            cacheView = new SparseArray<>(photoBeans.size());
+        }
+
+        @Override
+        public Object instantiateItem(final ViewGroup container, int position) {
+            View view = cacheView.get(position);
+            if (view == null) {
+                view = LayoutInflater.from(context).inflate(R.layout.image_photo_detail, container, false);
+                final ImageView imageView = (ImageView) view.findViewById(R.id.iv_photo_detail_item_imageview);
+                final PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imageView);
+
+                // 使用Picasso RGB_565高效加载图片
+                Picasso.with(context).load(photoBeans.get(position).getBigpic()).config(Bitmap.Config.RGB_565).into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // 加载成功需要更新一下 否则可能错位
+                        photoViewAttacher.update();
+                    }
+
+                    @Override
+                    public void onError() {
+                        LogUtils.d(TAG, "图片加载失败");
+                    }
+                });
+
+                photoViewAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
+
+                    // 单点图片内区域
+                    @Override
+                    public void onPhotoTap(View view, float x, float y) {
+                        onPhotoOneTapped();
+                        LogUtils.d(TAG, "onPhotoTap");
+                    }
+
+                    // 单点图片外区域
+                    @Override
+                    public void onOutsidePhotoTap() {
+                        onPhotoOneTapped();
+                        LogUtils.d(TAG, "onOutsidePhotoTap");
+                    }
+                });
+                cacheView.put(position, view);
+            }
+            container.addView(view);
+            return view;
+        }
+
+        @Override
+        public int getCount() {
+            return photoBeans.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
     }
 
 }

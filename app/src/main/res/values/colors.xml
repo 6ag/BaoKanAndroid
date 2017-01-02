@@ -18,7 +18,10 @@
     <!--红色按钮默认颜色-->
     <color name="colorTextNormal">#fff</color>
 
+    <!--图片详情黑色透明背景颜色 不透明-->
+    <color name="colorPhotoBackground">#1C1A1C</color>
+
     <!--图片详情黑色透明背景颜色 70%透明度-->
-    <color name="colorPhotoBackground">#B21C1A1C</color>
+    <color name="colorPhotoShadow">#B21C1A1C</color>
 
 </resources>

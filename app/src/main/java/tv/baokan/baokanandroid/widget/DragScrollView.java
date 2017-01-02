@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.animation.TranslateAnimation;
 
 /**
- * 可以拖动的ScrollView
+ * 可以拖动的ScrollView 仿iOS UIScrollView
  */
 public class DragScrollView extends ScrollView {
 

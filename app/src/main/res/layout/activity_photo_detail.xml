@@ -5,10 +5,60 @@
     android:id="@+id/activity_photo_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPhotoBackground"
     tools:context="tv.baokan.baokanandroid.ui.activity.PhotoDetailActivity">
 
-    <!--滚动区域-->
+    <!--滚动区域 最底层-->
+    <tv.baokan.baokanandroid.widget.ViewPagerFixed
+        android:id="@+id/vp_photo_detail_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        >
+    </tv.baokan.baokanandroid.widget.ViewPagerFixed>
 
+    <!--顶部导航栏-->
+    <LinearLayout
+        android:id="@+id/ll_photo_detail_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPhotoShadow"
+        android:orientation="vertical">
+
+        <!--遮盖状态栏-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+        <!--导航栏-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp">
+
+            <TextView
+                android:id="@+id/tv_photo_detail_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="1/1"
+                android:textColor="#f5f5f5"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/tv_photo_detail_report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="15dp"
+                android:clickable="true"
+                android:text="举报"
+                android:textColor="#ccc"
+                android:textSize="16sp"/>
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <!--进度圈-->
     <ProgressBar
@@ -19,20 +69,42 @@
         android:layout_centerInParent="true"
         android:indeterminateDrawable="@anim/progressbar_rotate"/>
 
-    <!--新闻内容页底部条-->
+    <!--内容页底部-->
     <LinearLayout
-        android:id="@+id/ll_photo_detail_bottom_bar"
+        android:id="@+id/ll_photo_detail_bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorPhotoBackground"
+        android:background="@color/colorPhotoShadow"
         android:orientation="vertical">
+
+        <!--文字滚动视图-->
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nsv_photo_detail_caption_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:overScrollMode="never"
+            android:paddingBottom="20dp"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:paddingTop="15dp"
+            android:scrollbars="vertical">
+
+            <!--文字介绍-->
+            <TextView
+                android:id="@+id/tv_photo_detail_caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路"
+                android:textColor="#f5f5f5"
+                android:textSize="14sp"/>
+        </android.support.v4.widget.NestedScrollView>
 
         <!--分割线-->
         <View
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
-            android:background="#cccccc"/>
+            android:background="#19cccccc"/>
 
         <!--5个功能按钮-->
         <LinearLayout
