@@ -1,5 +1,8 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -20,13 +24,16 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -68,13 +75,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
     private static final String TAG = "NewsDetailActivity";
 
-    private Context mContext;
-
     private String classid;                 // 栏目id
     private String id;                      // 文章id
     private ArticleDetailBean detailBean;   // 新闻详情模型
     private List<CommentBean> commentBeanList; // 评论模型集合
 
+    private ViewGroup mContentView;              // 最外层视图
     private ProgressBar mProgressBar;       // 进度圈
     private ScrollView mScrollView;         // 内容载体 scrollView
     private WebView mContentWebView;        // 正文载体 webView
@@ -122,7 +128,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             LogUtils.d(TAG, "修改状态栏没有作用");
         }
         setContentView(R.layout.activity_news_detail);
-        mContext = this;
 
         prepareUI();
         prepareData();
@@ -133,6 +138,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      * 准备UI
      */
     private void prepareUI() {
+        mContentView = (ViewGroup) findViewById(R.id.activity_news_detail);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_news_detail_progressbar);
         mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
         mContentWebView = (WebView) findViewById(R.id.wv_news_detail_webview);
@@ -787,7 +793,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         }
 
         /**
-         * 让js调用这个方法进行数据回传
+         * 让js调用这个方法进行数据回传 - 如果不需要获取图片的坐标和尺寸，直接在上面那个方法操作也行的。我这里暂时写下面吧，后面再做个转场动画
          *
          * @param json 回传的图片信息json数据
          */
@@ -799,14 +805,79 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                     LogUtils.d(TAG, json);
                     try {
                         JSONObject jsonObject = new JSONObject(json);
-                        int index = jsonObject.getInt("index");
+                        final int index = jsonObject.getInt("index");
                         int x = Math.round((float) jsonObject.getDouble("x"));
                         int y = Math.round((float) jsonObject.getDouble("y"));
                         int width = Math.round((float) jsonObject.getDouble("width"));
                         int height = Math.round((float) jsonObject.getDouble("height"));
                         String url = jsonObject.getString("url");
 
-                        // 进入图片浏览器activity
+                        int imageViewX = SizeUtils.dip2px(mContext, x);
+                        int imageViewY = SizeUtils.dip2px(mContext, y + 20) - mScrollView.getScrollY();
+                        int imageViewWidth = SizeUtils.dip2px(mContext, width);
+                        int imageViewHeight = SizeUtils.dip2px(mContext, height);
+
+                        // 模拟颜色渐变的临时背景
+                        final ImageView tempBgView = new ImageView(mContext);
+                        RelativeLayout.LayoutParams tempBgViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                        tempBgView.setLayoutParams(tempBgViewLayoutParams);
+                        tempBgView.setBackgroundColor(mContext.getResources().getColor(R.color.colorPhotoBackground));
+                        mContentView.addView(tempBgView);
+
+                        // 创建一个临时图片，覆盖在被点击的正文图片上
+                        final SimpleDraweeView tempImageView = new SimpleDraweeView(mContext);
+                        tempImageView.setImageURI(url);
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageViewWidth, imageViewHeight);
+                        layoutParams.leftMargin = imageViewX;
+                        layoutParams.topMargin = imageViewY;
+                        tempImageView.setLayoutParams(layoutParams);
+                        mContentView.addView(tempImageView);
+
+                        int screenWidth = SizeUtils.getScreenWidthPx(mContext);
+                        int screenHeight = SizeUtils.getScreenHeightPx(mContext);
+
+                        // y方向偏移量达到居中
+                        float offestY = (screenHeight - imageViewHeight) * 0.5f - imageViewY;
+
+                        LogUtils.d(TAG, "x = " + imageViewX + " y = " + imageViewY + " offsetY = " + offestY + " width = " + imageViewWidth + " height = " + imageViewHeight);
+
+                        ObjectAnimator translationY = ObjectAnimator.ofFloat(tempImageView, "translationY", offestY);
+                        ObjectAnimator scaleX = ObjectAnimator.ofFloat(tempImageView, "scaleX", (float) screenWidth / imageViewWidth);
+                        ObjectAnimator scaleY = ObjectAnimator.ofFloat(tempImageView, "scaleY", (float) screenWidth / imageViewWidth);
+                        ObjectAnimator alphaBg = ObjectAnimator.ofFloat(tempBgView, "alpha", 0.0f, 1.0f);
+                        AnimatorSet animSet = new AnimatorSet();
+                        animSet.play(alphaBg).with(translationY).with(scaleX).with(scaleY);
+                        animSet.setDuration(300);
+                        animSet.start();
+                        animSet.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                // 进入图片浏览器activity - 无动画模式 模拟一个假象
+                                PhotoBrowserActivity.start(NewsDetailActivity.this, detailBean.getAllPhotoList(), index);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mContentView.removeView(tempImageView);
+                                        mContentView.removeView(tempBgView);
+                                    }
+                                }, 1000);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        });
 
                     } catch (JSONException e) {
                         e.printStackTrace();

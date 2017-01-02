@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class ArticleDetailBean {
     }
 
     // 正文插图
-    public static class InsetPhotoBean {
+    public static class InsetPhotoBean implements Serializable {
 
         // 图片占位字符
         private String ref;

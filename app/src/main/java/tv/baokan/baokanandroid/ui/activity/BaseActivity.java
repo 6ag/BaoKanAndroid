@@ -12,8 +12,8 @@ import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private BaoKanApp application;
-    private BaseActivity mContext;
+    public BaoKanApp application;
+    public BaseActivity mContext;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +64,7 @@ public class BaseActivity extends AppCompatActivity {
 
     /**
      * 把Toast定义成一个方法  可以重复使用，使用时只需要传入需要提示的内容即可
+     *
      * @param text 提示文字
      */
     public void showToast(String text) {
@@ -76,8 +77,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        // 不是退出应用才执行返回动画
-        if (!(this instanceof MainActivity)) {
+        if (this instanceof PhotoBrowserActivity) {
+            overridePendingTransition(R.anim.dismiss_enter, R.anim.dismiss_exit);
+        } else if (!(this instanceof MainActivity)) {
+            // 不是退出应用才执行返回动画
             overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
         }
     }

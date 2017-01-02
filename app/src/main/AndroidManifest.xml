@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".ui.activity.AgreementActivity">
         </activity>
+        <activity android:name=".ui.activity.PhotoBrowserActivity">
+        </activity>
     </application>
 
 </manifest>

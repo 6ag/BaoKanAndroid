@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_photo_browser"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPhotoBackground"
+    tools:context="tv.baokan.baokanandroid.ui.activity.PhotoBrowserActivity">
+
+    <!--滚动区域 最底层-->
+    <tv.baokan.baokanandroid.widget.ViewPagerFixed
+        android:id="@+id/vp_photo_browser_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
+    </tv.baokan.baokanandroid.widget.ViewPagerFixed>
+
+    <!--内容页底部-->
+    <LinearLayout
+        android:id="@+id/ll_photo_detail_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPhotoShadow"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingEnd="5dp"
+        android:paddingStart="10dp"
+        >
+
+        <TextView
+            android:id="@+id/tv_photo_browser_page"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="15dp"
+            android:text="1/1"
+            android:textColor="#f5f5f5"/>
+
+        <!--文字介绍-->
+        <TextView
+            android:id="@+id/tv_photo_browser_caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            android:text="偶家中文的张大年和玄清带着5000万又杀回来了"
+            android:textColor="#f5f5f5"
+            android:textSize="14sp"/>
+
+        <!--保存图片-->
+        <ImageView
+            android:id="@+id/iv_photo_browser_save"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:padding="5dp"
+            android:src="@drawable/bottom_bar_save_normal"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
