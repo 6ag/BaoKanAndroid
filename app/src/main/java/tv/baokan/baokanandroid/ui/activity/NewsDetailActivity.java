@@ -805,11 +805,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                         int width = Math.round((float) jsonObject.getDouble("width"));
                         int height = Math.round((float) jsonObject.getDouble("height"));
                         String url = jsonObject.getString("url");
-                        Toast.makeText(NewsDetailActivity.this, url, Toast.LENGTH_SHORT).show();
+
+                        // 进入图片浏览器activity
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
                 }
             });
         }

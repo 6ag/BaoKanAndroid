@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:overScrollMode="never"
-            android:paddingBottom="20dp"
+            android:paddingBottom="30dp"
             android:paddingEnd="15dp"
             android:paddingStart="15dp"
             android:paddingTop="15dp"

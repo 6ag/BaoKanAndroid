@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -59,6 +61,7 @@ import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
+import tv.baokan.baokanandroid.utils.SizeUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PhotoDetailActivity extends BaseActivity implements View.OnClickListener {
@@ -286,6 +289,28 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
     private void onPageChanged(int position) {
         mPageTextView.setText(position + 1 + "/" + photoBeans.size());
         mCaptionTextView.setText(photoBeans.get(position).getCaption());
+
+        // 滚动到最顶部
+        mCaptionScriollView.scrollTo(0, 0);
+
+        // 修改文本描述载体scrollView高度
+        ViewTreeObserver vto = mCaptionTextView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mCaptionTextView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = mCaptionTextView.getHeight();
+
+                int scrollViewHeight = height + SizeUtils.dip2px(mContext, 45);
+                int scrollViewMaxHeight = SizeUtils.dip2px(mContext, 120);
+
+                // 修改文字载体ScrollView的高度 = mCaptionTextView高度 + 35dp，并且现在最大高度为200dip
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mCaptionScriollView.getLayoutParams();
+                layoutParams.height = scrollViewHeight < scrollViewMaxHeight ? scrollViewHeight : scrollViewMaxHeight;
+                mCaptionScriollView.setLayoutParams(layoutParams);
+            }
+        });
+
     }
 
     // 是否是展开状态 - 默认是展开
