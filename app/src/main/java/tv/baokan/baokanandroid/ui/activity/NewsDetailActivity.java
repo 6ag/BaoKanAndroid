@@ -666,8 +666,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             for (int i = 0; i < detailBean.getAllPhotoList().size(); i++) {
                 ArticleDetailBean.InsetPhotoBean insetPhotoBean = detailBean.getAllPhotoList().get(i);
 
-                int width = insetPhotoBean.getWidthPixel();
-                int height = insetPhotoBean.getHeightPixel();
+                int width = insetPhotoBean.getWidthDip();
+                int height = insetPhotoBean.getHeightDip();
 
                 int screenWidth = SizeUtils.getScreenWidthDip(this);
                 if (width > screenWidth - 40) {

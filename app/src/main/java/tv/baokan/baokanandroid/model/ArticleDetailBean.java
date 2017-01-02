@@ -197,19 +197,19 @@ public class ArticleDetailBean {
         // 图片url
         private String url;
 
-        // 宽度 像素单位
-        private int widthPixel;
+        // 宽度 - 这里的单位可以看成dip
+        private int widthDip;
 
-        // 高度 像素单位
-        private int heightPixel;
+        // 高度 - 这里的单位可以看成dip
+        private int heightDip;
 
         InsetPhotoBean(JSONObject photo) {
             try {
                 ref = photo.getString("ref");
                 caption = photo.getString("caption");
                 url = photo.getString("url");
-                widthPixel = photo.getJSONObject("pixel").getInt("width");
-                heightPixel = photo.getJSONObject("pixel").getInt("height");
+                widthDip = photo.getJSONObject("pixel").getInt("width");
+                heightDip = photo.getJSONObject("pixel").getInt("height");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -227,12 +227,12 @@ public class ArticleDetailBean {
             return url;
         }
 
-        public int getWidthPixel() {
-            return widthPixel;
+        public int getWidthDip() {
+            return widthDip;
         }
 
-        public int getHeightPixel() {
-            return heightPixel;
+        public int getHeightDip() {
+            return heightDip;
         }
     }
 
