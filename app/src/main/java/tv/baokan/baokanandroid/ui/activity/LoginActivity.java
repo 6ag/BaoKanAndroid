@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
@@ -50,6 +51,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     private View mQqView;                             // QQ
     private View mRegisterView;                       // 注册
     private View mForgotPasswordView;                 // 忘记密码
+    private TextView mAgreementTextView;              // 注册条款
 
     /**
      * 便捷启动当前activity
@@ -76,6 +78,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         mQqView = findViewById(R.id.ll_login_qq);
         mRegisterView = findViewById(R.id.rl_login_register);
         mForgotPasswordView = findViewById(R.id.rl_login_forgotpassword);
+        mAgreementTextView = (TextView) findViewById(R.id.tv_login_agreement);
 
         // 配置导航栏
         mNavigationViewRed.setupNavigationView(true, false, "登录", new NavigationViewRed.OnClickListener() {
@@ -92,6 +95,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         mQqView.setOnClickListener(this);
         mRegisterView.setOnClickListener(this);
         mForgotPasswordView.setOnClickListener(this);
+        mAgreementTextView.setOnClickListener(this);
 
         // 改变登录按钮的状态
         loginButtonStateChange();
@@ -167,7 +171,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             case R.id.rl_login_forgotpassword:
                 forgotPassword();
                 break;
+            case R.id.tv_login_agreement:
+                readUserAgreement();
+                break;
         }
+    }
+
+    /**
+     * 阅读用户条款
+     */
+    private void readUserAgreement() {
+        AgreementActivity.start(this);
     }
 
     /**

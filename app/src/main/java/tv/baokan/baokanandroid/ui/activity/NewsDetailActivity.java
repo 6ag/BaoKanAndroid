@@ -649,8 +649,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private void setupWebViewData() {
 
         // 发布时间
-        String newstime = newstime = DateUtils.getStringTime(detailBean.getNewstime());
-        ;
+        String newstime = DateUtils.getStringTime(detailBean.getNewstime());
 
         String html = "";
         html += "<div class=\"title\">" + detailBean.getTitle() + "</div>\n";

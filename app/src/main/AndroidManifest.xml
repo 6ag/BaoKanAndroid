@@ -33,6 +33,8 @@
         </activity>
         <activity android:name=".ui.activity.ForgotActivity">
         </activity>
+        <activity android:name=".ui.activity.AgreementActivity">
+        </activity>
     </application>
 
 </manifest>

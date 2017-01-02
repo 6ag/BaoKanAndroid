@@ -95,7 +95,6 @@
                 android:id="@+id/tv_photo_detail_caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路盗墓？道县人的墓那才是至高的境界......一代盗圣水墨的成长之路"
                 android:textColor="#f5f5f5"
                 android:textSize="14sp"/>
         </android.support.v4.widget.NestedScrollView>

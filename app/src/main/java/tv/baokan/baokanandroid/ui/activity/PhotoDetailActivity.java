@@ -2,11 +2,13 @@ package tv.baokan.baokanandroid.ui.activity;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
@@ -279,14 +281,35 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
     private void onPhotoOneTapped() {
         if (flag) {
             flag = false;
-            // 隐藏
-            setupAnimation(mBottomLayout, R.animator.bottom_hide);
-            setupAnimation(mTopLayout, R.animator.top_hide);
+
+            // 隐藏状态栏
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+            // 为了调节隐藏UI的动画和隐藏状态栏动画一致
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // 隐藏顶部底部视图
+                    setupAnimation(mBottomLayout, R.animator.bottom_hide);
+                    setupAnimation(mTopLayout, R.animator.top_hide);
+                }
+            }, 200);
+
         } else {
             flag = true;
-            // 展开
+
+            // 展开顶部底部视图
             setupAnimation(mBottomLayout, R.animator.bottom_show);
             setupAnimation(mTopLayout, R.animator.top_show);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // 显示状态栏
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                }
+            }, 330);
+
         }
     }
 
@@ -494,21 +517,6 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 view = LayoutInflater.from(context).inflate(R.layout.image_photo_detail, container, false);
                 final ImageView imageView = (ImageView) view.findViewById(R.id.iv_photo_detail_item_imageview);
                 final PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imageView);
-
-                // 使用Picasso RGB_565高效加载图片
-                Picasso.with(context).load(photoBeans.get(position).getBigpic()).config(Bitmap.Config.RGB_565).into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        // 加载成功需要更新一下 否则可能错位
-                        photoViewAttacher.update();
-                    }
-
-                    @Override
-                    public void onError() {
-                        LogUtils.d(TAG, "图片加载失败");
-                    }
-                });
-
                 photoViewAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
 
                     // 单点图片内区域
@@ -523,6 +531,20 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                     public void onOutsidePhotoTap() {
                         onPhotoOneTapped();
                         LogUtils.d(TAG, "onOutsidePhotoTap");
+                    }
+                });
+
+                // 使用Picasso RGB_565高效加载图片
+                Picasso.with(context).load(photoBeans.get(position).getBigpic()).config(Bitmap.Config.RGB_565).into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // 加载成功需要更新一下 否则可能错位
+                        photoViewAttacher.update();
+                    }
+
+                    @Override
+                    public void onError() {
+                        LogUtils.d(TAG, "图片加载失败");
                     }
                 });
                 cacheView.put(position, view);
