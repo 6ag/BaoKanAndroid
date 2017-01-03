@@ -71,7 +71,8 @@ public class NewsListRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
             if (maxId.compareTo(newArticleListBeans.get(0).getId()) <= -1) {
                 // 替换数据
-                mArticleListBeans = newArticleListBeans;
+                mArticleListBeans.clear();
+                mArticleListBeans.addAll(newArticleListBeans);
                 // 刷新列表数据
                 notifyDataSetChanged();
 

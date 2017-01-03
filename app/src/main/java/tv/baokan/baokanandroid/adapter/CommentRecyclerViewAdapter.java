@@ -1,6 +1,7 @@
 package tv.baokan.baokanandroid.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,10 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tv.baokan.baokanandroid.R;
@@ -30,9 +31,13 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         public abstract void onStarTap(CommentBean commentBean, int position);
     }
 
-    private List<CommentBean> commentBeanList;
+    private List<CommentBean> commentBeanList = new ArrayList<>();
     private Context mContext;
     private OnCommentTapListener commentTapListener;
+
+    public CommentRecyclerViewAdapter(Context mContext) {
+        this.mContext = mContext;
+    }
 
     /**
      * 设置评论点击监听器
@@ -43,9 +48,45 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         this.commentTapListener = commentTapListener;
     }
 
-    public CommentRecyclerViewAdapter(List<CommentBean> commentBeanList, Context mContext) {
-        this.commentBeanList = commentBeanList;
-        this.mContext = mContext;
+    /**
+     * 更新数据
+     *
+     * @param newCommentBeanList 新数据
+     * @param method             0下拉刷新 1上拉加载更多
+     */
+    public void updateData(List<CommentBean> newCommentBeanList, int method) {
+
+        String maxId = "0";
+        String minId = "0";
+        if (commentBeanList != null && commentBeanList.size() > 0) {
+            maxId = commentBeanList.get(0).getPlid();
+            minId = commentBeanList.get(commentBeanList.size() - 1).getPlid();
+        }
+
+        if (method == 0) { // 下拉刷新
+            if (maxId.compareTo(newCommentBeanList.get(0).getPlid()) <= -1) {
+                // 替换数据
+                commentBeanList.clear();
+                commentBeanList.addAll(newCommentBeanList);
+
+                // 刷新列表数据
+                notifyDataSetChanged();
+            }
+
+        } else { // 上拉加载
+
+            if (minId.compareTo(newCommentBeanList.get(0).getPlid()) >= 1) {
+                // 拼接数据
+                commentBeanList.addAll(newCommentBeanList);
+                // 刷新列表数据
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return commentBeanList.size();
     }
 
     @Override
@@ -73,7 +114,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         holder.starNumTextView.setText(commentBean.getZcnum());
         holder.commentNumTextView.setText(commentBean.getPlstep());
         // 最后一个分割线隐藏
-        if (position == commentBeanList.size() - 1) {
+        if (position == commentBeanList.size() - 1 && commentBeanList.size() < 10) {
             holder.lineView.setVisibility(View.INVISIBLE);
         } else {
             holder.lineView.setVisibility(View.VISIBLE);
@@ -85,12 +126,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
             holder.starImageView.setImageResource(R.drawable.comment_support);
             holder.starNumTextView.setTextColor(mContext.getResources().getColor(R.color.colorCommentGray));
         }
-        LogUtils.d(TAG, commentBean.toString());
-    }
 
-    @Override
-    public int getItemCount() {
-        return commentBeanList.size();
     }
 
     // 相关链接item基类

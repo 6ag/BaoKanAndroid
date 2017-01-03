@@ -184,54 +184,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mCollectionButton.setOnClickListener(this);
         mShareButton.setOnClickListener(this);
 
-        // 相关链接列表
-        mLinkRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mLinkRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                switch (newState) {
-                    case RecyclerView.SCROLL_STATE_SETTLING:
-                        if (!Fresco.getImagePipeline().isPaused()) {
-                            Fresco.getImagePipeline().pause();
-                        }
-                        break;
-                    case RecyclerView.SCROLL_STATE_DRAGGING:
-                    case RecyclerView.SCROLL_STATE_IDLE:
-                        if (Fresco.getImagePipeline().isPaused()) {
-                            Fresco.getImagePipeline().resume();
-                        }
-                        break;
-                }
-            }
-        });
-
-        // 评论列表
-        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mCommentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                switch (newState) {
-                    case RecyclerView.SCROLL_STATE_SETTLING:
-                        if (!Fresco.getImagePipeline().isPaused()) {
-                            Fresco.getImagePipeline().pause();
-                        }
-                        break;
-                    case RecyclerView.SCROLL_STATE_DRAGGING:
-                    case RecyclerView.SCROLL_STATE_IDLE:
-                        if (Fresco.getImagePipeline().isPaused()) {
-                            Fresco.getImagePipeline().resume();
-                        }
-                        break;
-                }
-            }
-        });
-
         // 更多评论
         mMoreCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 跳转到评论列表
-
+                CommentListActivity.start(mContext, classid, id, commentBeanList, "news");
             }
         });
 
@@ -598,6 +556,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    ProgressHUD.showInfo(mContext, "数据解析失败");
                 }
             }
         });
@@ -630,6 +589,25 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             mLinkLayout.setVisibility(View.VISIBLE);
             mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
             mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
+            mLinkRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mLinkRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    switch (newState) {
+                        case RecyclerView.SCROLL_STATE_SETTLING:
+                            if (!Fresco.getImagePipeline().isPaused()) {
+                                Fresco.getImagePipeline().pause();
+                            }
+                            break;
+                        case RecyclerView.SCROLL_STATE_DRAGGING:
+                        case RecyclerView.SCROLL_STATE_IDLE:
+                            if (Fresco.getImagePipeline().isPaused()) {
+                                Fresco.getImagePipeline().resume();
+                            }
+                            break;
+                    }
+                }
+            });
         }
 
         // 页面加载完才去请求评论数据
@@ -644,18 +622,44 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         // 加载评论数据
         if (commentBeanList != null && commentBeanList.size() > 0) {
             mCommentLayout.setVisibility(View.VISIBLE);
-            mCommentRecyclerViewAdapter = new CommentRecyclerViewAdapter(commentBeanList, this);
+            mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mCommentRecyclerViewAdapter = new CommentRecyclerViewAdapter(this);
             mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
 
+            // 更新数据 - 0表示下拉刷新
+            mCommentRecyclerViewAdapter.updateData(commentBeanList, 0);
+
             // 评论数量不低于10条才显示更多评论
-            if (commentBeanList.size() <= 10) {
+            if (commentBeanList.size() < 10) {
                 mMoreCommentButton.setVisibility(View.GONE);
             } else {
                 mMoreCommentButton.setVisibility(View.VISIBLE);
             }
 
+            // 评论列表滚动事件
+            mCommentRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    switch (newState) {
+                        case RecyclerView.SCROLL_STATE_SETTLING:
+                            if (!Fresco.getImagePipeline().isPaused()) {
+                                Fresco.getImagePipeline().pause();
+                            }
+                            break;
+                        case RecyclerView.SCROLL_STATE_DRAGGING:
+                        case RecyclerView.SCROLL_STATE_IDLE:
+                            if (Fresco.getImagePipeline().isPaused()) {
+                                Fresco.getImagePipeline().resume();
+                            }
+                            break;
+                    }
+                }
+            });
+
             // 监听评论里的各种tap事件
             mCommentRecyclerViewAdapter.setOnCommentTapListener(new CommentRecyclerViewAdapter.OnCommentTapListener() {
+
+                // 评论点赞
                 @Override
                 public void onStarTap(final CommentBean commentBean, final int position) {
                     HashMap<String, String> parameters = new HashMap<>();

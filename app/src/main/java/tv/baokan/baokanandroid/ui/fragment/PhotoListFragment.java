@@ -177,17 +177,26 @@ public class PhotoListFragment extends BaseFragment {
             @Override
             public void onResponse(String response, int id) {
                 try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("data");
-                    List<ArticleListBean> tempListBeans = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                        tempListBeans.add(bean);
+                    if (new JSONObject(response).getString("err_msg").equals("success")) {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        List<ArticleListBean> tempListBeans = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
+                            tempListBeans.add(bean);
+                        }
+                        if (tempListBeans.size() == 0) {
+                            ProgressHUD.showInfo(mContext, "没有数据了~");
+                        } else {
+                            // 更新图片列表数据
+                            newsListAdapter.updateData(tempListBeans, method);
+                        }
+                    } else {
+                        String errorInfo = new JSONObject(response).getString("info");
+                        if (errorInfo != null) {
+                            ProgressHUD.showInfo(mContext, errorInfo);
+                        }
                     }
-
-                    // 更新图片列表数据
-                    newsListAdapter.updateData(tempListBeans, method);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } finally {

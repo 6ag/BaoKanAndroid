@@ -181,17 +181,27 @@ public class NewsListFragment extends BaseFragment {
             @Override
             public void onResponse(String response, int id) {
                 try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("data");
-                    List<ArticleListBean> tempListBeans = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                        tempListBeans.add(bean);
+                    // 如果所有接口响应格式是统一的，这些判断是可以封装在网络请求工具类里的哦
+                    if (new JSONObject(response).getString("err_msg").equals("success")) {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        List<ArticleListBean> tempListBeans = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
+                            tempListBeans.add(bean);
+                        }
+                        if (tempListBeans.size() == 0) {
+                            ProgressHUD.showInfo(mContext, "没有数据了~");
+                        } else {
+                            // 刷新数据
+                            newsListAdapter.updateData(tempListBeans, method);
+                        }
+                    } else {
+                        String errorInfo = new JSONObject(response).getString("info");
+                        if (errorInfo != null) {
+                            ProgressHUD.showInfo(mContext, errorInfo);
+                        }
                     }
-
-                    // 更新适配器里的列表数据
-                    newsListAdapter.updateData(tempListBeans, method);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } finally {

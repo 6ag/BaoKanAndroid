@@ -3,7 +3,9 @@ package tv.baokan.baokanandroid.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CommentBean {
+import java.io.Serializable;
+
+public class CommentBean implements Serializable {
 
     // 楼层
     private String plstep;

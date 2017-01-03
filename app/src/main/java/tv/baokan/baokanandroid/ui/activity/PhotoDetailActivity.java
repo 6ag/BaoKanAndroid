@@ -138,7 +138,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 showCommentDialog();
                 break;
             case R.id.ib_photo_detail_bottom_bar_comment:
-                ProgressHUD.showInfo(mContext, "评论");
+                CommentListActivity.start(mContext, classid, id, null, "photo");
                 break;
             case R.id.ib_photo_detail_bottom_bar_collection:
                 collectArticle();
