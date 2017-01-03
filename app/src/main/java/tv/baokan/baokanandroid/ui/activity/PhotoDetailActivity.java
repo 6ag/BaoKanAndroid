@@ -72,6 +72,8 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
     private ImageButton mCollectionButton;  // 底部条 收藏
     private ImageButton mShareButton;       // 底部条 分享
 
+    private TextView mPlnumTextView;        // 评论数量
+
     private AlertDialog commentDialog;      // 评论会话框
     private EditText commentEditText;       // 评论文本框
 
@@ -117,6 +119,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         mCommentButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_comment);
         mCollectionButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_collection);
         mShareButton = (ImageButton) findViewById(R.id.ib_photo_detail_bottom_bar_share);
+        mPlnumTextView = (TextView) findViewById(R.id.tv_photo_detail_plnum);
 
         // 监听点击事件
         mReportTextView.setOnClickListener(this);
@@ -211,6 +214,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         mProgressBar.setVisibility(View.INVISIBLE);
 
         // 评论数量
+        mPlnumTextView.setText(detailBean.getPlnum());
 
         // 收藏状态 1已经收藏过
         if (detailBean.getHavefava().equals("1")) {

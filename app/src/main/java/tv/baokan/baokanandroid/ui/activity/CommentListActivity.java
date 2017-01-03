@@ -26,7 +26,6 @@ import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.adapter.CommentRecyclerViewAdapter;
 import tv.baokan.baokanandroid.model.CommentBean;
 import tv.baokan.baokanandroid.utils.APIs;
-import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;

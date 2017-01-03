@@ -85,8 +85,8 @@
             android:layout_height="120dp"
             android:overScrollMode="never"
             android:paddingBottom="30dp"
-            android:paddingEnd="15dp"
-            android:paddingStart="15dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
             android:paddingTop="15dp"
             android:scrollbars="vertical">
 
@@ -131,15 +131,32 @@
                 android:paddingTop="10dp"
                 android:src="@drawable/bottom_bar_edit_normal"/>
 
-            <ImageButton
-                android:id="@+id/ib_photo_detail_bottom_bar_comment"
+            <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@null"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:src="@drawable/bottom_bar_comment_normal"/>
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/ib_photo_detail_bottom_bar_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:src="@drawable/bottom_bar_comment_normal"/>
+
+                <!--评论数量-->
+                <TextView
+                    android:id="@+id/tv_photo_detail_plnum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="8dp"
+                    android:text="27"
+                    android:textColor="@color/colorPrimary"/>
+
+            </RelativeLayout>
 
             <ImageButton
                 android:id="@+id/ib_photo_detail_bottom_bar_collection"
