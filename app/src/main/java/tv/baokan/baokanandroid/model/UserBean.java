@@ -20,7 +20,7 @@ public class UserBean {
     private static final String TAG = "UserBean";
 
     // 用户id
-    private int id;
+    private String userid;
 
     // token
     private String token;
@@ -61,7 +61,7 @@ public class UserBean {
 
     public UserBean(JSONObject jsonObject) {
         try {
-            id = jsonObject.getInt("id");
+            userid = jsonObject.getString("id");
             token = jsonObject.getString("token");
             username = jsonObject.getString("username");
             nickname = jsonObject.getString("nickname");
@@ -75,15 +75,16 @@ public class UserBean {
             points = jsonObject.getString("points");
         } catch (JSONException e) {
             e.printStackTrace();
+            LogUtils.d(TAG, "数据解析异常");
         }
     }
 
-    public int getId() {
-        return id;
+    public String getUserid() {
+        return userid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserid(String userid) {
+        this.userid = userid;
     }
 
     public String getToken() {
@@ -211,6 +212,7 @@ public class UserBean {
      * 退出登录
      */
     public static void logout() {
+        UserBean.userAccount = null;
         SharedPreferences sp = BaoKanApp.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         sp.edit().clear().apply();
     }
@@ -241,7 +243,7 @@ public class UserBean {
         if (isLogin()) {
             HashMap<String, String> parameters = new HashMap<>();
             parameters.put("username", shared().username);
-            parameters.put("userid", String.valueOf(shared().id));
+            parameters.put("userid", shared().userid);
             parameters.put("token", shared().token);
             NetworkUtils.shared.get(APIs.GET_USERINFO, parameters, new NetworkUtils.StringCallback() {
                 @Override
@@ -277,9 +279,10 @@ public class UserBean {
      * 编码
      */
     private void encode() {
+        LogUtils.d(TAG, this.toString());
         SharedPreferences sp = BaoKanApp.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("id", id);
+        editor.putString("userid", userid);
         editor.putString("token", token);
         editor.putString("username", username);
         editor.putString("nickname", nickname);
@@ -299,7 +302,7 @@ public class UserBean {
      */
     private void decode() {
         SharedPreferences sp = BaoKanApp.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        id = sp.getInt("id", 0);
+        userid = sp.getString("userid", "0");
         token = sp.getString("token", "");
         username = sp.getString("username", "");
         nickname = sp.getString("nickname", "");
@@ -313,4 +316,21 @@ public class UserBean {
         points = sp.getString("points", "");
     }
 
+    @Override
+    public String toString() {
+        return "UserBean{" +
+                "userid='" + userid + '\'' +
+                ", token='" + token + '\'' +
+                ", username='" + username + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", registerTime='" + registerTime + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", qq='" + qq + '\'' +
+                ", phone='" + phone + '\'' +
+                ", saytext='" + saytext + '\'' +
+                ", points='" + points + '\'' +
+                '}';
+    }
 }

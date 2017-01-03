@@ -24,4 +24,7 @@
     <!--图片详情黑色透明背景颜色 70%透明度-->
     <color name="colorPhotoShadow">#B21C1A1C</color>
 
+    <!--评论灰色文字颜色-->
+    <color name="colorCommentGray">#BCBCBC</color>
+
 </resources>

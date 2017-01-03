@@ -12,9 +12,12 @@ import okhttp3.Call;
 
 public class NetworkUtils {
 
+    private static final String TAG = "NetworkUtils";
+
     public static final NetworkUtils shared = new NetworkUtils();
 
-    private NetworkUtils() {}
+    private NetworkUtils() {
+    }
 
     public static abstract class StringCallback {
         public abstract void onError(Call call, Exception e, int id);
@@ -34,7 +37,10 @@ public class NetworkUtils {
         GetBuilder okHttpUtils = OkHttpUtils.get().url(api);
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             okHttpUtils.addParams(entry.getKey(), entry.getValue());
+            LogUtils.d(TAG, entry.getKey() + " = " + entry.getValue());
         }
+        LogUtils.d(TAG, "api = " + api);
+
         okHttpUtils.build().execute(new com.zhy.http.okhttp.callback.StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -61,7 +67,10 @@ public class NetworkUtils {
         PostFormBuilder okHttpUtils = OkHttpUtils.post().url(api);
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             okHttpUtils.addParams(entry.getKey(), entry.getValue());
+            LogUtils.d(TAG, entry.getKey() + " = " + entry.getValue());
         }
+        LogUtils.d(TAG, "api = " + api);
+
         okHttpUtils.build().execute(new com.zhy.http.okhttp.callback.StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {

@@ -35,6 +35,9 @@ public class CommentBean {
     // 用户头像 需要拼接
     private String userpic;
 
+    // 是否被赞过 - 默认没有
+    private boolean isStar = false;
+
     public CommentBean(JSONObject jsonObject) {
         try {
             plstep = jsonObject.getString("plstep");
@@ -106,5 +109,17 @@ public class CommentBean {
 
     public String getUserpic() {
         return userpic;
+    }
+
+    public void setZcnum(String zcnum) {
+        this.zcnum = zcnum;
+    }
+
+    public boolean isStar() {
+        return isStar;
+    }
+
+    public void setStar(boolean star) {
+        isStar = star;
     }
 }

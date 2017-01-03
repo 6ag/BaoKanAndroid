@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,15 +16,18 @@ import java.util.List;
 
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.CommentBean;
+import tv.baokan.baokanandroid.utils.LogUtils;
 
 /**
  * 评论适配器
  */
 public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
 
+    private static final String TAG = "CommentRecyclerViewAdap";
+
     public static interface OnCommentTapListener {
         // 点赞
-        public abstract void onStarTap(CommentBean commentBean);
+        public abstract void onStarTap(CommentBean commentBean, int position);
     }
 
     private List<CommentBean> commentBeanList;
@@ -52,7 +56,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
             @Override
             public void onClick(View v) {
                 if (commentTapListener != null) {
-                    commentTapListener.onStarTap(commentBeanList.get(holder.getAdapterPosition()));
+                    commentTapListener.onStarTap(commentBeanList.get(holder.getAdapterPosition()), holder.getAdapterPosition());
                 }
             }
         });
@@ -74,6 +78,14 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         } else {
             holder.lineView.setVisibility(View.VISIBLE);
         }
+        if (commentBean.isStar()) {
+            holder.starImageView.setImageResource(R.drawable.comment_support_highlighted);
+            holder.starNumTextView.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
+        } else {
+            holder.starImageView.setImageResource(R.drawable.comment_support);
+            holder.starNumTextView.setTextColor(mContext.getResources().getColor(R.color.colorCommentGray));
+        }
+        LogUtils.d(TAG, commentBean.toString());
     }
 
     @Override
@@ -88,6 +100,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         TextView nicknameTextView;    // 昵称
         TextView timeTextView;        // 时间
         TextView starNumTextView;     // 点赞数
+        ImageView starImageView;      // 点赞图标
         TextView commentNumTextView;  // 楼层
         TextView commentContentTextView; // 评论内容
         LinearLayout starLayout;      // 赞
@@ -98,7 +111,8 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
             portraitView = (SimpleDraweeView) itemView.findViewById(R.id.sdv_cell_news_detail_comment_portrait);
             nicknameTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_name);
             timeTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_time);
-            starNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_star_num);
+            starNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_star_num);
+            starImageView = (ImageView) itemView.findViewById(R.id.iv_cell_news_comment_star_image);
             commentNumTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_num);
             commentContentTextView = (TextView) itemView.findViewById(R.id.tv_cell_news_detail_comment_content);
             lineView = itemView.findViewById(R.id.v_cell_news_detail_comment_line);

@@ -88,7 +88,7 @@
         android:padding="12dp">
 
         <TextView
-            android:id="@+id/tv_cell_news_detail_star_num"
+            android:id="@+id/tv_cell_news_detail_comment_star_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -97,6 +97,7 @@
             android:textSize="12sp"/>
 
         <ImageView
+            android:id="@+id/iv_cell_news_comment_star_image"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginStart="3dp"

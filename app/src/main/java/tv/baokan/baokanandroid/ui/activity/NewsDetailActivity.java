@@ -279,7 +279,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         if (UserBean.isLogin()) {
             HashMap<String, String> parameters = new HashMap<>();
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
             parameters.put("classid", classid);
             parameters.put("id", id);
@@ -306,7 +306,13 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                                 mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal2);
                             }
                         }
-                        ProgressHUD.showInfo(NewsDetailActivity.this, tipString);
+                        if (tipString.equals("您还没登录!")) {
+                            showLoginTipDialog();
+                            // 注销本地用户信息
+                            UserBean.logout();
+                        } else {
+                            ProgressHUD.showInfo(NewsDetailActivity.this, tipString);
+                        }
                         collectionButtonSpringAnimation();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -315,20 +321,27 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 }
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setCancelable(true);
-            builder.setIcon(R.mipmap.ic_launcher);
-            builder.setTitle("您还未登录");
-            builder.setMessage("登录以后才能收藏文章哦！");
-            builder.setPositiveButton("登录", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    LoginActivity.start(NewsDetailActivity.this);
-                }
-            });
-            builder.setNegativeButton("以后再说", null);
-            builder.show();
+            showLoginTipDialog();
         }
+    }
+
+    /**
+     * 显示登录提示会话框
+     */
+    private void showLoginTipDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setTitle("您还未登录");
+        builder.setMessage("登录以后才能收藏文章哦！");
+        builder.setPositiveButton("登录", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LoginActivity.start(NewsDetailActivity.this);
+            }
+        });
+        builder.setNegativeButton("以后再说", null);
+        builder.show();
     }
 
     /**
@@ -397,13 +410,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * 发布评论
+     * 发布评论 - 把所有评论信息的用户名都改了。。
      *
      * @param comment 评论信息
      */
     private void sendComment(String comment) {
 
-        LogUtils.d(TAG, "评论内容 = " + comment);
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("classid", classid);
         parameters.put("id", id);
@@ -411,7 +423,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         if (UserBean.isLogin()) {
             parameters.put("nomember", "0");
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
         } else {
             parameters.put("nomember", "1");
@@ -527,7 +539,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         parameters.put("id", id);
         if (UserBean.isLogin()) {
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
         }
 
@@ -641,6 +653,42 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             } else {
                 mMoreCommentButton.setVisibility(View.VISIBLE);
             }
+
+            // 监听评论里的各种tap事件
+            mCommentRecyclerViewAdapter.setOnCommentTapListener(new CommentRecyclerViewAdapter.OnCommentTapListener() {
+                @Override
+                public void onStarTap(final CommentBean commentBean, final int position) {
+                    HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("classid", commentBean.getClassid());
+                    parameters.put("id", commentBean.getId());
+                    parameters.put("plid", commentBean.getPlid());
+                    parameters.put("dopl", "1");
+                    parameters.put("action", "DoForPl");
+
+                    NetworkUtils.shared.post(APIs.TOP_DOWN, parameters, new NetworkUtils.StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+                            ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+                        }
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                if (jsonObject.getString("err_msg").equals("success")) {
+                                    int newZcnum = Integer.valueOf(commentBean.getZcnum()).intValue() + 1;
+                                    commentBean.setZcnum(String.valueOf(newZcnum));
+                                    commentBean.setStar(true);
+                                    mCommentRecyclerViewAdapter.notifyItemChanged(position);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                ProgressHUD.showInfo(mContext, "数据解析失败");
+                            }
+                        }
+                    });
+                }
+            });
 
         }
     }

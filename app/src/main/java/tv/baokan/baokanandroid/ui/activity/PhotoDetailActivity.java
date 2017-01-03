@@ -175,7 +175,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         parameters.put("id", id);
         if (UserBean.isLogin()) {
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
         }
 
@@ -406,7 +406,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         if (UserBean.isLogin()) {
             parameters.put("nomember", "0");
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
         } else {
             parameters.put("nomember", "1");
@@ -444,7 +444,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         if (UserBean.isLogin()) {
             HashMap<String, String> parameters = new HashMap<>();
             parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", String.valueOf(UserBean.shared().getId()));
+            parameters.put("userid", UserBean.shared().getUserid());
             parameters.put("token", UserBean.shared().getToken());
             parameters.put("classid", classid);
             parameters.put("id", id);
@@ -471,7 +471,13 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                                 mCollectionButton.setImageResource(R.drawable.bottom_bar_collection_normal1);
                             }
                         }
-                        ProgressHUD.showInfo(mContext, tipString);
+                        if (tipString.equals("您还没登录!")) {
+                            showLoginTipDialog();
+                            // 注销本地用户信息
+                            UserBean.logout();
+                        } else {
+                            ProgressHUD.showInfo(mContext, tipString);
+                        }
                         collectionButtonSpringAnimation();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -480,20 +486,27 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 }
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setCancelable(true);
-            builder.setIcon(R.mipmap.ic_launcher);
-            builder.setTitle("您还未登录");
-            builder.setMessage("登录以后才能收藏文章哦！");
-            builder.setPositiveButton("登录", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    LoginActivity.start(PhotoDetailActivity.this);
-                }
-            });
-            builder.setNegativeButton("以后再说", null);
-            builder.show();
+            showLoginTipDialog();
         }
+    }
+
+    /**
+     * 显示登录提示会话框
+     */
+    private void showLoginTipDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setTitle("您还未登录");
+        builder.setMessage("登录以后才能收藏文章哦！");
+        builder.setPositiveButton("登录", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LoginActivity.start(PhotoDetailActivity.this);
+            }
+        });
+        builder.setNegativeButton("以后再说", null);
+        builder.show();
     }
 
     /**
