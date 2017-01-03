@@ -21,8 +21,23 @@ import tv.baokan.baokanandroid.model.CommentBean;
  */
 public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
 
-    List<CommentBean> commentBeanList;
-    Context mContext;
+    public static interface OnCommentTapListener {
+        // 点赞
+        public abstract void onStarTap(CommentBean commentBean);
+    }
+
+    private List<CommentBean> commentBeanList;
+    private Context mContext;
+    private OnCommentTapListener commentTapListener;
+
+    /**
+     * 设置评论点击监听器
+     *
+     * @param commentTapListener 监听器
+     */
+    public void setOnCommentTapListener(OnCommentTapListener commentTapListener) {
+        this.commentTapListener = commentTapListener;
+    }
 
     public CommentRecyclerViewAdapter(List<CommentBean> commentBeanList, Context mContext) {
         this.commentBeanList = commentBeanList;
@@ -32,11 +47,13 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
     @Override
     public CommentRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.cell_news_detail_comment, parent, false);
-        CommentRecyclerViewAdapter.ViewHolder holder = new CommentRecyclerViewAdapter.ViewHolder(view);
+        final CommentRecyclerViewAdapter.ViewHolder holder = new CommentRecyclerViewAdapter.ViewHolder(view);
         holder.starLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "点赞", Toast.LENGTH_SHORT).show();
+                if (commentTapListener != null) {
+                    commentTapListener.onStarTap(commentBeanList.get(holder.getAdapterPosition()));
+                }
             }
         });
         return holder;

@@ -557,39 +557,39 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      * 加载最新10条评论数据
      */
     private void loadCommentFromNetwork() {
-        OkHttpUtils
-                .get()
-                .url(APIs.GET_COMMENT)
-                .addParams("classid", classid)
-                .addParams("id", id)
-                .addParams("pageIndex", "1")
-                .addParams("pageSize", "10")
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Toast.makeText(mContext, "您的网络不给力哦", Toast.LENGTH_SHORT).show();
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("classid", classid);
+        parameters.put("id", id);
+        parameters.put("pageIndex", "1");
+        parameters.put("pageSize", "10");
+
+        NetworkUtils.shared.get(APIs.GET_COMMENT, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    List<CommentBean> tempBeanList = new ArrayList<>();
+                    JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        CommentBean commentBean = new CommentBean(jsonArray.getJSONObject(i));
+                        tempBeanList.add(commentBean);
                     }
+                    commentBeanList = tempBeanList;
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        try {
-                            List<CommentBean> tempBeanList = new ArrayList<>();
-                            JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                CommentBean commentBean = new CommentBean(jsonArray.getJSONObject(i));
-                                tempBeanList.add(commentBean);
-                            }
-                            commentBeanList = tempBeanList;
+                    // 配置评论数据
+                    setupCommentData();
 
-                            // 配置评论数据
-                            setupCommentData();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
-                    }
-                });
     }
 
     /**
@@ -706,6 +706,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
         // 本地html加载一定要成功
         if (localHtml == null) {
+            ProgressHUD.showInfo(mContext, "解析数据失败");
             return;
         }
 
