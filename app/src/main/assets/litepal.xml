@@ -5,6 +5,11 @@
     <version value="1">
     </version>
     <list>
-
+        <mapping class="tv.baokan.baokanandroid.cache.NewsListHomeCache">
+        </mapping>
+        <mapping class="tv.baokan.baokanandroid.cache.NewsListOtherCache">
+        </mapping>
+        <mapping class="tv.baokan.baokanandroid.cache.NewsContentCache">
+        </mapping>
     </list>
 </litepal>

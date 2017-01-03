@@ -23,14 +23,17 @@ import java.util.List;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.adapter.NewsListRecyclerViewAdapter;
+import tv.baokan.baokanandroid.cache.NewsDALManager;
 import tv.baokan.baokanandroid.model.ArticleListBean;
 import tv.baokan.baokanandroid.ui.activity.NewsDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 
 public class NewsListFragment extends BaseFragment {
 
+    private static final String TAG = "NewsListFragment";
     private String classid;      // 栏目id
     private int pageIndex = 1;   // 当前页码
 
@@ -126,23 +129,13 @@ public class NewsListFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadNewsFromNetwork(classid, 1, 0);
-                    }
-                }, 500);
+                loadNewsFromNetwork(classid, 1, 0);
             }
 
             @Override
             public void onLoadMore(final TwinklingRefreshLayout refreshLayout) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        pageIndex += 1;
-                        loadNewsFromNetwork(classid, pageIndex, 1);
-                    }
-                }, 500);
+                pageIndex += 1;
+                loadNewsFromNetwork(classid, pageIndex, 1);
             }
         });
 
@@ -160,59 +153,41 @@ public class NewsListFragment extends BaseFragment {
      */
     private void loadNewsFromNetwork(final String classid, int pageIndex, final int method) {
 
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put("table", "news");
-        parameters.put("classid", classid);
-        parameters.put("pageIndex", String.valueOf(pageIndex));
-        parameters.put("pageSize", String.valueOf(20));
-
-        NetworkUtils.shared.get(APIs.ARTICLE_LIST, parameters, new NetworkUtils.StringCallback() {
+        // 从数据访问层加载数据
+        NewsDALManager.shared.loadNewsList("news", classid, pageIndex, new NewsDALManager.NewsListCallback() {
             @Override
-            public void onError(Call call, Exception e, int id) {
-                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
-                // 网络错误也得结束刷新
-                if (method == 0) {
-                    refreshLayout.finishRefreshing();
-                } else {
-                    refreshLayout.finishLoadmore();
-                }
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
+            public void onSuccess(JSONArray jsonArray) {
                 try {
-                    // 如果所有接口响应格式是统一的，这些判断是可以封装在网络请求工具类里的哦
-                    if (new JSONObject(response).getString("err_msg").equals("success")) {
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        List<ArticleListBean> tempListBeans = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                            tempListBeans.add(bean);
-                        }
-                        if (tempListBeans.size() == 0) {
-                            ProgressHUD.showInfo(mContext, "没有数据了~");
-                        } else {
-                            // 刷新数据
-                            newsListAdapter.updateData(tempListBeans, method);
-                        }
+                    List<ArticleListBean> tempListBeans = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
+                        tempListBeans.add(bean);
+                    }
+                    if (tempListBeans.size() == 0) {
+                        ProgressHUD.showInfo(mContext, "没有数据了~");
                     } else {
-                        String errorInfo = new JSONObject(response).getString("info");
-                        if (errorInfo != null) {
-                            ProgressHUD.showInfo(mContext, errorInfo);
-                        }
+                        // 刷新数据
+                        newsListAdapter.updateData(tempListBeans, method);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } finally {
-                    // 结束刷新
                     if (method == 0) {
                         refreshLayout.finishRefreshing();
                     } else {
                         refreshLayout.finishLoadmore();
                     }
                 }
+            }
 
+            @Override
+            public void onError(String tipString) {
+                ProgressHUD.showInfo(mContext, tipString);
+                if (method == 0) {
+                    refreshLayout.finishRefreshing();
+                } else {
+                    refreshLayout.finishLoadmore();
+                }
             }
         });
 

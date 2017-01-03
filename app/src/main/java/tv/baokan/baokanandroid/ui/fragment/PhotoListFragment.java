@@ -22,6 +22,7 @@ import java.util.List;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.adapter.PhotoListRecyclerViewAdapter;
+import tv.baokan.baokanandroid.cache.NewsDALManager;
 import tv.baokan.baokanandroid.model.ArticleListBean;
 import tv.baokan.baokanandroid.ui.activity.PhotoDetailActivity;
 import tv.baokan.baokanandroid.utils.APIs;
@@ -121,23 +122,13 @@ public class PhotoListFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadNewsFromNetwork(classid, 1, 0);
-                    }
-                }, 500);
+                loadNewsFromNetwork(classid, 1, 0);
             }
 
             @Override
             public void onLoadMore(final TwinklingRefreshLayout refreshLayout) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        pageIndex += 1;
-                        loadNewsFromNetwork(classid, pageIndex, 1);
-                    }
-                }, 500);
+                pageIndex += 1;
+                loadNewsFromNetwork(classid, pageIndex, 1);
             }
         });
 
@@ -155,59 +146,41 @@ public class PhotoListFragment extends BaseFragment {
      */
     private void loadNewsFromNetwork(final String classid, int pageIndex, final int method) {
 
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put("table", "photo");
-        parameters.put("classid", classid);
-        parameters.put("pageIndex", String.valueOf(pageIndex));
-        parameters.put("pageSize", String.valueOf(20));
-
-        NetworkUtils.shared.get(APIs.ARTICLE_LIST, parameters, new NetworkUtils.StringCallback() {
-
+        // 从数据访问层加载数据
+        NewsDALManager.shared.loadNewsList("photo", classid, pageIndex, new NewsDALManager.NewsListCallback() {
             @Override
-            public void onError(Call call, Exception e, int id) {
-                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
-                // 结束刷新
-                if (method == 0) {
-                    refreshLayout.finishRefreshing();
-                } else {
-                    refreshLayout.finishLoadmore();
-                }
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
+            public void onSuccess(JSONArray jsonArray) {
                 try {
-                    if (new JSONObject(response).getString("err_msg").equals("success")) {
-                        JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        List<ArticleListBean> tempListBeans = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
-                            tempListBeans.add(bean);
-                        }
-                        if (tempListBeans.size() == 0) {
-                            ProgressHUD.showInfo(mContext, "没有数据了~");
-                        } else {
-                            // 更新图片列表数据
-                            newsListAdapter.updateData(tempListBeans, method);
-                        }
+                    List<ArticleListBean> tempListBeans = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        ArticleListBean bean = new ArticleListBean(jsonArray.getJSONObject(i));
+                        tempListBeans.add(bean);
+                    }
+                    if (tempListBeans.size() == 0) {
+                        ProgressHUD.showInfo(mContext, "没有数据了~");
                     } else {
-                        String errorInfo = new JSONObject(response).getString("info");
-                        if (errorInfo != null) {
-                            ProgressHUD.showInfo(mContext, errorInfo);
-                        }
+                        // 刷新数据
+                        newsListAdapter.updateData(tempListBeans, method);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } finally {
-                    // 结束刷新
                     if (method == 0) {
                         refreshLayout.finishRefreshing();
                     } else {
                         refreshLayout.finishLoadmore();
                     }
                 }
+            }
 
+            @Override
+            public void onError(String tipString) {
+                ProgressHUD.showInfo(mContext, tipString);
+                if (method == 0) {
+                    refreshLayout.finishRefreshing();
+                } else {
+                    refreshLayout.finishLoadmore();
+                }
             }
         });
 
