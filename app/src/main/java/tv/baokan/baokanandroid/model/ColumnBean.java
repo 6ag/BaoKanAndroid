@@ -8,29 +8,29 @@ import java.io.Serializable;
 public class ColumnBean implements Serializable {
 
     // 分类id
-    private String classId;
+    private String classid;
 
     // 分类名称
-    private String className;
+    private String classname;
 
-    public ColumnBean(String classId, String className) {
-        this.classId = classId;
-        this.className = className;
+    public ColumnBean(String classid, String classname) {
+        this.classid = classid;
+        this.classname = classname;
     }
 
-    public String getClassId() {
-        return classId;
+    public String getClassid() {
+        return classid;
     }
 
-    public void setClassId(String classId) {
-        this.classId = classId;
+    public void setClassid(String classid) {
+        this.classid = classid;
     }
 
-    public String getClassName() {
-        return className;
+    public String getClassname() {
+        return classname;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setClassname(String classname) {
+        this.classname = classname;
     }
 }

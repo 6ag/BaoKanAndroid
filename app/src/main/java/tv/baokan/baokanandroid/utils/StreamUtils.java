@@ -4,10 +4,17 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+
+import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class StreamUtils {
 
@@ -33,8 +40,6 @@ public class StreamUtils {
                 sb.append(str).append("\n");
             }
             return sb.toString();
-        } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,6 +69,82 @@ public class StreamUtils {
             e.printStackTrace();
         }
         return stringBuffer.toString();
+    }
+
+    /**
+     * 写入字符串到手机存储卡内
+     *
+     * @param fileName 文件名
+     * @param string   要存储的字符串
+     */
+    public static void writeStringToFile(String fileName, String string) {
+        FileOutputStream out = null;
+        BufferedWriter writer = null;
+        try {
+            out = BaoKanApp.getContext().openFileOutput(fileName, Context.MODE_PRIVATE);
+            writer = new BufferedWriter(new OutputStreamWriter(out));
+            writer.write(string);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 从手机存储卡读取字符串数据
+     *
+     * @param fileName 文件名
+     * @return 读取到的字符串
+     */
+    public static String readStringFromFile(String fileName) {
+        FileInputStream in = null;
+        BufferedReader reader = null;
+        StringBuilder content = new StringBuilder();
+        try {
+            in = BaoKanApp.getContext().openFileInput(fileName);
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return content.toString();
+    }
+
+    /**
+     * 判断文件是否存在
+     *
+     * @param filePath 文件绝对路径
+     * @return 是否存在
+     */
+    public static boolean fileIsExists(String filePath) {
+        try {
+            File f = new File(filePath);
+            if (!f.exists()) {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }

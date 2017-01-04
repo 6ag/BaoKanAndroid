@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.ColumnBean;
 import tv.baokan.baokanandroid.ui.activity.ColumnActivity;
 import tv.baokan.baokanandroid.utils.LogUtils;
@@ -61,12 +62,14 @@ public class NewsFragment extends BaseFragment {
     @Override
     protected void loadData() {
 
-        LogUtils.d(TAG, "loadData");
-        // 如果没有缓存则加载assets里的默认数据
-        String jsonString = StreamUtils.readAssetsFile(mContext, "column.json");
-
-        // 读取本地json数据
-        loadNewsColumn(jsonString);
+        // 判断手机缓存里有没有栏目数据，有则加载，无咋加载默认json数据
+        if (StreamUtils.fileIsExists(BaoKanApp.getContext().getFileStreamPath("column.json").getAbsolutePath())) {
+            String jsonString = StreamUtils.readStringFromFile("column.json");
+            loadNewsColumn(jsonString);
+        } else {
+            String jsonString = StreamUtils.readAssetsFile(mContext, "column.json");
+            loadNewsColumn(jsonString);
+        }
 
         // 配置ViewPager
         mFragmentPageAdapter = new NewsFragmentPagerAdapter(getChildFragmentManager(), newsListFragments, selectedList);
@@ -126,7 +129,7 @@ public class NewsFragment extends BaseFragment {
         }
 
         for (int i = 0; i < selectedList.size(); i++) {
-            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassId(), true);
+            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassid(), true);
             newsListFragments.add(newsListFragment);
         }
 
@@ -145,7 +148,7 @@ public class NewsFragment extends BaseFragment {
                     selectedList.addAll((List<ColumnBean>) data.getSerializableExtra("selectedList_key"));
                     optionalList.addAll((List<ColumnBean>) data.getSerializableExtra("optionalList_key"));
                     for (int i = 0; i < selectedList.size(); i++) {
-                        NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassId(), true);
+                        NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassid(), true);
                         newsListFragments.add(newsListFragment);
                     }
 
@@ -210,7 +213,7 @@ public class NewsFragment extends BaseFragment {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return mSelectedList.get(position).getClassName();
+            return mSelectedList.get(position).getClassname();
         }
     }
 

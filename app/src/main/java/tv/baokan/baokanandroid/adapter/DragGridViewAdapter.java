@@ -73,7 +73,7 @@ public class DragGridViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_column_item, null);
         item_text = (TextView) view.findViewById(R.id.text_item);
-        String className = getItem(position).getClassName();
+        String className = getItem(position).getClassname();
         item_text.setText(className);
         if (isUser) {
             if ((position == 0) || (position == 1)) {

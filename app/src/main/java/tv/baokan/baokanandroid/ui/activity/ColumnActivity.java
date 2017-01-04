@@ -1,8 +1,10 @@
 package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -18,18 +20,34 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.adapter.DragGridViewAdapter;
 import tv.baokan.baokanandroid.adapter.OptionalGridViewAdapter;
 import tv.baokan.baokanandroid.model.ColumnBean;
 import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.StreamUtils;
 import tv.baokan.baokanandroid.widget.DragGridView;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 import tv.baokan.baokanandroid.widget.OptionalGridView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ColumnActivity extends BaseActivity implements OnItemClickListener {
@@ -114,6 +132,15 @@ public class ColumnActivity extends BaseActivity implements OnItemClickListener 
      * 设置回调数据
      */
     private void setupResultData() {
+        // 在回调数据之前，缓存数据到本地
+        HashMap<String, List<ColumnBean>> map = new HashMap<>();
+        map.put("selected", mDragGridViewAdapter.getSelectedList());
+        map.put("optional", mOptionalGridViewAdapter.getOptionalList());
+        String jsonString = JSON.toJSONString(map);
+        // 将栏目数据写入本地
+        StreamUtils.writeStringToFile("column.json", jsonString);
+        LogUtils.d(TAG, jsonString);
+
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedList_key", (Serializable) mDragGridViewAdapter.getSelectedList());
