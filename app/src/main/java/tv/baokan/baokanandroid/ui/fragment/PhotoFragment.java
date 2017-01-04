@@ -102,6 +102,11 @@ public class PhotoFragment extends BaseFragment {
         }
 
         @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            // 重写父类销毁方法，就切换viewPager上的列表就不会重复去加载数据，但是会增加内存占用
+        }
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return selectedList.get(position).get("classname");
         }

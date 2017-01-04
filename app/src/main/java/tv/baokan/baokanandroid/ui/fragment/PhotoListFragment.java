@@ -122,6 +122,10 @@ public class PhotoListFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
+                // 下拉刷新状态 并且网络状态良好 就清除本地数据
+                NewsDALManager.shared.removeNewsList(classid);
+
+                // 重新加载并缓存数据
                 loadNewsFromNetwork(classid, 1, 0);
             }
 
@@ -132,8 +136,8 @@ public class PhotoListFragment extends BaseFragment {
             }
         });
 
-        // 默认加载一次数据
-        refreshLayout.startRefresh();
+        // 默认加载一次数据 不使用下拉刷新
+        loadNewsFromNetwork(classid, 1, 0);
 
     }
 

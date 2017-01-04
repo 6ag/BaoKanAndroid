@@ -1,25 +1,18 @@
 package tv.baokan.baokanandroid.cache;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
-import org.litepal.tablemanager.Connector;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
-import tv.baokan.baokanandroid.model.ArticleDetailBean;
-import tv.baokan.baokanandroid.model.ArticleListBean;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
-import tv.baokan.baokanandroid.utils.ProgressHUD;
 
 /**
  * 资讯数据访问层
@@ -47,9 +40,30 @@ public class NewsDALManager {
 
     private static final String TAG = "NewsDALManager";
 
+    // 单例对象
     public static final NewsDALManager shared = new NewsDALManager();
 
-    private NewsDALManager() {}
+    private NewsDALManager() {
+    }
+
+    /**
+     * 移除指定分类的列表数据
+     * 今日头条的数据和其他分类的数据不是存在一张表里的，需要判断下哦
+     * 资讯内容数据基本固定，可以根据需求写个过期清理
+     *
+     * @param classid 分类id
+     */
+    public void removeNewsList(String classid) {
+        if (classid.equals("0")) {
+            // 今日头条
+            int deleteCount = DataSupport.deleteAll(NewsListHomeCache.class);
+            LogUtils.d(TAG, "删除了今日头条分类下 " + deleteCount + " 条记录");
+        } else {
+            // 其他分类
+            int deleteCount = DataSupport.deleteAll(NewsListOtherCache.class);
+            LogUtils.d(TAG, "删除了其他分类下 " + deleteCount + " 条记录");
+        }
+    }
 
     /**
      * 加载资讯列表数据
@@ -163,6 +177,7 @@ public class NewsDALManager {
             }
         }
 
+        LogUtils.d(TAG, "缓存资讯列表数据成功" + jsonArray.toString());
     }
 
     /**
@@ -255,6 +270,7 @@ public class NewsDALManager {
                     if (new JSONObject(response).getString("err_msg").equals("success")) {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        LogUtils.d(TAG, "从网络请求资讯列表数据成功 " + jsonArray.toString());
                         newsListCallback.onSuccess(jsonArray);
                     } else {
                         String errorInfo = new JSONObject(response).getString("info");
@@ -285,6 +301,7 @@ public class NewsDALManager {
         newsContentCache.setArticleid(id);
         newsContentCache.setNews(jsonObject.toString());
         newsContentCache.save();
+        LogUtils.d(TAG, "缓存资讯内容数据成功" + jsonObject.toString());
     }
 
     /**
@@ -338,6 +355,7 @@ public class NewsDALManager {
             public void onResponse(String response, int id) {
                 try {
                     JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
+                    LogUtils.d(TAG, "从网络请求资讯内容数据成功 " + jsonObject.toString());
                     newsContentCallback.onSuccess(jsonObject);
                 } catch (JSONException e) {
                     e.printStackTrace();
