@@ -17,7 +17,6 @@ import java.util.List;
 
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.CommentBean;
-import tv.baokan.baokanandroid.utils.LogUtils;
 
 /**
  * 评论适配器
