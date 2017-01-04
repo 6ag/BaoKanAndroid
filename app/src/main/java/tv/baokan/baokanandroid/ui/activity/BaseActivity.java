@@ -79,8 +79,8 @@ public class BaseActivity extends AppCompatActivity {
         super.finish();
         if (this instanceof PhotoBrowserActivity) {
             overridePendingTransition(R.anim.dismiss_enter, R.anim.dismiss_exit);
-        }if (this instanceof ColumnActivity) {
-            overridePendingTransition(0, R.anim.column_hide);
+        } else if (this instanceof ColumnActivity) {
+            overridePendingTransition(R.anim.column_bottom, R.anim.column_hide);
         } else if (!(this instanceof MainActivity)) {
             // 不是退出应用才执行返回动画
             overridePendingTransition(R.anim.pop_enter, R.anim.pop_exit);
