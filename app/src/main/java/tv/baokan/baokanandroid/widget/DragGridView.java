@@ -3,6 +3,7 @@ package tv.baokan.baokanandroid.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -117,6 +118,7 @@ public class DragGridView extends GridView {
     public DragGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
+        if (isInEditMode()) { return; }
     }
 
     public void init(Context context) {

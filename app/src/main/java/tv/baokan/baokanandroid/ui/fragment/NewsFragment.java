@@ -149,17 +149,8 @@ public class NewsFragment extends BaseFragment {
                         newsListFragments.add(newsListFragment);
                     }
 
-                    for (int i = 0; i < selectedList.size(); i++) {
-                        LogUtils.d(TAG, selectedList.get(i).getClassName());
-                    }
-
-                    LogUtils.d(TAG, "传递前onActivityResult newSelectedList.size = " + selectedList.size() + " newNewsListFragments.size = " + newsListFragments.size());
-
-                    if (newsListFragments.size() > 0) {
-                        // 重新加载数据
-                        mFragmentPageAdapter.reloadData(newsListFragments, selectedList);
-                    }
-
+                    // 重新加载数据
+                    mFragmentPageAdapter.reloadData(newsListFragments, selectedList);
                 }
                 break;
         }
@@ -185,9 +176,6 @@ public class NewsFragment extends BaseFragment {
          */
         public void reloadData(List<NewsListFragment> newNewsListFragments, List<ColumnBean> newSelectedList) {
 
-            LogUtils.d(TAG, "线程 = " + Thread.currentThread().getName());
-            LogUtils.d(TAG, "传递后reloadData newSelectedList.size = " + newSelectedList.size() + " newNewsListFragments.size = " + newNewsListFragments.size());
-
             // 清除原有数据源
             this.mNewsListFragments.clear();
             this.mSelectedList.clear();
@@ -195,8 +183,6 @@ public class NewsFragment extends BaseFragment {
             // 重新添加数据源
             this.mNewsListFragments.addAll(newNewsListFragments);
             this.mSelectedList.addAll(newSelectedList);
-
-            LogUtils.d(TAG, "内部reloadData selectedList.size = " + this.mSelectedList.size() + " newsListFragments.size = " + this.mNewsListFragments.size());
 
             // 刷新数据
             notifyDataSetChanged();
@@ -217,10 +203,10 @@ public class NewsFragment extends BaseFragment {
             return mNewsListFragments.size();
         }
 
-//        @Override
-//        public void destroyItem(ViewGroup container, int position, Object object) {
-//            // 重写父类销毁方法，就切换viewPager上的列表就不会重复去加载数据，但是会增加内存占用
-//        }
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            // 重写父类销毁方法，就切换viewPager上的列表就不会重复去加载数据，但是会增加内存占用
+        }
 
         @Override
         public CharSequence getPageTitle(int position) {

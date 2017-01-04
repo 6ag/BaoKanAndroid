@@ -25,6 +25,7 @@ import tv.baokan.baokanandroid.model.ColumnBean;
 import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.widget.DragGridView;
+import tv.baokan.baokanandroid.widget.NavigationViewRed;
 import tv.baokan.baokanandroid.widget.OptionalGridView;
 
 import java.io.Serializable;
@@ -41,6 +42,7 @@ public class ColumnActivity extends BaseActivity implements OnItemClickListener 
     private List<ColumnBean> optionalList = new ArrayList<>();
     private OptionalGridViewAdapter mOptionalGridViewAdapter;
     private DragGridViewAdapter mDragGridViewAdapter;
+    private NavigationViewRed mNavigationViewRed;
 
     /**
      * 便捷启动当前activity
@@ -57,23 +59,6 @@ public class ColumnActivity extends BaseActivity implements OnItemClickListener 
         activity.overridePendingTransition(R.anim.column_show, R.anim.column_bottom);
     }
 
-    // 返回true则是不继续传播事件，自己处理。返回false则系统继续传播处理
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("selectedList_key", (Serializable) mDragGridViewAdapter.getSelectedList());
-            bundle.putSerializable("optionalList_key", (Serializable) mOptionalGridViewAdapter.getOptionalList());
-            intent.putExtras(bundle);
-            // 这里会回调给MainActivity，然后在MainActivity里传递给NewsFragment
-            setResult(RESULT_OK, intent);
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +68,16 @@ public class ColumnActivity extends BaseActivity implements OnItemClickListener 
         Intent intent = getIntent();
         selectedList = (List<ColumnBean>) intent.getSerializableExtra("selectedList_key");
         optionalList = (List<ColumnBean>) intent.getSerializableExtra("optionalList_key");
+
+        mNavigationViewRed = (NavigationViewRed) findViewById(R.id.nav_column);
+        mNavigationViewRed.getRightView().setImageResource(R.drawable.top_navigation_close);
+        mNavigationViewRed.setupNavigationView(false, true, "栏目管理", new NavigationViewRed.OnClickListener() {
+            @Override
+            public void onRightClick(View v) {
+                setupResultData();
+                finish();
+            }
+        });
 
         // 准备UI
         prepareUI();
@@ -102,6 +97,30 @@ public class ColumnActivity extends BaseActivity implements OnItemClickListener 
         mOtherGv.setAdapter(mOptionalGridViewAdapter);
         mUserGv.setOnItemClickListener(this);
         mOtherGv.setOnItemClickListener(this);
+    }
+
+    // 返回true则是不继续传播事件，自己处理。返回false则系统继续传播处理
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            setupResultData();
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 设置回调数据
+     */
+    private void setupResultData() {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedList_key", (Serializable) mDragGridViewAdapter.getSelectedList());
+        bundle.putSerializable("optionalList_key", (Serializable) mOptionalGridViewAdapter.getOptionalList());
+        intent.putExtras(bundle);
+        // 这里会回调给MainActivity，然后在MainActivity里传递给NewsFragment
+        setResult(RESULT_OK, intent);
     }
 
     /**
