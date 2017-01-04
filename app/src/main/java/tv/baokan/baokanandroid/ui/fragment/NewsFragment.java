@@ -1,5 +1,6 @@
 package tv.baokan.baokanandroid.ui.fragment;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,23 +9,35 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.model.ColumnBean;
+import tv.baokan.baokanandroid.ui.activity.ColumnActivity;
+import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.StreamUtils;
+
+import static android.app.Activity.RESULT_OK;
 
 public class NewsFragment extends BaseFragment {
+
+    private static final String TAG = "NewsFragment";
+
+    public static final int REQUEST_CODE_COLUMN = 0;
 
     private TabLayout mNewsTabLayout;
     private ViewPager mNewsViewPager;
     private ImageButton mNewsClassAdd;
-    private List<Map<String, String>> selectedList;
-    private List<Map<String, String>> optionalList;
-    List<NewsListFragment> newsListFragments;
+    private List<ColumnBean> selectedList = new ArrayList<>();
+    private List<ColumnBean> optionalList = new ArrayList<>();
+    List<NewsListFragment> newsListFragments = new ArrayList<>();
+    private NewsFragmentPagerAdapter mFragmentPageAdapter;
 
     @Override
     protected View prepareUI() {
@@ -32,19 +45,32 @@ public class NewsFragment extends BaseFragment {
         mNewsTabLayout = (TabLayout) view.findViewById(R.id.tl_news_tabLayout);
         mNewsViewPager = (ViewPager) view.findViewById(R.id.vp_news_viewPager);
         mNewsClassAdd = (ImageButton) view.findViewById(R.id.ib_news_class_add);
+
+        // 点击加号进入栏目编辑activity
+        mNewsClassAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 弹出栏目管理activity
+                ColumnActivity.start(getActivity(), selectedList, optionalList);
+            }
+        });
+        LogUtils.d(TAG, "prepareUI");
         return view;
     }
 
     @Override
     protected void loadData() {
-        selectedList = new ArrayList<>();
-        optionalList = new ArrayList<>();
-        newsListFragments = new ArrayList<>();
 
-        // 初始化数据
-        initNewsColumn();
+        LogUtils.d(TAG, "loadData");
+        // 如果没有缓存则加载assets里的默认数据
+        String jsonString = StreamUtils.readAssetsFile(mContext, "column.json");
 
-        mNewsViewPager.setAdapter(new NewsFragmentPagerAdapter(getChildFragmentManager()));
+        // 读取本地json数据
+        loadNewsColumn(jsonString);
+
+        // 配置ViewPager
+        mFragmentPageAdapter = new NewsFragmentPagerAdapter(getChildFragmentManager(), newsListFragments, selectedList);
+        mNewsViewPager.setAdapter(mFragmentPageAdapter);
         mNewsTabLayout.setupWithViewPager(mNewsViewPager);
         mNewsTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -63,50 +89,117 @@ public class NewsFragment extends BaseFragment {
             }
         });
 
-        mNewsClassAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "点击了加号", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     /**
      * 初始化新闻栏目数据 - 这里数据存数据库
      */
-    private void initNewsColumn() {
-        String[] selectedIds = new String[]{"0", "2", "21", "12", "264", "33", "34", "212", "132", "396", "119"};
-        String[] selectedNames = new String[]{"今日头条", "网文快讯", "媒体视角", "网文IP", "企业资讯", "作家风采", "维权在线", "业者动态", "风花雪月", "独家报道", "求职招聘"};
-        String[] optionalIds = new String[]{"32", "102", "111", "115", "51", "440", "209", "208", "405", "394", "414", "281", "57", "58", "56"};
-        String[] optionalNames = new String[]{"高端访谈", "政策解读", "写作指导", "征稿信息", "精彩活动", "写作常识", "数据分析", "统计图表", "名家专栏", "传统文学", "写作素材", "游戏世界", "娱乐八卦", "社会杂谈", "影视动画"};
+    private void loadNewsColumn(String jsonString) {
 
-        for (int i = 0; i < selectedIds.length; i++) {
-            Map<String, String> item = new HashMap<>();
-            item.put("classid", selectedIds[i]);
-            item.put("classname", selectedNames[i]);
-            selectedList.add(item);
-        }
+        // 清空集合数据
+        selectedList.clear();
+        optionalList.clear();
+        newsListFragments.clear();
 
-        for (int i = 0; i < optionalIds.length; i++) {
-            Map<String, String> item = new HashMap<>();
-            item.put("classid", optionalIds[i]);
-            item.put("classname", optionalNames[i]);
-            optionalList.add(item);
+        LogUtils.d(TAG, "jsonString = " + jsonString);
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray selectedJSONArray = jsonObject.getJSONArray("selected");
+            JSONArray optionalJSONArray = jsonObject.getJSONArray("optional");
+
+            for (int i = 0; i < selectedJSONArray.length(); i++) {
+                ColumnBean columnBean = new ColumnBean(
+                        selectedJSONArray.getJSONObject(i).getString("classid"),
+                        selectedJSONArray.getJSONObject(i).getString("classname"));
+                selectedList.add(columnBean);
+            }
+
+            for (int i = 0; i < optionalJSONArray.length(); i++) {
+                ColumnBean columnBean = new ColumnBean(
+                        optionalJSONArray.getJSONObject(i).getString("classid"),
+                        optionalJSONArray.getJSONObject(i).getString("classname"));
+                optionalList.add(columnBean);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            LogUtils.d(TAG, "数据解析失败");
         }
 
         for (int i = 0; i < selectedList.size(); i++) {
-            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).get("classid"), true);
+            NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassId(), true);
             newsListFragments.add(newsListFragment);
         }
 
     }
 
-    // viewPager适配器
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_COLUMN:
+                if (resultCode == RESULT_OK) {
+                    // 清空集合数据
+                    selectedList.clear();
+                    optionalList.clear();
+                    newsListFragments.clear();
+
+                    selectedList.addAll((List<ColumnBean>) data.getSerializableExtra("selectedList_key"));
+                    optionalList.addAll((List<ColumnBean>) data.getSerializableExtra("optionalList_key"));
+                    for (int i = 0; i < selectedList.size(); i++) {
+                        NewsListFragment newsListFragment = NewsListFragment.newInstance(selectedList.get(i).getClassId(), true);
+                        newsListFragments.add(newsListFragment);
+                    }
+
+                    for (int i = 0; i < selectedList.size(); i++) {
+                        LogUtils.d(TAG, selectedList.get(i).getClassName());
+                    }
+
+                    LogUtils.d(TAG, "传递前onActivityResult newSelectedList.size = " + selectedList.size() + " newNewsListFragments.size = " + newsListFragments.size());
+
+                    if (newsListFragments.size() > 0) {
+                        // 重新加载数据
+                        mFragmentPageAdapter.reloadData(newsListFragments, selectedList);
+                    }
+
+                }
+                break;
+        }
+    }
+
+    // tab viewPager适配器
     private class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
 
-        NewsFragmentPagerAdapter(FragmentManager fm) {
+        private List<ColumnBean> mSelectedList = new ArrayList<>();
+        private List<NewsListFragment> mNewsListFragments = new ArrayList<>();
+
+        NewsFragmentPagerAdapter(FragmentManager fm, List<NewsListFragment> newsListFragments, List<ColumnBean> selectedList) {
             super(fm);
+            this.mNewsListFragments.addAll(newsListFragments);
+            this.mSelectedList.addAll(selectedList);
+        }
+
+        /**
+         * 重新加载数据
+         *
+         * @param newNewsListFragments 新的fragment集合
+         * @param newSelectedList      新的选中分类集合
+         */
+        public void reloadData(List<NewsListFragment> newNewsListFragments, List<ColumnBean> newSelectedList) {
+
+            LogUtils.d(TAG, "线程 = " + Thread.currentThread().getName());
+            LogUtils.d(TAG, "传递后reloadData newSelectedList.size = " + newSelectedList.size() + " newNewsListFragments.size = " + newNewsListFragments.size());
+
+            // 清除原有数据源
+            this.mNewsListFragments.clear();
+            this.mSelectedList.clear();
+
+            // 重新添加数据源
+            this.mNewsListFragments.addAll(newNewsListFragments);
+            this.mSelectedList.addAll(newSelectedList);
+
+            LogUtils.d(TAG, "内部reloadData selectedList.size = " + this.mSelectedList.size() + " newsListFragments.size = " + this.mNewsListFragments.size());
+
+            // 刷新数据
+            notifyDataSetChanged();
         }
 
         @Override
@@ -116,22 +209,22 @@ public class NewsFragment extends BaseFragment {
 
         @Override
         public Fragment getItem(int position) {
-            return newsListFragments.get(position);
+            return mNewsListFragments.get(position);
         }
 
         @Override
         public int getCount() {
-            return selectedList.size();
+            return mNewsListFragments.size();
         }
 
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            // 重写父类销毁方法，就切换viewPager上的列表就不会重复去加载数据，但是会增加内存占用
-        }
+//        @Override
+//        public void destroyItem(ViewGroup container, int position, Object object) {
+//            // 重写父类销毁方法，就切换viewPager上的列表就不会重复去加载数据，但是会增加内存占用
+//        }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return selectedList.get(position).get("classname");
+            return mSelectedList.get(position).getClassName();
         }
     }
 

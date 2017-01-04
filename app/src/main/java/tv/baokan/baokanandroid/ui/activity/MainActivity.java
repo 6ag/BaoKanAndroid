@@ -1,5 +1,6 @@
 package tv.baokan.baokanandroid.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,11 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.model.ColumnBean;
 import tv.baokan.baokanandroid.ui.fragment.BaseFragment;
 import tv.baokan.baokanandroid.ui.fragment.HotFragment;
 import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
+import tv.baokan.baokanandroid.ui.fragment.NewsListFragment;
 import tv.baokan.baokanandroid.ui.fragment.PhotoFragment;
 import tv.baokan.baokanandroid.ui.fragment.ProfileFragment;
+import tv.baokan.baokanandroid.utils.LogUtils;
+
+import static tv.baokan.baokanandroid.ui.fragment.NewsFragment.REQUEST_CODE_COLUMN;
 
 public class MainActivity extends BaseActivity {
 
@@ -141,6 +147,17 @@ public class MainActivity extends BaseActivity {
             removeAllActivity();
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_COLUMN:
+                // 传递给资讯模块，更新栏目数据
+                NewsFragment newsFragment = (NewsFragment) mBaseFragments.get(0);
+                newsFragment.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
     }
 
 }

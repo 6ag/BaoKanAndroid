@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".app.BaoKanApp"
@@ -38,6 +40,8 @@
         <activity android:name=".ui.activity.PhotoBrowserActivity">
         </activity>
         <activity android:name=".ui.activity.CommentListActivity">
+        </activity>
+        <activity android:name=".ui.activity.ColumnActivity">
         </activity>
     </application>
 

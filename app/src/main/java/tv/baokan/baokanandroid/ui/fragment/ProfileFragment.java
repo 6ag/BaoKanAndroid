@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
@@ -67,6 +68,8 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     @Override
     protected void loadData() {
 
+        // 版本号
+        versionTextView.setText("v" + ((BaoKanApp) getActivity().getApplication()).getVersionName());
     }
 
     /**

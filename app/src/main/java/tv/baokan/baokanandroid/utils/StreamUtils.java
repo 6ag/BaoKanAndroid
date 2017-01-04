@@ -1,5 +1,8 @@
 package tv.baokan.baokanandroid.utils;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +13,8 @@ public class StreamUtils {
 
     /**
      * inputStrean转String
-     * @param in InputStream
+     *
+     * @param in     InputStream
      * @param encode 编码
      * @return 转换后的字符串
      */
@@ -37,4 +41,29 @@ public class StreamUtils {
 
         return str;
     }
+
+    /**
+     * 读取Assets下的文本文件
+     *
+     * @param context  上下文
+     * @param fileName 文件名
+     * @return 读取到的字符串
+     */
+    public static String readAssetsFile(Context context, String fileName) {
+
+        StringBuilder stringBuffer = new StringBuilder();
+        AssetManager assetManager = context.getAssets();
+        try {
+            InputStream is = assetManager.open(fileName);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String str = null;
+            while ((str = br.readLine()) != null) {
+                stringBuffer.append(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuffer.toString();
+    }
+
 }

@@ -1,6 +1,9 @@
 package tv.baokan.baokanandroid.app;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
@@ -38,6 +41,24 @@ public class BaoKanApp extends LitePalApplication {
     public void onTerminate() {
         super.onTerminate();
 
+    }
+
+    /**
+     * 获取当前应用的版本号
+     *
+     * @return 版本号
+     */
+    public String getVersionName() {
+        PackageManager pm = getPackageManager();
+        // 第一个参数：应用程序的包名
+        // 第二个参数：指定信息的标签，0表示获取基础信息，比如包名、版本号。要想获取权限等信息必须要通过标签指定。
+        try {
+            PackageInfo info = pm.getPackageInfo(getPackageName(), 0);
+            return info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**
