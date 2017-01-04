@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
+import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.ArticleListBean;
+import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
@@ -25,6 +27,7 @@ import tv.baokan.baokanandroid.utils.ProgressHUD;
 
 public class NewsDALManager {
 
+    // 资讯列表回调接口
     public static interface NewsListCallback {
         // 成功加载到数据
         public abstract void onSuccess(JSONArray jsonArray);
@@ -33,23 +36,28 @@ public class NewsDALManager {
         public abstract void onError(String tipString);
     }
 
+    // 资讯详情回调接口
+    public static interface NewsContentCallback {
+        // 成功加载到数据
+        public abstract void onSuccess(JSONObject jsonObject);
+
+        // 加载数据失败
+        public abstract void onError(String tipString);
+    }
+
     private static final String TAG = "NewsDALManager";
 
     public static final NewsDALManager shared = new NewsDALManager();
-    // 数据库
-    private SQLiteDatabase db;
 
-    private NewsDALManager() {
-        // 创建数据库
-        db = Connector.getDatabase();
-    }
+    private NewsDALManager() {}
 
     /**
      * 加载资讯列表数据
      *
-     * @param table     数据表 news photo
-     * @param classid   分类id
-     * @param pageIndex 分页页码
+     * @param table            数据表 news photo
+     * @param classid          分类id
+     * @param pageIndex        分页页码
+     * @param newsListCallback 资讯列表回调
      */
     public void loadNewsList(final String table, final String classid, final int pageIndex, final NewsListCallback newsListCallback) {
 
@@ -66,21 +74,60 @@ public class NewsDALManager {
             // 数据加载失败
             @Override
             public void onError(String tipString) {
-                LogUtils.d(TAG, "加载本地数据 = " + tipString);
+                LogUtils.d(TAG, "加载本地列表数据失败 = " + tipString);
                 // 从本地加载数据失败，就去网络加载
                 loadNewsListFromNetwork(table, classid, pageIndex, new NewsListCallback() {
                     @Override
                     public void onSuccess(JSONArray jsonArray) {
-                        // 加载到数据先缓存到本地
-                        saveNewsList(classid, jsonArray);
-
-                        // 然后才返回给调用者
+                        // 返回给调用者
                         newsListCallback.onSuccess(jsonArray);
+
+                        // 并缓存到本地
+                        saveNewsList(classid, jsonArray);
                     }
 
                     @Override
                     public void onError(String tipString) {
                         newsListCallback.onError(tipString);
+                    }
+                });
+            }
+        });
+
+    }
+
+    /**
+     * 加载资讯内容数据
+     *
+     * @param classid             分类id
+     * @param id                  文章id
+     * @param newsContentCallback 资讯内容回调
+     */
+    public void loadNewsContent(final String classid, final String id, final NewsContentCallback newsContentCallback) {
+
+        loadNewsContentFromLocal(classid, id, new NewsContentCallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                newsContentCallback.onSuccess(jsonObject);
+            }
+
+            @Override
+            public void onError(String tipString) {
+                LogUtils.d(TAG, "加载本地内容数据失败 = " + tipString);
+                loadNewsContentFromNetwork(classid, id, new NewsContentCallback() {
+                    @Override
+                    public void onSuccess(JSONObject jsonObject) {
+
+                        // 返回给调用者
+                        newsContentCallback.onSuccess(jsonObject);
+
+                        // 并缓存到本地
+                        saveNewsContent(classid, id, jsonObject);
+                    }
+
+                    @Override
+                    public void onError(String tipString) {
+                        newsContentCallback.onError(tipString);
                     }
                 });
             }
@@ -121,8 +168,9 @@ public class NewsDALManager {
     /**
      * 从本地缓存加载资讯数据列表
      *
-     * @param classid   分类id
-     * @param pageIndex 分页页码
+     * @param classid          分类id
+     * @param pageIndex        分页页码
+     * @param newsListCallback 资讯列表回调
      */
     private void loadNewsListFromLocal(String classid, int pageIndex, final NewsListCallback newsListCallback) {
 
@@ -149,9 +197,9 @@ public class NewsDALManager {
             }
             if (jsonArray.length() > 0) {
                 newsListCallback.onSuccess(jsonArray);
-                LogUtils.d(TAG, "加载到今日头条数据 = " + jsonArray.toString());
+                LogUtils.d(TAG, "加载到缓存今日头条数据 = " + jsonArray.toString());
             } else {
-                newsListCallback.onError("没有本地数据");
+                newsListCallback.onError("没有缓存数据");
             }
         } else {
             // 其他分类
@@ -169,7 +217,7 @@ public class NewsDALManager {
             }
             if (jsonArray.length() > 0) {
                 newsListCallback.onSuccess(jsonArray);
-                LogUtils.d(TAG, "加载到其他分类数据 = " + jsonArray.toString());
+                LogUtils.d(TAG, "加载到缓存其他分类数据 = " + jsonArray.toString());
             } else {
                 newsListCallback.onError("没有本地数据");
             }
@@ -181,9 +229,10 @@ public class NewsDALManager {
     /**
      * 从网络加载资讯列表数据
      *
-     * @param table     数据表
-     * @param classid   分类id
-     * @param pageIndex 分页页码
+     * @param table            数据表
+     * @param classid          分类id
+     * @param pageIndex        分页页码
+     * @param newsListCallback 资讯列表回调
      */
     private void loadNewsListFromNetwork(String table, String classid, int pageIndex, final NewsListCallback newsListCallback) {
 
@@ -221,5 +270,82 @@ public class NewsDALManager {
 
     }
 
+    /**
+     * 缓存资讯内容数据到本地数据库
+     *
+     * @param classid    分类id
+     * @param id         文章id
+     * @param jsonObject 资讯内容json数据
+     */
+    private void saveNewsContent(String classid, String id, JSONObject jsonObject) {
+
+        // 如果没有被缓存，则去缓存
+        NewsContentCache newsContentCache = new NewsContentCache();
+        newsContentCache.setClassid(classid);
+        newsContentCache.setArticleid(id);
+        newsContentCache.setNews(jsonObject.toString());
+        newsContentCache.save();
+    }
+
+    /**
+     * 从本地加载资讯内容数据
+     *
+     * @param classid             分类id
+     * @param id                  文章id
+     * @param newsContentCallback 资讯内容回调
+     */
+    private void loadNewsContentFromLocal(String classid, String id, NewsContentCallback newsContentCallback) {
+        NewsContentCache contentCache = DataSupport.where("classid = ? and articleid = ?", classid, id).findFirst(NewsContentCache.class);
+        if (contentCache != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(contentCache.getNews());
+                newsContentCallback.onSuccess(jsonObject);
+                LogUtils.d(TAG, "加载到缓存资讯内容数据 = " + jsonObject.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                newsContentCallback.onError("数据解析异常");
+            }
+        } else {
+            newsContentCallback.onError("没有缓存数据");
+        }
+    }
+
+    /**
+     * 从网络加载资讯内容数据
+     *
+     * @param classid             分类id
+     * @param id                  文章id
+     * @param newsContentCallback 资讯内容回调
+     */
+    private void loadNewsContentFromNetwork(String classid, String id, final NewsContentCallback newsContentCallback) {
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("classid", classid);
+        parameters.put("id", id);
+        if (UserBean.isLogin()) {
+            parameters.put("username", UserBean.shared().getUsername());
+            parameters.put("userid", UserBean.shared().getUserid());
+            parameters.put("token", UserBean.shared().getToken());
+        }
+
+        NetworkUtils.shared.get(APIs.ARTICLE_DETAIL, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                newsContentCallback.onError("您的网络不给力哦");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
+                    newsContentCallback.onSuccess(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    newsContentCallback.onError("数据解析异常");
+                }
+            }
+        });
+
+    }
 
 }

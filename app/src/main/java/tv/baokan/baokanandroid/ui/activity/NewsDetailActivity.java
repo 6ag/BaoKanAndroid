@@ -54,6 +54,7 @@ import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
+import tv.baokan.baokanandroid.cache.NewsDALManager;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.model.CommentBean;
 import tv.baokan.baokanandroid.model.UserBean;
@@ -492,32 +493,17 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void loadNewsDetailFromNetwork() {
 
-        HashMap<String, String> parameters = new HashMap<>();
-        parameters.put("classid", classid);
-        parameters.put("id", id);
-        if (UserBean.isLogin()) {
-            parameters.put("username", UserBean.shared().getUsername());
-            parameters.put("userid", UserBean.shared().getUserid());
-            parameters.put("token", UserBean.shared().getToken());
-        }
-
-        NetworkUtils.shared.get(APIs.ARTICLE_DETAIL, parameters, new NetworkUtils.StringCallback() {
+        NewsDALManager.shared.loadNewsContent(classid, id, new NewsDALManager.NewsContentCallback() {
             @Override
-            public void onError(Call call, Exception e, int id) {
-                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+            public void onSuccess(JSONObject jsonObject) {
+                detailBean = new ArticleDetailBean(jsonObject);
+                // 加载webView
+                setupWebViewData();
             }
 
             @Override
-            public void onResponse(String response, int id) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
-                    detailBean = new ArticleDetailBean(jsonObject);
-                    // 加载webView
-                    setupWebViewData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    ProgressHUD.showInfo(mContext, "数据解析异常");
-                }
+            public void onError(String tipString) {
+                ProgressHUD.showInfo(mContext, tipString);
             }
         });
 
