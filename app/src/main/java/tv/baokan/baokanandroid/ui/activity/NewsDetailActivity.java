@@ -160,6 +160,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         // 新闻正文
         WebSettings webSettings = mContentWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        mContentWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mContentWebView.addJavascriptInterface(new ArticleJavascriptInterface(), "ARTICLE");
         mContentWebView.setWebChromeClient(new WebChromeClient() {
         });

@@ -18,7 +18,6 @@ public class DragScrollView extends ScrollView {
     private View inner;
     private float y;
     private Rect normal = new Rect();
-    ;
 
     public DragScrollView(Context context) {
         super(context);
