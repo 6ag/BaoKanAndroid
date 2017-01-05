@@ -49,6 +49,7 @@
                         android:padding="5dp"
                         android:textColor="#000"
                         android:textColorHint="#ccc"
+                        android:maxLength="255"
                         android:textSize="14sp"/>
 
                     <!--剩余可输入字符-->
@@ -63,11 +64,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="还能输入字符"
+                            android:text="剩余输入字符"
+                            android:layout_marginEnd="1dp"
                             android:textColor="#ccc"
                             android:textSize="12sp"/>
 
                         <TextView
+                            android:id="@+id/tv_feedback_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="255"
