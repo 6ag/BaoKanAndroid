@@ -1,12 +1,24 @@
 package tv.baokan.baokanandroid.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +29,8 @@ import java.io.UnsupportedEncodingException;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 
 public class StreamUtils {
+
+    private static final String TAG = "StreamUtils";
 
     /**
      * inputStrean转String
@@ -145,6 +159,66 @@ public class StreamUtils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 保存远程图片到相册 - 会保存到2个目录
+     */
+    public static void saveImageToAlbum(final Context context, final String imageUrl) {
+        Picasso.with(context).load(imageUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                // 创建目录
+                File appDir = new File(Environment.getExternalStorageDirectory(), "BaoKanImage");
+                if (!appDir.exists()) {
+                    appDir.mkdir();
+                }
+
+                // 获取图片类型
+                String[] imageTypes = new String[]{".jpg", ".png", ".jpeg", "webp"};
+                String imageType = "";
+                if (imageUrl.endsWith(imageTypes[0])) {
+                    imageType = "jpg";
+                } else if (imageUrl.endsWith(imageTypes[1])) {
+                    imageType = "png";
+                } else {
+                    imageType = "jpeg";
+                }
+                String fileName = System.currentTimeMillis() + "." + imageType;
+                File file = new File(appDir, fileName);
+                // 保存图片
+                try {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    if (TextUtils.equals(imageType, "jpg")) imageType = "jpeg";
+                    imageType = imageType.toUpperCase();
+                    bitmap.compress(Bitmap.CompressFormat.valueOf(imageType), 100, fos);
+                    fos.flush();
+                    fos.close();
+                    Toast.makeText(context, "保存成功", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // 其次把文件插入到系统图库
+                try {
+                    MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), fileName, null);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                // 最后通知图库更新
+                context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + file.getPath())));
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
 }

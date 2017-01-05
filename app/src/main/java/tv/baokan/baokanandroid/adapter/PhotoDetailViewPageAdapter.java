@@ -16,6 +16,7 @@ import java.util.List;
 
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -79,7 +80,7 @@ public class PhotoDetailViewPageAdapter extends PagerAdapter {
 
                 @Override
                 public void onError() {
-                    LogUtils.d("ViewPageAdapter", "图片加载失败");
+                    ProgressHUD.showInfo(context, "图片加载失败");
                 }
             });
             cacheView.put(position, view);
