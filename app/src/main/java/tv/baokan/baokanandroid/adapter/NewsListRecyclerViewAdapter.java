@@ -76,14 +76,17 @@ public class NewsListRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 // 刷新列表数据
                 notifyDataSetChanged();
 
-                // 列表数据大于3条就显示banner
-                if (mArticleListBeans.size() >= 3) {
-                    // 幻灯片数据
+                // 列表数据大于3条 并且外部允许显示 就显示banner
+                if (mArticleListBeans.size() >= 3 && isShowBannerOuter) {
+                    // 幻灯片数据 - 如果没有标题图片就不显示
                     isGoodArticleBeans = new ArrayList<>();
-                    isGoodArticleBeans.add(mArticleListBeans.get(0));
-                    isGoodArticleBeans.add(mArticleListBeans.get(1));
-                    isGoodArticleBeans.add(mArticleListBeans.get(2));
-                    isShowBannerInner = true;
+                    for (int i = 0; i < 3; i++) {
+                        ArticleListBean articleListBean = mArticleListBeans.get(i);
+                        if (!TextUtils.isEmpty(articleListBean.getTitlepic())) {
+                            isGoodArticleBeans.add(articleListBean);
+                        }
+                    }
+                    isShowBannerInner = isGoodArticleBeans.size() > 0;
                 } else {
                     isShowBannerInner = false;
                 }
