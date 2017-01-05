@@ -9,7 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import tv.baokan.baokanandroid.utils.LogUtils;
+
 public abstract class BaseFragment extends Fragment {
+
+    private static final String TAG = "BaseFragment";
 
     // 承载fragment的activity的上下文
     protected Context mContext;
@@ -28,6 +32,7 @@ public abstract class BaseFragment extends Fragment {
 
     /**
      * 强制子类重写，准备UI
+     *
      * @return fragment加载的视图
      */
     protected abstract View prepareUI();
@@ -41,5 +46,7 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 在activity创建成功后才会调用，加载页面需要的数据
      */
-    protected void loadData() {}
+    protected void loadData() {
+    }
+
 }

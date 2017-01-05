@@ -72,8 +72,9 @@ public class NewsListFragment extends BaseFragment {
         // 配置recyclerView资讯列表
         setupRecyclerView();
 
-        // 设置刷新监听器
+        // 配置刷新
         setupRefresh();
+
     }
 
     /**
