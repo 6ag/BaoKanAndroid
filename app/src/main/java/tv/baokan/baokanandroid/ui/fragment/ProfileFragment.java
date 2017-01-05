@@ -9,10 +9,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.core.ImagePipeline;
 
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
+import tv.baokan.baokanandroid.cache.NewsDALManager;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
 import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
@@ -176,6 +179,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
      * 清除缓存
      */
     private void clearCache() {
+        // 清理新闻json数据
+        NewsDALManager.shared.clearCache();
+
+        // Fresco清除缓存
+        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+        imagePipeline.clearCaches();
+
 
     }
 

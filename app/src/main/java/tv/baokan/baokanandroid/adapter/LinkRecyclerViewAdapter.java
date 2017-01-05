@@ -2,6 +2,7 @@ package tv.baokan.baokanandroid.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,29 +15,33 @@ import java.util.List;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.ArticleDetailBean;
 import tv.baokan.baokanandroid.ui.activity.NewsDetailActivity;
+import tv.baokan.baokanandroid.utils.LogUtils;
 
 /**
  * 新闻正文底部相关链接适配器
  */
 public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final String TAG = "LinkRecyclerViewAdapter";
+
     // 相关链接item类型枚举
-    enum LINK_ITEM_TYPE {
+    private enum LINK_ITEM_TYPE {
         NO_TITLE_PIC, // 无图
         TITLE_PIC     // 有图
     }
 
-    List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList;
-    Context mContext;
+    private List<ArticleDetailBean.ArticleDetailLinkBean> mLinkBeanList;
+    private Context mContext;
 
-    public LinkRecyclerViewAdapter(List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList, Context mContext) {
-        this.linkBeanList = linkBeanList;
-        this.mContext = mContext;
+    public LinkRecyclerViewAdapter(Context context, List<ArticleDetailBean.ArticleDetailLinkBean> linkBeanList) {
+        this.mLinkBeanList = linkBeanList;
+        this.mContext = context;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (linkBeanList.get(position).getTitlepic() == null) {
+        if (TextUtils.isEmpty(mLinkBeanList.get(position).getTitlepic()) || mLinkBeanList.get(position).getTitlepic().equals("null")) {
+            LogUtils.d(TAG, "titlePic = " + mLinkBeanList.get(position).getTitlepic());
             return LINK_ITEM_TYPE.NO_TITLE_PIC.ordinal();
         } else {
             return LINK_ITEM_TYPE.TITLE_PIC.ordinal();
@@ -59,7 +64,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 // 进入相关链接的正文页面
-                NewsDetailActivity.start((NewsDetailActivity) mContext, linkBeanList.get(position).getClassid(), linkBeanList.get(position).getId());
+                NewsDetailActivity.start((NewsDetailActivity) mContext, mLinkBeanList.get(position).getClassid(), mLinkBeanList.get(position).getId());
             }
         });
         return holder;
@@ -67,7 +72,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ArticleDetailBean.ArticleDetailLinkBean linkBean = linkBeanList.get(position);
+        ArticleDetailBean.ArticleDetailLinkBean linkBean = mLinkBeanList.get(position);
         LinkBaseViewHolder baseViewHolder = (LinkBaseViewHolder) holder;
         baseViewHolder.titleTextView.setText(linkBean.getTitle());
         baseViewHolder.classNameTextView.setText(linkBean.getClassname());
@@ -77,7 +82,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             titlePicViewHolder.titlePicView.setImageURI(linkBean.getTitlepic());
         }
         // 最后一个分割线隐藏
-        if (position == linkBeanList.size() - 1) {
+        if (position == mLinkBeanList.size() - 1) {
             baseViewHolder.lineView.setVisibility(View.INVISIBLE);
         } else {
             baseViewHolder.lineView.setVisibility(View.VISIBLE);
@@ -86,7 +91,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return linkBeanList.size();
+        return mLinkBeanList.size();
     }
 
     // 相关链接item基类
@@ -109,7 +114,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     // 无图的item
-    class NoTitlePicViewHolder extends LinkBaseViewHolder {
+    private class NoTitlePicViewHolder extends LinkBaseViewHolder {
 
         NoTitlePicViewHolder(View itemView) {
             super(itemView);
@@ -117,7 +122,7 @@ public class LinkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     // 有图的item
-    class TitlePicViewHolder extends LinkBaseViewHolder {
+    private class TitlePicViewHolder extends LinkBaseViewHolder {
 
         SimpleDraweeView titlePicView;
 

@@ -154,12 +154,10 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mCommentRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_comment_recyclerview);
         mMoreCommentButton = (Button) findViewById(R.id.btn_news_detail_comment_more);
 
-        // view硬件加速
-        mScrollView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
         // 新闻正文
         WebSettings webSettings = mContentWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        mContentWebView.setScrollContainer(false);
         mContentWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mContentWebView.addJavascriptInterface(new ArticleJavascriptInterface(), "ARTICLE");
         mContentWebView.setWebChromeClient(new WebChromeClient() {
@@ -559,7 +557,6 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                // 加载页面
                 mScrollView.setVisibility(View.VISIBLE);
             }
         }, 100);
@@ -572,11 +569,11 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         }
 
         // 加载相关链接
-        if (detailBean.getOtherLinks() != null) {
+        if (detailBean.getOtherLinks() != null && detailBean.getOtherLinks().size() > 0) {
             mLinkLayout.setVisibility(View.VISIBLE);
-            mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(detailBean.getOtherLinks(), this);
-            mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
             mLinkRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mLinkRecyclerViewAdapter = new LinkRecyclerViewAdapter(this, detailBean.getOtherLinks());
+            mLinkRecyclerView.setAdapter(mLinkRecyclerViewAdapter);
             mLinkRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {

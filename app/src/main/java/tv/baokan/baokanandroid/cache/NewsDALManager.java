@@ -47,6 +47,15 @@ public class NewsDALManager {
     }
 
     /**
+     * 清除所有缓存
+     */
+    public void clearCache() {
+        DataSupport.deleteAll(NewsListHomeCache.class);
+        DataSupport.deleteAll(NewsListOtherCache.class);
+        DataSupport.deleteAll(NewsContentCache.class);
+    }
+
+    /**
      * 移除指定分类的列表数据
      * 今日头条的数据和其他分类的数据不是存在一张表里的，需要判断下哦
      * 资讯内容数据基本固定，可以根据需求写个过期清理
