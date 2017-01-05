@@ -1,7 +1,11 @@
 package tv.baokan.baokanandroid.ui.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -10,7 +14,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.UserBean;
+import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
+import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
+import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
@@ -28,8 +35,10 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     private View feedbackView;                  // 意见反馈
     private View aboutView;                     // 关于我们
     private View commendView;                   // 推荐给好友
-    private View versionView;                   // 当前版本
     private TextView versionTextView;           // 版本号
+    private AlertDialog mClearCacheDiglog;      // 清除缓存
+    private AlertDialog mSetFontDialog;         // 设置字体
+    private int mFontSize;                       // 字体大小
 
     @Override
     protected View prepareUI() {
@@ -48,7 +57,6 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         feedbackView = view.findViewById(R.id.rl_profile_feekback_layout);
         aboutView = view.findViewById(R.id.rl_profile_aboutme_layout);
         commendView = view.findViewById(R.id.rl_profile_commend_layout);
-        versionView = view.findViewById(R.id.rl_profile_version_layout);
         versionTextView = (TextView) view.findViewById(R.id.tv_profile_current_version);
 
         // 添加点击事件
@@ -61,20 +69,19 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         feedbackView.setOnClickListener(this);
         aboutView.setOnClickListener(this);
         commendView.setOnClickListener(this);
-        versionView.setOnClickListener(this);
         return view;
     }
 
     @Override
     protected void loadData() {
 
+        // 字体
+        fontTextView.setText(getFontSizeString());
+
         // 版本号
         versionTextView.setText("v" + ((BaoKanApp) getActivity().getApplication()).getVersionName());
     }
 
-    /**
-     * onResume前调用 马上显示
-     */
     @Override
     public void onStart() {
         super.onStart();
@@ -122,24 +129,142 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 }
                 break;
             case R.id.rl_profile_clear_cache_layout:
-
+                showClearCacheDialog();
                 break;
             case R.id.rl_profile_set_font_layout:
-
+                showSetFontDialog();
                 break;
             case R.id.rl_profile_feekback_layout:
-
+                FeedbackActivity.start(getActivity());
                 break;
             case R.id.rl_profile_aboutme_layout:
-
+                AboutUsActivity.start(getActivity());
                 break;
             case R.id.rl_profile_commend_layout:
 
                 break;
-            case R.id.rl_profile_version_layout:
+        }
+    }
 
+    /**
+     * 清除缓存前需要询问一下用户
+     */
+    private void showClearCacheDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setCancelable(true);
+        builder.setTitle("您确定要清除缓存吗？");
+        builder.setMessage("缓存可以节省您的流量哦！");
+        builder.setPositiveButton("确定清除", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mClearCacheDiglog.dismiss();
+                clearCache();
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mClearCacheDiglog.dismiss();
+            }
+        });
+        mClearCacheDiglog = builder.create();
+        mClearCacheDiglog.show();
+
+    }
+
+    /**
+     * 清除缓存
+     */
+    private void clearCache() {
+
+    }
+
+    /**
+     * 弹出显示选择字体的会话框
+     */
+    private void showSetFontDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        View view = View.inflate(mContext, R.layout.dialog_set_font, null);
+        builder.setView(view);
+        builder.setCancelable(true);
+        mSetFontDialog = builder.create();
+        mSetFontDialog.show();
+
+        RadioGroup setFontGroup = (RadioGroup) view.findViewById(R.id.rg_set_font_group);
+        // 根据缓存的字体选择默认的item
+        switch (SharedPreferencesUtils.getInt(mContext, SharedPreferencesUtils.DETAIL_FONT, 18)) {
+            case 16:
+                setFontGroup.check(R.id.rb_set_font_small);
+                break;
+            case 18:
+                setFontGroup.check(R.id.rb_set_font_middle);
+                break;
+            case 20:
+                setFontGroup.check(R.id.rb_set_font_big);
+                break;
+            case 22:
+                setFontGroup.check(R.id.rb_set_font_verybig);
                 break;
         }
+        setFontGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // 不会直接修改，而是先存储起来，点击确认的时候才修改
+                switch (checkedId) {
+                    case R.id.rb_set_font_verybig:
+                        mFontSize = 22;
+                        break;
+                    case R.id.rb_set_font_big:
+                        mFontSize = 20;
+                        break;
+                    case R.id.rb_set_font_middle:
+                        mFontSize = 18;
+                        break;
+                    case R.id.rb_set_font_small:
+                        mFontSize = 16;
+                        break;
+                }
+            }
+        });
+        Button cancelButton = (Button) view.findViewById(R.id.btn_set_font_cancel);
+        Button confirmButton = (Button) view.findViewById(R.id.btn_set_font_confirm);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSetFontDialog.dismiss();
+            }
+        });
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 修改字体
+                SharedPreferencesUtils.setInt(mContext, SharedPreferencesUtils.DETAIL_FONT, mFontSize);
+                fontTextView.setText(getFontSizeString());
+                mSetFontDialog.dismiss();
+            }
+        });
+    }
+
+    /**
+     * 更新显示字体大小的ui
+     */
+    private String getFontSizeString() {
+        String fontSizeString = "";
+        switch (SharedPreferencesUtils.getInt(mContext, SharedPreferencesUtils.DETAIL_FONT, 18)) {
+            case 16:
+                fontSizeString = "小号字体";
+                break;
+            case 18:
+                fontSizeString = "中号字体";
+                break;
+            case 20:
+                fontSizeString = "大号字体";
+                break;
+            case 22:
+                fontSizeString = "特大号字体";
+                break;
+        }
+        return fontSizeString;
     }
 
 }

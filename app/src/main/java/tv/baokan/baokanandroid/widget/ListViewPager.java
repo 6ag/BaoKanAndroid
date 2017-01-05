@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 /**
- * 解决ViewPager大屏手机滑动问题 无需滑动过半才翻页
+ * 解决ViewPager大屏手机滑动问题 无需滑动过半才翻页 - 会影响RecyclerView的滑动
  */
 
 public class ListViewPager extends ViewPager {
@@ -21,18 +21,18 @@ public class ListViewPager extends ViewPager {
         super(context, attrs);
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        boolean res = super.onInterceptTouchEvent(ev);
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            preX = ev.getX();
-        } else {
-            if (Math.abs(ev.getX() - preX) > 4) {
-                return true;
-            } else {
-                preX = ev.getX();
-            }
-        }
-        return res;
-    }
+//    @Override
+//    public boolean onInterceptTouchEvent(MotionEvent ev) {
+//        boolean res = super.onInterceptTouchEvent(ev);
+//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+//            preX = ev.getX();
+//        } else {
+//            if (Math.abs(ev.getX() - preX) > 4) {
+//                return true;
+//            } else {
+//                preX = ev.getX();
+//            }
+//        }
+//        return res;
+//    }
 }

@@ -3,7 +3,7 @@
           package="tv.baokan.baokanandroid">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <!-- 震动权限 -->
@@ -44,6 +44,10 @@
         <activity android:name=".ui.activity.CommentListActivity">
         </activity>
         <activity android:name=".ui.activity.ColumnActivity">
+        </activity>
+        <activity android:name=".ui.activity.AboutUsActivity">
+        </activity>
+        <activity android:name=".ui.activity.FeedbackActivity">
         </activity>
     </application>
 

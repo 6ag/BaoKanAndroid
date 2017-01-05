@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_about_us"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="tv.baokan.baokanandroid.ui.activity.AgreementActivity">
+
+    <!--导航栏-->
+    <tv.baokan.baokanandroid.widget.NavigationViewRed
+        android:id="@+id/nav_about_us"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </tv.baokan.baokanandroid.widget.NavigationViewRed>
+
+    <WebView
+        android:id="@+id/wv_about_us_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/nav_about_us"
+        android:overScrollMode="never">
+    </WebView>
+
+    <!--进度圈-->
+    <ProgressBar
+        android:id="@+id/pb_about_us_progressbar"
+        style="@android:style/Widget.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="100dp"
+        android:indeterminateDrawable="@anim/progressbar_rotate"/>
+
+</RelativeLayout>

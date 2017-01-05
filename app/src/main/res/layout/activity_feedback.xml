@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_feedback"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="tv.baokan.baokanandroid.ui.activity.AgreementActivity">
+
+    <!--导航栏-->
+    <tv.baokan.baokanandroid.widget.NavigationViewRed
+        android:id="@+id/nav_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </tv.baokan.baokanandroid.widget.NavigationViewRed>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/nav_feedback"
+        android:background="@color/colorAllBackgroundColor">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cv_feedback_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/et_feedback_content_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@null"
+                        android:gravity="start|top"
+                        android:hint="您的支持是我们最大的动力!"
+                        android:padding="5dp"
+                        android:textColor="#000"
+                        android:textColorHint="#ccc"
+                        android:textSize="14sp"/>
+
+                    <!--剩余可输入字符-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="还能输入字符"
+                            android:textColor="#ccc"
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="255"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="15dp">
+
+                <tv.baokan.baokanandroid.widget.ClearEditText
+                    android:id="@+id/et_feedback_contacts_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@null"
+                    android:fastScrollEnabled="true"
+                    android:hint="请留下您的联系方式 qq/微信/电话"
+                    android:inputType="textFilter"
+                    android:maxLines="1"
+                    android:overScrollMode="never"
+                    android:textColorHint="#ccc"
+                    android:textSize="14sp">
+                </tv.baokan.baokanandroid.widget.ClearEditText>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                app:cardCornerRadius="5dp">
+
+                <Button
+                    android:id="@+id/btn_feedback_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_red_button"
+                    android:text="提交"
+                    android:textColor="@drawable/selector_red_button_text"/>
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</RelativeLayout>
