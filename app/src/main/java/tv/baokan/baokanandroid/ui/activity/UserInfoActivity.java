@@ -98,10 +98,10 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_user_info_modify_info_layout:
-
+                ModifyInfoActivity.start(mContext);
                 break;
             case R.id.rl_user_info_modify_safe_info_layout:
-
+                ModifySafeInfoActivity.start(mContext);
                 break;
             case R.id.btn_user_info_logout:
                 showLogoutDialog();

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_modify_info"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="tv.baokan.baokanandroid.ui.activity.ModifyInfoActivity">
+
+    <!--导航栏-->
+    <tv.baokan.baokanandroid.widget.NavigationViewRed
+        android:id="@+id/nav_modify_user_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </tv.baokan.baokanandroid.widget.NavigationViewRed>
+
+    <!--内容区域-->
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/nav_modify_user_info"
+        android:background="#ECECF2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rl_modify_user_info_portrait_layout"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="#fff"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="头像"/>
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/sdv_modify_user_info_portrait"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="0dp"
+                    fresco:actualImageScaleType="fitXY"
+                    fresco:placeholderImage="@drawable/default_portrait"
+                    fresco:roundedCornerRadius="30dp"/>
+
+            </RelativeLayout>
+
+            <!--分组间隔-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#ECECF2"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#fff">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="用户名："/>
+
+                <TextView
+                    android:id="@+id/tv_modify_user_info_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="80dp"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:text="a44334512"/>
+
+                <!--分割线-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="10dp"
+                    android:alpha="0.5"
+                    android:background="#ccc"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#fff">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="昵称："/>
+
+                <tv.baokan.baokanandroid.widget.ClearEditText
+                    android:id="@+id/et_modify_user_info_nickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="80dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="昵称"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textColorHint="#ccc"
+                    android:textSize="15sp"/>
+
+                <!--分割线-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="10dp"
+                    android:alpha="0.5"
+                    android:background="#ccc"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#fff">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="联系电话："/>
+
+                <tv.baokan.baokanandroid.widget.ClearEditText
+                    android:id="@+id/et_modify_user_info_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="80dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="联系电话"
+                    android:inputType="phone"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textColorHint="#ccc"
+                    android:textSize="15sp"/>
+
+                <!--分割线-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="10dp"
+                    android:alpha="0.5"
+                    android:background="#ccc"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#fff">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="QQ号码："/>
+
+                <tv.baokan.baokanandroid.widget.ClearEditText
+                    android:id="@+id/et_modify_user_info_qq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="80dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="QQ号"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textColorHint="#ccc"
+                    android:textSize="15sp"/>
+
+                <!--分割线-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="10dp"
+                    android:alpha="0.5"
+                    android:background="#ccc"/>
+
+            </RelativeLayout>
+
+            <!--我的等级-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#fff">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="个性签名："/>
+
+                <tv.baokan.baokanandroid.widget.ClearEditText
+                    android:id="@+id/et_modify_user_info_say"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="80dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="个性签名"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:textColorHint="#ccc"
+                    android:textSize="15sp"/>
+
+            </RelativeLayout>
+
+            <android.support.v7.widget.CardView
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                app:cardCornerRadius="5dp">
+
+                <Button
+                    android:id="@+id/btn_modify_user_info_modify"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_red_button"
+                    android:text="保存修改"
+                    android:textColor="@drawable/selector_red_button_text"/>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</RelativeLayout>

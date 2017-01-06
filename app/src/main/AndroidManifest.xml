@@ -51,6 +51,10 @@
         </activity>
         <activity android:name=".ui.activity.UserInfoActivity">
         </activity>
+        <activity android:name=".ui.activity.ModifyInfoActivity">
+        </activity>
+        <activity android:name=".ui.activity.ModifySafeInfoActivity">
+        </activity>
     </application>
 
 </manifest>
