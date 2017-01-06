@@ -122,8 +122,10 @@ public class PhotoListFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
-                // 下拉刷新状态 并且网络状态良好 就清除本地数据
-                NewsDALManager.shared.removeNewsList(classid);
+                // 下拉刷新数据时，在有网络情况下清除本地缓存的数据
+                if (NetworkUtils.shared.isNetworkConnected(mContext)) {
+                    NewsDALManager.shared.removeNewsList(classid);
+                }
 
                 // 重新加载并缓存数据
                 loadNewsFromNetwork(classid, 1, 0);
