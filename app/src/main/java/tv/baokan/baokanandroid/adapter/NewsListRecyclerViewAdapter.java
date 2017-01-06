@@ -60,36 +60,32 @@ public class NewsListRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
      */
     public void updateData(List<ArticleListBean> newArticleListBeans, int method) {
 
-        String maxId = "0";
         String minId = "0";
         if (mArticleListBeans.size() > 0) {
-            maxId = mArticleListBeans.get(0).getId();
             minId = mArticleListBeans.get(mArticleListBeans.size() - 1).getId();
         }
 
-        if (method == 0) { // 下拉刷新
+        if (method == 0) { // 下拉刷新 - 每次都刷新 为了刷新列表的浏览量、评论数据
 
-            if (maxId.compareTo(newArticleListBeans.get(0).getId()) <= -1) {
-                // 替换数据
-                mArticleListBeans.clear();
-                mArticleListBeans.addAll(newArticleListBeans);
-                // 刷新列表数据
-                notifyDataSetChanged();
+            // 替换数据
+            mArticleListBeans.clear();
+            mArticleListBeans.addAll(newArticleListBeans);
+            // 刷新列表数据
+            notifyDataSetChanged();
 
-                // 列表数据大于3条 并且外部允许显示 就显示banner
-                if (mArticleListBeans.size() >= 3 && isShowBannerOuter) {
-                    // 幻灯片数据 - 如果没有标题图片就不显示
-                    isGoodArticleBeans = new ArrayList<>();
-                    for (int i = 0; i < 3; i++) {
-                        ArticleListBean articleListBean = mArticleListBeans.get(i);
-                        if (!TextUtils.isEmpty(articleListBean.getTitlepic())) {
-                            isGoodArticleBeans.add(articleListBean);
-                        }
+            // 列表数据大于3条 并且外部允许显示 就显示banner
+            if (mArticleListBeans.size() >= 3 && isShowBannerOuter) {
+                // 幻灯片数据 - 如果没有标题图片就不显示
+                isGoodArticleBeans = new ArrayList<>();
+                for (int i = 0; i < 3; i++) {
+                    ArticleListBean articleListBean = mArticleListBeans.get(i);
+                    if (!TextUtils.isEmpty(articleListBean.getTitlepic())) {
+                        isGoodArticleBeans.add(articleListBean);
                     }
-                    isShowBannerInner = isGoodArticleBeans.size() > 0;
-                } else {
-                    isShowBannerInner = false;
                 }
+                isShowBannerInner = isGoodArticleBeans.size() > 0;
+            } else {
+                isShowBannerInner = false;
             }
 
         } else { // 上拉加载
