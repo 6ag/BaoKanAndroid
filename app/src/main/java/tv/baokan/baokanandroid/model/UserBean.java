@@ -211,7 +211,7 @@ public class UserBean {
     /**
      * 退出登录
      */
-    public static void logout() {
+    public void logout() {
         UserBean.userAccount = null;
         SharedPreferences sp = BaoKanApp.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         sp.edit().clear().apply();
@@ -263,7 +263,7 @@ public class UserBean {
                         } else {
                             String info = jsonObject.getString("info");
                             LogUtils.d(TAG, "更新用户信息失败" + info);
-                            logout();
+                            UserBean.shared().logout();
                             userInfoListener.onError(info);
                         }
                     } catch (JSONException e) {

@@ -20,6 +20,7 @@ import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
 import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
+import tv.baokan.baokanandroid.ui.activity.UserInfoActivity;
 import tv.baokan.baokanandroid.utils.FileCacheUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
@@ -131,7 +132,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.ll_profile_info_layout:
                 if (UserBean.isLogin()) {
-                    Toast.makeText(mContext, "资料", Toast.LENGTH_SHORT).show();
+                    UserInfoActivity.start(getActivity());
                 } else {
                     LoginActivity.start(getActivity());
                 }

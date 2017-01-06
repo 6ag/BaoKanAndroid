@@ -266,7 +266,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                         if (tipString.equals("您还没登录!")) {
                             showLoginTipDialog();
                             // 注销本地用户信息
-                            UserBean.logout();
+                            UserBean.shared().logout();
                         } else {
                             ProgressHUD.showInfo(NewsDetailActivity.this, tipString);
                         }

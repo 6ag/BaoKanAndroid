@@ -468,7 +468,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                         if (tipString.equals("您还没登录!")) {
                             showLoginTipDialog();
                             // 注销本地用户信息
-                            UserBean.logout();
+                            UserBean.shared().logout();
                         } else {
                             ProgressHUD.showInfo(mContext, tipString);
                         }

@@ -49,6 +49,8 @@
         </activity>
         <activity android:name=".ui.activity.FeedbackActivity">
         </activity>
+        <activity android:name=".ui.activity.UserInfoActivity">
+        </activity>
     </application>
 
 </manifest>
