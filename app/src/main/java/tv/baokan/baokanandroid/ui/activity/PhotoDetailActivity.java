@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.sharesdk.onekeyshare.OnekeyShare;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.adapter.PhotoDetailViewPageAdapter;
@@ -49,6 +50,7 @@ import tv.baokan.baokanandroid.utils.SizeUtils;
 
 public class PhotoDetailActivity extends BaseActivity implements View.OnClickListener {
 
+    private int mPosition = 0;
     private static final String TAG = "PhotoDetailActivity";
     private String classid;                 // 栏目id
     private String id;                      // 文章id
@@ -148,12 +150,37 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 collectArticle();
                 break;
             case R.id.ib_photo_detail_bottom_bar_share:
-                ProgressHUD.showInfo(mContext, "分享");
+                share();
                 break;
             case R.id.tv_photo_detail_report:
                 ProgressHUD.showInfo(mContext, "举报成功");
                 break;
         }
+    }
+
+    /**
+     * 分享
+     */
+    private void share() {
+        OnekeyShare oks = new OnekeyShare();
+        // 关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        // title标题，印象笔记、邮箱、信息、微信、人人网、QQ和QQ空间使用
+        oks.setTitle(detailBean.getTitle());
+        // titleUrl是标题的网络链接，仅在Linked-in,QQ和QQ空间使用
+        oks.setTitleUrl(detailBean.getTitleurl());
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText(photoBeans.get(mPosition).getCaption());
+        //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
+        oks.setImageUrl(photoBeans.get(mPosition).getBigpic());
+        // url仅在微信（包括好友和朋友圈）中使用
+        oks.setUrl(detailBean.getTitleurl());
+        // site是分享此内容的网站名称，仅在QQ空间使用
+        oks.setSite("爆侃网文");
+        // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+        oks.setSiteUrl(detailBean.getTitleurl());
+        // 启动分享GUI
+        oks.show(mContext);
     }
 
     /**
@@ -232,8 +259,8 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
         mViewPager.setAdapter(adapter);
 
         // 默认从第一页开始浏览
-        mViewPager.setCurrentItem(0);
-        onPageChanged(0);
+        mViewPager.setCurrentItem(mPosition);
+        onPageChanged(mPosition);
 
         // 监听viewPager的滚动
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -244,6 +271,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onPageSelected(int position) {
+                mPosition = position;
                 onPageChanged(position);
             }
 

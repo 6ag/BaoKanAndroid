@@ -13,6 +13,8 @@ import org.litepal.LitePalApplication;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.sharesdk.framework.ShareSDK;
+
 public class BaoKanApp extends LitePalApplication {
 
     // 用于存放所有启动的Activity的集合
@@ -34,6 +36,8 @@ public class BaoKanApp extends LitePalApplication {
         // 初始化app异常处理器
 //        CrashHandler handler = CrashHandler.getInstance();
 //        handler.init(getApplicationContext());
+
+        ShareSDK.initSDK(this);
 
     }
 

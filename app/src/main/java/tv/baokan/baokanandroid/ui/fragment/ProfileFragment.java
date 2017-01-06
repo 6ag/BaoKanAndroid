@@ -14,6 +14,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
+import cn.sharesdk.onekeyshare.OnekeyShare;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.UserBean;
@@ -161,7 +162,25 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
      * 分享app
      */
     private void shareApp() {
-        ProgressHUD.showInfo(mContext, "分享");
+        OnekeyShare oks = new OnekeyShare();
+        // 关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        // title标题，印象笔记、邮箱、信息、微信、人人网、QQ和QQ空间使用
+        oks.setTitle("爆侃网文");
+        // titleUrl是标题的网络链接，仅在Linked-in,QQ和QQ空间使用
+        oks.setTitleUrl("http://www.baokan.tv");
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText("爆侃网文精心打造网络文学互动平台，专注最新文学市场动态，聚焦第一手网文圈资讯！");
+        //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
+        oks.setImageUrl("http://www.baokan.tv/d/file/p/2017-01-05/8c81061deb5b31ce6fb8e3a018afe8e5.jpg");
+        // url仅在微信（包括好友和朋友圈）中使用
+        oks.setUrl("http://www.baokan.tv");
+        // site是分享此内容的网站名称，仅在QQ空间使用
+        oks.setSite("爆侃网文");
+        // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+        oks.setSiteUrl("http://www.baokan.tv");
+        // 启动分享GUI
+        oks.show(getContext());
     }
 
     /**

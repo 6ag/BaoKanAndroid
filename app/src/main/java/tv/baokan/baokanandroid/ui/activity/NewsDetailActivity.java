@@ -51,6 +51,12 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.tencent.qq.QQ;
+import cn.sharesdk.wechat.friends.Wechat;
+import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.cache.NewsDALManager;
@@ -89,6 +95,10 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private ImageButton mFontButton;        // 底部条 设置字体
     private ImageButton mCollectionButton;  // 收藏
     private ImageButton mShareButton;       // 分享
+
+    private Button mShareQQButton;     // qq分享
+    private Button mShareWxButton;     // 微信分享
+    private Button mSharePyqButton;    // 朋友圈
 
     private LinearLayout mLinkLayout;       // 相关阅读
     private RecyclerView mLinkRecyclerView; // 相关阅读列表
@@ -142,6 +152,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mProgressBar = (ProgressBar) findViewById(R.id.pb_news_detail_progressbar);
         mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
         mContentWebView = (WebView) findViewById(R.id.wv_news_detail_webview);
+        mShareQQButton = (Button) findViewById(R.id.btn_news_detail_share_qq);
+        mShareWxButton = (Button) findViewById(R.id.btn_news_detail_share_wx);
+        mSharePyqButton = (Button) findViewById(R.id.btn_news_detail_share_pyq);
         mBackButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_back);
         mEditButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_edit);
         mFontButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_font);
@@ -184,6 +197,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mFontButton.setOnClickListener(this);
         mCollectionButton.setOnClickListener(this);
         mShareButton.setOnClickListener(this);
+        mShareQQButton.setOnClickListener(this);
+        mShareWxButton.setOnClickListener(this);
+        mSharePyqButton.setOnClickListener(this);
 
         // 更多评论
         mMoreCommentButton.setOnClickListener(new View.OnClickListener() {
@@ -226,9 +242,56 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 collectArticle();
                 break;
             case R.id.ib_news_detail_bottom_bar_share:
-                Toast.makeText(this, "弹出分享", Toast.LENGTH_SHORT).show();
+                // 弹出分享ui
+                showShare(null);
+                break;
+            case R.id.btn_news_detail_share_qq:
+                // qq分享
+                showShare(ShareSDK.getPlatform(QQ.NAME).getName());
+                break;
+            case R.id.btn_news_detail_share_wx:
+                // 微信分享
+                showShare(ShareSDK.getPlatform(Wechat.NAME).getName());
+                break;
+            case R.id.btn_news_detail_share_pyq:
+                // 朋友圈分享
+                showShare(ShareSDK.getPlatform(WechatMoments.NAME).getName());
                 break;
         }
+    }
+
+    /**
+     * 分享
+     */
+    private void showShare(String platform) {
+        OnekeyShare oks = new OnekeyShare();
+        //指定分享的平台，如果为空，还是会调用九宫格的平台列表界面
+        if (platform != null) {
+            oks.setPlatform(platform);
+        }
+        // 关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        // title标题，印象笔记、邮箱、信息、微信、人人网、QQ和QQ空间使用
+        oks.setTitle(detailBean.getTitle());
+        // titleUrl是标题的网络链接，仅在Linked-in,QQ和QQ空间使用
+        oks.setTitleUrl(detailBean.getTitleurl());
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText(detailBean.getSmalltext());
+        //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
+        if (!TextUtils.isEmpty(detailBean.getTitlepic())) {
+            oks.setImageUrl(detailBean.getTitlepic());
+        } else {
+            // 默认图片，放服务器
+            oks.setImageUrl("http://www.baokan.tv/d/file/p/2017-01-05/8c81061deb5b31ce6fb8e3a018afe8e5.jpg");
+        }
+        // url仅在微信（包括好友和朋友圈）中使用
+        oks.setUrl(detailBean.getTitleurl());
+        // site是分享此内容的网站名称，仅在QQ空间使用
+        oks.setSite("爆侃网文");
+        // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+        oks.setSiteUrl(detailBean.getTitleurl());
+        // 启动分享GUI
+        oks.show(mContext);
     }
 
     /**
