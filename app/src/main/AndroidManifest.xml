@@ -55,9 +55,9 @@
         </activity>
         <activity android:name=".ui.activity.ModifySafeInfoActivity">
         </activity>
-        <activity android:name=".ui.activity.CollectionActivity">
+        <activity android:name=".ui.activity.CollectionRecordActivity">
         </activity>
-        <activity android:name=".ui.activity.CommentActivity">
+        <activity android:name=".ui.activity.CommentRecordActivity">
         </activity>
     </application>
 

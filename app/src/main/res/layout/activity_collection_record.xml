@@ -2,27 +2,36 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_comment"
+    android:id="@+id/activity_collection_record"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:clipToPadding="true"
     android:fitsSystemWindows="true"
-    tools:context="tv.baokan.baokanandroid.ui.activity.CommentActivity">
+    tools:context="tv.baokan.baokanandroid.ui.activity.CollectionRecordActivity">
 
     <!--导航栏-->
     <tv.baokan.baokanandroid.widget.NavigationViewRed
-        android:id="@+id/nav_comment"
+        android:id="@+id/nav_collection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </tv.baokan.baokanandroid.widget.NavigationViewRed>
 
-    <android.support.v7.widget.RecyclerView
+    <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+        android:id="@+id/srl_collection_record_list_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/nav_comment"
+        android:layout_below="@id/nav_collection"
         android:background="@color/colorAllBackgroundColor">
 
-    </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_collection_record_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+
 
 </RelativeLayout>

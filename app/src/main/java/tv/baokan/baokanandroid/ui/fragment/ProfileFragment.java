@@ -18,8 +18,8 @@ import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
-import tv.baokan.baokanandroid.ui.activity.CollectionActivity;
-import tv.baokan.baokanandroid.ui.activity.CommentActivity;
+import tv.baokan.baokanandroid.ui.activity.CollectionRecordActivity;
+import tv.baokan.baokanandroid.ui.activity.CommentRecordActivity;
 import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
 import tv.baokan.baokanandroid.ui.activity.UserInfoActivity;
@@ -120,14 +120,14 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.ll_profile_collection_layout:
                 if (UserBean.isLogin()) {
-                    CollectionActivity.start(getActivity());
+                    CollectionRecordActivity.start(getActivity());
                 } else {
                     LoginActivity.start(getActivity());
                 }
                 break;
             case R.id.ll_profile_comment_layout:
                 if (UserBean.isLogin()) {
-                    CommentActivity.start(getActivity());
+                    CommentRecordActivity.start(getActivity());
                 } else {
                     LoginActivity.start(getActivity());
                 }
@@ -161,7 +161,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
      * 分享app
      */
     private void shareApp() {
-        ProgressHUD.show(mContext, "分享");
+        ProgressHUD.showInfo(mContext, "分享");
     }
 
     /**

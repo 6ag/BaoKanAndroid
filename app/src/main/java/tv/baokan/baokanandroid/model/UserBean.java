@@ -272,6 +272,8 @@ public class UserBean {
                     }
                 }
             });
+        } else {
+            userInfoListener.onError("未登录");
         }
     }
 

@@ -30,6 +30,7 @@ import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
@@ -230,7 +231,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
             @Override
             public void onResponse(String response, int id) {
-
+                LogUtils.d(TAG, response);
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     if (jsonObject.getString("err_msg").equals("success")) {
@@ -252,7 +253,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
                     } else {
                         hud.dismiss();
-                        String info = jsonObject.getString("info");
+                        String info = jsonObject.getJSONObject("data").getString("info");
                         Toast.makeText(LoginActivity.this, info, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {

@@ -172,6 +172,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 setupDetailData();
                 // 加载网页缓存图片
                 getImageFromDownloaderOrDiskByImageUrlArray();
+                // 页面滑动到顶部
+                mScrollView.fullScroll(ScrollView.FOCUS_UP);
             }
 
         });

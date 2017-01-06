@@ -8,7 +8,7 @@ import android.view.View;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
-public class CommentActivity extends BaseActivity {
+public class CommentRecordActivity extends BaseActivity {
 
     private NavigationViewRed mNavigationViewRed;
 
@@ -18,7 +18,7 @@ public class CommentActivity extends BaseActivity {
      * @param activity 启动当前activity的activity
      */
     public static void start(Activity activity) {
-        Intent intent = new Intent(activity, CommentActivity.class);
+        Intent intent = new Intent(activity, CommentRecordActivity.class);
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
     }
@@ -26,7 +26,7 @@ public class CommentActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comment);
+        setContentView(R.layout.activity_comment_record);
 
         prepareUI();
         prepareData();
