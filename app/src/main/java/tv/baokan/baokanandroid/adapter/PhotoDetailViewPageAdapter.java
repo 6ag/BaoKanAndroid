@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -30,7 +31,7 @@ public class PhotoDetailViewPageAdapter extends PagerAdapter {
     }
 
     private Context context;
-    List<String> photoList;
+    private List<String> photoList;
     private SparseArray<View> cacheView; // 缓存展示图片的View
     private OnPhotoTapListener photoTapListener;
 

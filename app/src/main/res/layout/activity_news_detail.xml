@@ -28,10 +28,10 @@
             <!--正文-->
             <WebView
                 android:id="@+id/wv_news_detail_webview"
-                android:overScrollMode="never"
-                android:scrollbars="none"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:scrollbars="none">
             </WebView>
 
             <!--文章来源-->

@@ -121,7 +121,6 @@ public class PhotoBrowserActivity extends BaseActivity {
             }
         });
         mViewPager.setAdapter(adapter);
-
         mViewPager.setCurrentItem(mIndex);
         onPageChanged(mIndex);
 

@@ -2,9 +2,9 @@ package tv.baokan.baokanandroid.ui.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,16 +12,17 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.kaopiz.kprogresshud.KProgressHUD;
 
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
-import tv.baokan.baokanandroid.cache.NewsDALManager;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
 import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
+import tv.baokan.baokanandroid.utils.FileCacheUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
-import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
 
@@ -83,6 +84,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
         // 版本号
         versionTextView.setText("v" + ((BaoKanApp) getActivity().getApplication()).getVersionName());
+
     }
 
     @Override
@@ -97,6 +99,9 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             portraitImageView.setImageURI("");
             nicknameTextView.setText("登录账号");
         }
+
+        // 更新缓存 - 如果缓存太大，计算缓存大小应该放到子线程。然后计算完在主线程更新UI
+        cacheTextView.setText(FileCacheUtils.getTotalCacheSize(mContext));
 
     }
 
@@ -179,13 +184,25 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
      * 清除缓存
      */
     private void clearCache() {
-        // 清理新闻json数据
-        NewsDALManager.shared.clearCache();
+        // 清理新闻json数据 - 不清理json数据
+//        NewsDALManager.shared.clearCache();
 
-        // Fresco清除缓存
+        // Fresco清除图片缓存
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         imagePipeline.clearCaches();
 
+        // 清除缓存目录 - 清除所有缓存目录文件
+        FileCacheUtils.clearAllCache(mContext);
+
+        final KProgressHUD hud = ProgressHUD.show(mContext, "正在清理...");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hud.dismiss();
+                ProgressHUD.showInfo(mContext, "清理缓存完成");
+                cacheTextView.setText(FileCacheUtils.getTotalCacheSize(mContext));
+            }
+        }, 2000);
 
     }
 

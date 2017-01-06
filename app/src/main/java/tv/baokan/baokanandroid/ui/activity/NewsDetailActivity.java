@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,8 +38,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
-import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +61,7 @@ import tv.baokan.baokanandroid.adapter.CommentRecyclerViewAdapter;
 import tv.baokan.baokanandroid.adapter.LinkRecyclerViewAdapter;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.DateUtils;
-import tv.baokan.baokanandroid.utils.ImageCacheUtils;
+import tv.baokan.baokanandroid.utils.FileCacheUtils;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
@@ -83,7 +82,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
 
     private ViewGroup mContentView;              // 最外层视图
     private ProgressBar mProgressBar;       // 进度圈
-    private ScrollView mScrollView;         // 内容载体 scrollView
+    private ScrollView mScrollView;   // 内容载体 scrollView
     private WebView mContentWebView;        // 正文载体 webView
     private ImageButton mBackButton;        // 底部条 返回
     private ImageButton mEditButton;        // 底部条 编辑发布评论信息
@@ -157,8 +156,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         // 新闻正文
         WebSettings webSettings = mContentWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        mContentWebView.setScrollContainer(false);
-        mContentWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        // 开启硬件加速后，webView内容太大会crash 还在寻求最终解决办法
+//        mContentWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mContentWebView.addJavascriptInterface(new ArticleJavascriptInterface(), "ARTICLE");
         mContentWebView.setWebChromeClient(new WebChromeClient() {
         });
@@ -766,14 +765,14 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
             final String url = insetPhotoBean.getUrl();
 
             // 判断本地磁盘是否已经缓存
-            ImageCacheUtils.checkCacheInDisk(url, new ImageCacheUtils.OnCheckCacheInDiskListener() {
+            FileCacheUtils.checkCacheInDisk(url, new FileCacheUtils.OnCheckCacheInDiskListener() {
                 @Override
                 public void checkCacheInDisk(boolean isExist, String filePath) {
-                    if (isExist && filePath != null) {
+                    if (isExist && !TextUtils.isEmpty(filePath)) {
                         String sendData = "replaceimage" + url + "~" + filePath;
                         mContentWebView.loadUrl("javascript:replaceContentImage('" + sendData + "');");
                     } else {
-                        ImageCacheUtils.downloadImage(NewsDetailActivity.this, url, new ImageCacheUtils.OnDownloadImageToDiskListener() {
+                        FileCacheUtils.downloadImage(NewsDetailActivity.this, url, new FileCacheUtils.OnDownloadImageToDiskListener() {
                             @Override
                             public void downloadFinished(boolean success, final String filePath) {
                                 if (!success) {
