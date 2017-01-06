@@ -44,9 +44,7 @@ public class AboutUsActivity extends BaseActivity {
             }
         });
 
-        mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mWebView.loadUrl("file:///android_asset/www/html/aboutus.html");
-
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
