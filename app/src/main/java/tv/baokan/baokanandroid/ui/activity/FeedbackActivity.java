@@ -1,6 +1,7 @@
 package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
@@ -76,6 +80,17 @@ public class FeedbackActivity extends BaseActivity implements TextWatcher {
                 submitFeedback();
             }
         });
+
+        // 自动弹出键盘
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) mContentEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(mContentEditText, 0);
+            }
+
+        }, 500);
 
     }
 

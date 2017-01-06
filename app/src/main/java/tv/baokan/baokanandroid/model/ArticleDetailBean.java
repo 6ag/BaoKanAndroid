@@ -121,6 +121,10 @@ public class ArticleDetailBean {
                 '}';
     }
 
+    public void setPlnum(String plnum) {
+        this.plnum = plnum;
+    }
+
     public String getTop() {
         return top;
     }

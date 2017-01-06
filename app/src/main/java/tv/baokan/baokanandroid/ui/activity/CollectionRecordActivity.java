@@ -170,7 +170,7 @@ public class CollectionRecordActivity extends BaseActivity {
                                 CollectionRecordBean collectionRecordBean = new CollectionRecordBean(jsonArray.getJSONObject(i));
                                 collectionRecordBeanList.add(collectionRecordBean);
                             }
-                            
+
                             // 更新数据
                             mAdapter.updateData(collectionRecordBeanList, method);
                         }

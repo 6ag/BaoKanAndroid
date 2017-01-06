@@ -48,19 +48,6 @@ public class CollectionRecordBean {
         }
     }
 
-    @Override
-    public String toString() {
-        return "CollectionRecordBean{" +
-                "title='" + title + '\'' +
-                ", classid='" + classid + '\'' +
-                ", id='" + id + '\'' +
-                ", tbname='" + tbname + '\'' +
-                ", favatime='" + favatime + '\'' +
-                ", favaid='" + favaid + '\'' +
-                ", cid='" + cid + '\'' +
-                '}';
-    }
-
     public String getTitle() {
         return title;
     }
