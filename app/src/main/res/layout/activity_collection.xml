@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_collection"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="tv.baokan.baokanandroid.ui.activity.CollectionActivity">
+
+    <!--导航栏-->
+    <tv.baokan.baokanandroid.widget.NavigationViewRed
+        android:id="@+id/nav_collection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </tv.baokan.baokanandroid.widget.NavigationViewRed>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/nav_collection"
+        android:background="@color/colorAllBackgroundColor">
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>

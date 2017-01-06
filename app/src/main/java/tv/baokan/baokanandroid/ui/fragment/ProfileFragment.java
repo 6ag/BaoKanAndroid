@@ -18,6 +18,8 @@ import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.ui.activity.AboutUsActivity;
+import tv.baokan.baokanandroid.ui.activity.CollectionActivity;
+import tv.baokan.baokanandroid.ui.activity.CommentActivity;
 import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
 import tv.baokan.baokanandroid.ui.activity.UserInfoActivity;
@@ -118,14 +120,14 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.ll_profile_collection_layout:
                 if (UserBean.isLogin()) {
-                    Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
+                    CollectionActivity.start(getActivity());
                 } else {
                     LoginActivity.start(getActivity());
                 }
                 break;
             case R.id.ll_profile_comment_layout:
                 if (UserBean.isLogin()) {
-                    Toast.makeText(mContext, "评论", Toast.LENGTH_SHORT).show();
+                    CommentActivity.start(getActivity());
                 } else {
                     LoginActivity.start(getActivity());
                 }
@@ -150,9 +152,16 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 AboutUsActivity.start(getActivity());
                 break;
             case R.id.rl_profile_commend_layout:
-
+                shareApp();
                 break;
         }
+    }
+
+    /**
+     * 分享app
+     */
+    private void shareApp() {
+        ProgressHUD.show(mContext, "分享");
     }
 
     /**
