@@ -1,22 +1,40 @@
 package tv.baokan.baokanandroid.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.kaopiz.kprogresshud.KProgressHUD;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.UserBean;
+import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.LogUtils;
+import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.widget.ClearEditText;
 import tv.baokan.baokanandroid.widget.NavigationViewRed;
 
 public class ModifyInfoActivity extends BaseActivity {
+
+    private static final String TAG = "ModifyInfoActivity";
 
     private NavigationViewRed mNavigationViewRed;
     private View mPortraitLayout;                    // 头像区域
@@ -86,6 +104,17 @@ public class ModifyInfoActivity extends BaseActivity {
             }
         });
 
+        // 自动弹出键盘
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) mNicknameEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(mNicknameEditText, 0);
+            }
+
+        }, 500);
+
     }
 
     /**
@@ -111,6 +140,64 @@ public class ModifyInfoActivity extends BaseActivity {
      * 保存修改信息
      */
     private void saveModifyInfo() {
+
+        final KProgressHUD hud = ProgressHUD.show(mContext, "正在处理");
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("username", mUsernameTextView.getText().toString());
+        parameters.put("userid", UserBean.shared().getUserid());
+        parameters.put("token", UserBean.shared().getToken());
+        parameters.put("action", "EditInfo");
+        parameters.put("nickname", mNicknameEditText.getText().toString());
+        parameters.put("qq", mQQEditText.getText().toString());
+        parameters.put("phone", mPhoneEditText.getText().toString());
+        parameters.put("saytext", mSayEditText.getText().toString());
+
+        NetworkUtils.shared.post(APIs.MODIFY_ACCOUNT_INFO, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                hud.dismiss();
+                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                LogUtils.d(TAG, response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (jsonObject.getString("err_msg").equals("success")) {
+
+                        // 修改资料成功后需要更新本地用户信息
+                        UserBean.updateUserInfoFromNetwork(new UserBean.OnUpdatedUserInfoListener() {
+                            @Override
+                            public void onSuccess(UserBean userBean) {
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        hud.dismiss();
+                                        ProgressHUD.showInfo(mContext, "修改资料成功");
+                                        finish();
+                                    }
+                                }, 1000);
+                            }
+
+                            @Override
+                            public void onError(String tipString) {
+                                hud.dismiss();
+                                ProgressHUD.showInfo(mContext, tipString);
+                            }
+                        });
+                    } else {
+                        hud.dismiss();
+                        ProgressHUD.showInfo(mContext, jsonObject.getString("info"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    hud.dismiss();
+                    ProgressHUD.showInfo(mContext, "数据解析异常");
+                }
+            }
+        });
 
     }
 
