@@ -153,7 +153,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 AboutUsActivity.start(getActivity());
                 break;
             case R.id.rl_profile_commend_layout:
-                shareApp();
+                showShareApp();
                 break;
         }
     }
@@ -161,7 +161,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     /**
      * 分享app
      */
-    private void shareApp() {
+    private void showShareApp() {
         OnekeyShare oks = new OnekeyShare();
         // 关闭sso授权
         oks.disableSSOWhenAuthorize();
@@ -172,7 +172,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         // text是分享文本，所有平台都需要这个字段
         oks.setText("爆侃网文精心打造网络文学互动平台，专注最新文学市场动态，聚焦第一手网文圈资讯！");
         //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
-        oks.setImageUrl("http://www.baokan.tv/d/file/p/2017-01-05/8c81061deb5b31ce6fb8e3a018afe8e5.jpg");
+        oks.setImageUrl("http://www.baokan.tv/fx.png");
         // url仅在微信（包括好友和朋友圈）中使用
         oks.setUrl("http://www.baokan.tv");
         // site是分享此内容的网站名称，仅在QQ空间使用

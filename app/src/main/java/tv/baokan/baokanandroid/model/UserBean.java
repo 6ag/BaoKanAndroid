@@ -9,6 +9,10 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.app.BaoKanApp;
 import tv.baokan.baokanandroid.utils.APIs;
@@ -221,6 +225,17 @@ public class UserBean {
      * 从本地更新用户信息 - 登录成功后保存到偏好设置
      */
     public void updateUserInfoFromLocal() {
+
+        // 移除第三方授权
+        Platform weibo = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (weibo.isAuthValid()) {
+            weibo.removeAccount(true);
+        }
+        Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (qq.isAuthValid()) {
+            qq.removeAccount(true);
+        }
+
         // 内存缓存
         UserBean.userAccount = this;
         // 磁盘缓存

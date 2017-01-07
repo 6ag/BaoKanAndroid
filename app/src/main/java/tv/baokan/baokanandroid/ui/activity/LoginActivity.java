@@ -23,9 +23,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.PlatformDb;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.model.UserBean;
@@ -270,13 +277,123 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
      * 新浪登录
      */
     private void sinaLogin() {
-
+        showShareSDKLogin(SinaWeibo.NAME);
     }
 
     /**
      * qq登录
      */
     private void qqLogin() {
+        showShareSDKLogin(QQ.NAME);
+    }
+
+    /**
+     * 根据平台名称弹出对应的授权界面
+     *
+     * @param platformString 平台名称
+     */
+    private void showShareSDKLogin(String platformString) {
+        final Platform platform = ShareSDK.getPlatform(platformString);
+        // SSO可以登录，客户端回调有问题
+        platform.SSOSetting(true);
+        // 回调信息，可以在这里获取基本的授权返回的信息，但是注意如果做提示和UI操作要传到主线程handler里去执行
+        platform.setPlatformActionListener(new PlatformActionListener() {
+
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                arg2.printStackTrace();
+                LogUtils.d(TAG, "授权异常" + "线程 = " + Thread.currentThread().getName());
+            }
+
+            @Override
+            public void onComplete(final Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                LogUtils.d(TAG, "授权成功");
+                PlatformDb db = arg0.getDb();
+                String platformName = db.getPlatformNname();
+                String uid = db.getUserId();
+                String nickname = db.getUserName();
+                String avatar = db.getUserIcon();
+
+                if (platformName.equals(QQ.NAME)) {
+                    String figureurl_qq_2 = arg2.get("figureurl_qq_2").toString();
+                    if (!TextUtils.isEmpty(figureurl_qq_2)) {
+                        avatar = arg2.get("figureurl_qq_2").toString();
+                    }
+                } else if (platformName.equals(SinaWeibo.NAME)) {
+                    String avatar_hd = arg2.get("avatar_hd").toString();
+                    if (!TextUtils.isEmpty(avatar_hd)) {
+                        avatar = arg2.get("avatar_hd").toString();
+                    }
+                }
+
+                // 处理授权结果
+                shareSDKLoginhandler(nickname, avatar, uid, platformName);
+
+                LogUtils.d(TAG, "uid = " + uid + " avatar = " + avatar + " nickname = " + nickname);
+
+                for (Map.Entry<String, Object> entry : arg2.entrySet()) {
+                    LogUtils.d(TAG, entry.getKey() + " = " + entry.getValue());
+                }
+
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+                LogUtils.d(TAG, "授权取消" + "线程 = " + Thread.currentThread().getName());
+            }
+        });
+
+        // 授权并获取用户信息
+        platform.showUser(null);
+    }
+
+    /**
+     * shareSDK登录后续处理 - 先去判断是否已经注册，没有注册则先注册，然后登录。已经注册就直接登录
+     *
+     * @param nickname     昵称
+     * @param avatar       头像
+     * @param uid          唯一标识
+     * @param platformName 平台名称
+     */
+    private void shareSDKLoginhandler(String nickname, String avatar, String uid, final String platformName) {
+
+        String password = uid.length() >= 12 ? uid.substring(0, 12) : uid;
+        String username = platformName.equals(SinaWeibo.NAME) ? "wb_" + password : "qq_" + password;
+        username = username.toLowerCase();
+
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("username", username);
+        parameters.put("password", password);
+        parameters.put("email", username + "@baokan.name");
+        parameters.put("userpic", avatar);
+        parameters.put("nickname", nickname);
+
+        final String finalUsername = username;
+        final String finalPassword = password;
+        NetworkUtils.shared.post(APIs.REGISTER, parameters, new NetworkUtils.StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String info = jsonObject.getString("info");
+                    if (jsonObject.getString("err_msg").equals("success") || info.equals("此用户名已被注册")) {
+                        mUsernameEditText.setText(finalUsername);
+                        mPasswordEditText.setText(finalPassword);
+                        login();
+                    } else {
+                        ProgressHUD.showInfo(mContext, info);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    ProgressHUD.showInfo(mContext, "数据解析异常");
+                }
+            }
+        });
 
     }
 
@@ -303,7 +420,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     String password = data.getStringExtra("password");
                     mUsernameEditText.setText(username);
                     mPasswordEditText.setText(password);
-                    // 登录
                     login();
                 }
                 break;
