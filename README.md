@@ -30,33 +30,49 @@ iOS端使用 `Xcode8.1` + `Swift3.0` 开发，注释也很详细哦，有兴趣�
 
 ## 各种效果展示
 
-### 网文资讯
+### 栏目管理
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/1.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/0.jpg)
 
-### 新闻详情
+### 资讯列表
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/2.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/1.jpg)
 
-### 相关链接、评论
+### 资讯详情 - 正文
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/3.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/2.jpg)
 
-### 图库
+### 资讯详情 - 图片浏览器
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/4.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/3.jpg)
 
-### 图库详情
+### 资讯详情 - 相关连接、评论
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/5.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/4.jpg)
 
-### 热门
+### 图秀列表
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/6.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/5.jpg)
+
+### 图秀详情
+
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/6.jpg)
+
+### 热门板块
+
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/7.jpg)
 
 ### 个人中心
 
-![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/7.png)
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/8.jpg)
+
+### 登录、注册、找回密码 - 支持第三方登录
+
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/9.jpg)
+
+### 资料管理
+
+![image](https://github.com/6ag/BaoKanAndroid/blob/master/show/10.jpg)
 
 ## 许可
 
