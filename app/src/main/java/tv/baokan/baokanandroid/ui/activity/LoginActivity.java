@@ -205,6 +205,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             mShowPassword.setImageResource(R.drawable.login_icon_viewcode_normal);
             mPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
+        // 移动光标到最后
+        mPasswordEditText.setSelection(mPasswordEditText.length());
     }
 
     /**
