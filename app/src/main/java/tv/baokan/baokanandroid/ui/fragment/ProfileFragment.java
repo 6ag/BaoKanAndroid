@@ -1,34 +1,17 @@
 package tv.baokan.baokanandroid.ui.fragment;
 
-import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.kaopiz.kprogresshud.KProgressHUD;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import tv.baokan.baokanandroid.R;
@@ -41,10 +24,8 @@ import tv.baokan.baokanandroid.ui.activity.FeedbackActivity;
 import tv.baokan.baokanandroid.ui.activity.LoginActivity;
 import tv.baokan.baokanandroid.ui.activity.UserInfoActivity;
 import tv.baokan.baokanandroid.utils.FileCacheUtils;
-import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 import tv.baokan.baokanandroid.utils.SharedPreferencesUtils;
-import tv.baokan.baokanandroid.utils.StreamUtils;
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
 

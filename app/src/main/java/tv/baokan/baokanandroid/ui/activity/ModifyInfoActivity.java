@@ -157,6 +157,9 @@ public class ModifyInfoActivity extends BaseActivity {
         mPhoneEditText.setText(UserBean.shared().getPhone());
         mQQEditText.setText(UserBean.shared().getQq());
         mSayEditText.setText(UserBean.shared().getSaytext());
+
+        // 移动默认光标
+        mNicknameEditText.setSelection(mNicknameEditText.length());
     }
 
     /**
