@@ -186,19 +186,19 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         // 关闭sso授权
         oks.disableSSOWhenAuthorize();
         // title标题，印象笔记、邮箱、信息、微信、人人网、QQ和QQ空间使用
-        oks.setTitle("爆侃网文");
+        oks.setTitle("爆侃网文让您的网文之路不再孤单！");
         // titleUrl是标题的网络链接，仅在Linked-in,QQ和QQ空间使用
-        oks.setTitleUrl("http://www.baokan.tv");
+        oks.setTitleUrl("http://www.baokan.tv/wapapp/index.html");
         // text是分享文本，所有平台都需要这个字段
         oks.setText("爆侃网文精心打造网络文学互动平台，专注最新文学市场动态，聚焦第一手网文圈资讯！");
         //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
         oks.setImageUrl("http://www.baokan.tv/fx.png");
         // url仅在微信（包括好友和朋友圈）中使用
-        oks.setUrl("http://www.baokan.tv");
+        oks.setUrl("http://www.baokan.tv/wapapp/index.html");
         // site是分享此内容的网站名称，仅在QQ空间使用
         oks.setSite("爆侃网文");
         // siteUrl是分享此内容的网站地址，仅在QQ空间使用
-        oks.setSiteUrl("http://www.baokan.tv");
+        oks.setSiteUrl("http://www.baokan.tv/wapapp/index.html");
         // 启动分享GUI
         oks.show(getContext());
     }

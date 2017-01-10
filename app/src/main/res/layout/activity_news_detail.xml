@@ -98,43 +98,85 @@
                 android:layout_marginTop="15dp"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btn_news_detail_share_qq"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_news_content_share_button"
-                    android:drawableStart="@drawable/article_content_qq_normal"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="30dp"
-                    android:text="QQ"
-                    android:textColor="#BEBEBE"/>
-
-                <Button
-                    android:id="@+id/btn_news_detail_share_wx"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                <LinearLayout
+                    android:id="@+id/ll_article_content_share_qq"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_news_content_share_button"
-                    android:drawableStart="@drawable/article_content_share_weixin"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="30dp"
-                    android:text="微信"
-                    android:textColor="#BEBEBE"/>
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp">
 
-                <Button
-                    android:id="@+id/btn_news_detail_share_pyq"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/article_content_qq_normal"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="QQ"
+                        android:textColor="#BEBEBE"
+                        android:textSize="14sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_article_content_share_weixin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_news_content_share_button"
-                    android:drawableStart="@drawable/article_content_share_pyq"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="30dp"
-                    android:text="朋友圈"
-                    android:textColor="#BEBEBE"/>
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/article_content_share_weixin"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="微信"
+                        android:textColor="#BEBEBE"
+                        android:textSize="14sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_article_content_share_pyq"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_news_content_share_button"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/article_content_share_pyq"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="朋友圈"
+                        android:textColor="#BEBEBE"
+                        android:textSize="14sp"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 

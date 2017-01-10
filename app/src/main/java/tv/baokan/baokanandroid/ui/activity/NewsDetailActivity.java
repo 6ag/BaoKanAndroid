@@ -86,9 +86,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private ArticleDetailBean detailBean;   // 新闻详情模型
     private List<CommentBean> commentBeanList; // 评论模型集合
 
-    private ViewGroup mContentView;              // 最外层视图
+    private ViewGroup mContentView;         // 最外层视图
     private ProgressBar mProgressBar;       // 进度圈
-    private ScrollView mScrollView;   // 内容载体 scrollView
+    private ScrollView mScrollView;         // 内容载体 scrollView
     private WebView mContentWebView;        // 正文载体 webView
     private ImageButton mBackButton;        // 底部条 返回
     private ImageButton mEditButton;        // 底部条 编辑发布评论信息
@@ -96,9 +96,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private ImageButton mCollectionButton;  // 收藏
     private ImageButton mShareButton;       // 分享
 
-    private Button mShareQQButton;     // qq分享
-    private Button mShareWxButton;     // 微信分享
-    private Button mSharePyqButton;    // 朋友圈
+    private View mShareQQButton;          // qq分享
+    private View mShareWxButton;          // 微信分享
+    private View mSharePyqButton;         // 朋友圈
 
     private LinearLayout mLinkLayout;       // 相关阅读
     private RecyclerView mLinkRecyclerView; // 相关阅读列表
@@ -152,9 +152,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mProgressBar = (ProgressBar) findViewById(R.id.pb_news_detail_progressbar);
         mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
         mContentWebView = (WebView) findViewById(R.id.wv_news_detail_webview);
-        mShareQQButton = (Button) findViewById(R.id.btn_news_detail_share_qq);
-        mShareWxButton = (Button) findViewById(R.id.btn_news_detail_share_wx);
-        mSharePyqButton = (Button) findViewById(R.id.btn_news_detail_share_pyq);
+        mShareQQButton = findViewById(R.id.ll_article_content_share_qq);
+        mShareWxButton = findViewById(R.id.ll_article_content_share_weixin);
+        mSharePyqButton = findViewById(R.id.ll_article_content_share_pyq);
         mBackButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_back);
         mEditButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_edit);
         mFontButton = (ImageButton) findViewById(R.id.ib_news_detail_bottom_bar_font);
@@ -245,15 +245,15 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 // 弹出分享ui
                 showShare(null);
                 break;
-            case R.id.btn_news_detail_share_qq:
+            case R.id.ll_article_content_share_qq:
                 // qq分享
                 showShare(ShareSDK.getPlatform(QQ.NAME).getName());
                 break;
-            case R.id.btn_news_detail_share_wx:
+            case R.id.ll_article_content_share_weixin:
                 // 微信分享
                 showShare(ShareSDK.getPlatform(Wechat.NAME).getName());
                 break;
-            case R.id.btn_news_detail_share_pyq:
+            case R.id.ll_article_content_share_pyq:
                 // 朋友圈分享
                 showShare(ShareSDK.getPlatform(WechatMoments.NAME).getName());
                 break;

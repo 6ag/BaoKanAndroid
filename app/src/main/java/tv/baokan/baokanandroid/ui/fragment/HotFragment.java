@@ -18,7 +18,7 @@ public class HotFragment extends BaseFragment {
     protected View prepareUI() {
         View view = View.inflate(mContext, R.layout.fragment_hot, null);
         mNavigationViewRed = (NavigationViewRed) view.findViewById(R.id.nav_hot);
-        mNavigationViewRed.setupNavigationView(false, true, "近期热门", new NavigationViewRed.OnClickListener() {
+        mNavigationViewRed.setupNavigationView(false, false, "近期热门", new NavigationViewRed.OnClickListener() {
             @Override
             public void onRightClick(View v) {
                 Toast.makeText(mContext, "搜索", Toast.LENGTH_SHORT).show();

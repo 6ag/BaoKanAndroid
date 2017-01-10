@@ -5,14 +5,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
+import tv.baokan.baokanandroid.model.CommentRecordBean;
 import tv.baokan.baokanandroid.model.UserBean;
 import tv.baokan.baokanandroid.utils.APIs;
 import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
+import tv.baokan.baokanandroid.utils.ProgressHUD;
 
 /**
  * 资讯数据访问层
@@ -278,9 +281,13 @@ public class NewsDALManager {
                     // 如果所有接口响应格式是统一的，这些判断是可以封装在网络请求工具类里的哦
                     if (new JSONObject(response).getString("err_msg").equals("success")) {
                         JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        LogUtils.d(TAG, "从网络请求资讯列表数据成功 " + jsonArray.toString());
-                        newsListCallback.onSuccess(jsonArray);
+                        if (jsonObject.getString("data").equals("null")) {
+                            newsListCallback.onError("没有更多数据了");
+                        } else {
+                            JSONArray jsonArray = jsonObject.getJSONArray("data");
+                            LogUtils.d(TAG, "从网络请求资讯列表数据成功 " + jsonArray.toString());
+                            newsListCallback.onSuccess(jsonArray);
+                        }
                     } else {
                         String errorInfo = new JSONObject(response).getString("info");
                         newsListCallback.onError(errorInfo);
