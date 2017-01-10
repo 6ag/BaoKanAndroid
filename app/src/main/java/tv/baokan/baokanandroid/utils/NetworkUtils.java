@@ -38,24 +38,23 @@ public class NetworkUtils {
      */
     public void get(String api, HashMap<String, String> parameters, final StringCallback callback) {
 
-        GetBuilder okHttpUtils = OkHttpUtils.get().url(api);
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            okHttpUtils.addParams(entry.getKey(), entry.getValue());
-            LogUtils.d(TAG, entry.getKey() + " = " + entry.getValue());
-        }
         LogUtils.d(TAG, "api = " + api);
+        OkHttpUtils
+                .get()
+                .url(api)
+                .params(parameters)
+                .build()
+                .execute(new com.zhy.http.okhttp.callback.StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        callback.onError(call, e, id);
+                    }
 
-        okHttpUtils.build().execute(new com.zhy.http.okhttp.callback.StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                callback.onError(call, e, id);
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                callback.onResponse(response, id);
-            }
-        });
+                    @Override
+                    public void onResponse(String response, int id) {
+                        callback.onResponse(response, id);
+                    }
+                });
 
     }
 
@@ -68,24 +67,23 @@ public class NetworkUtils {
      */
     public void post(String api, HashMap<String, String> parameters, final StringCallback callback) {
 
-        PostFormBuilder okHttpUtils = OkHttpUtils.post().url(api);
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            okHttpUtils.addParams(entry.getKey(), entry.getValue());
-            LogUtils.d(TAG, entry.getKey() + " = " + entry.getValue());
-        }
         LogUtils.d(TAG, "api = " + api);
+        OkHttpUtils
+                .post()
+                .url(api)
+                .params(parameters)
+                .build()
+                .execute(new com.zhy.http.okhttp.callback.StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        callback.onError(call, e, id);
+                    }
 
-        okHttpUtils.build().execute(new com.zhy.http.okhttp.callback.StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                callback.onError(call, e, id);
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                callback.onResponse(response, id);
-            }
-        });
+                    @Override
+                    public void onResponse(String response, int id) {
+                        callback.onResponse(response, id);
+                    }
+                });
 
     }
 

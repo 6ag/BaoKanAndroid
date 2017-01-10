@@ -214,6 +214,7 @@
 
             <!--二维码广告-->
             <ImageView
+                android:id="@+id/iv_news_detail_ad"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_margin="10dp"
