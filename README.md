@@ -16,6 +16,12 @@
 
 - 整个工程代码注释齐全，适合新手参考，也欢迎大神指点。
 
+## Google Play
+
+<a target='_blank' href='http://download.baokan.tv/baokan.apk'>
+<img src='https://camo.githubusercontent.com/10fe76c8a0f9b9d8e5bee8170d88a3293449305a/68747470733a2f2f6f776e636c6f75642e6f72672f77702d636f6e74656e742f7468656d65732f6f776e636c6f75646f72676e65772f6173736574732f696d672f636c69656e74732f627574746f6e732f676f6f676c65706c61792e706e67' width='144' height='49' />
+</a>
+
 ## 开发环境
 
 使用Android Studio 2.2.3开发，最低支持Android 4.4。
