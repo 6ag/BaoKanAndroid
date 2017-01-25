@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +47,7 @@ import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
 import tv.baokan.baokanandroid.ui.fragment.PhotoFragment;
 import tv.baokan.baokanandroid.ui.fragment.ProfileFragment;
 import tv.baokan.baokanandroid.utils.APIs;
+import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 
@@ -60,6 +67,7 @@ public class MainActivity extends BaseActivity {
     private String serverVersion; // 服务器版本号
     private String description;   // 新版本更新描述
     private String apkUrl;        // 新版本apk下载地址
+    private int progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +181,7 @@ public class MainActivity extends BaseActivity {
 
         // apk文件保存路径
         String apkPath = null;
-        String apkName = "baokan" + serverVersion + ".apk";
+        final String apkName = "baokan" + serverVersion + ".apk";
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             apkPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         }
@@ -194,24 +202,23 @@ public class MainActivity extends BaseActivity {
                 .execute(new FileCallBack(apkPath, apkName) {
 
                     @Override
-                    public void onResponse(File arg0, int arg1) {
-                        mDownloadDialog.dismiss();
-                        // 下载完成安装apk
-                        installAPK(arg0.getAbsolutePath());
-                    }
-
-                    @Override
-                    public void onError(Call arg0, Exception arg1, int arg2) {
-                        mDownloadDialog.dismiss();
-                        ProgressHUD.showInfo(mContext, "您的网络不给力哦");
-                    }
-
-                    @Override
                     public void inProgress(float progress, long total, int id) {
                         // 更新下载进度
                         mDownloadDialog.setProgress(Math.round(progress * 100));
                     }
 
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        mDownloadDialog.dismiss();
+                        ProgressHUD.showInfo(mContext, "您的网络不给力哦");
+                    }
+
+                    @Override
+                    public void onResponse(File response, int id) {
+                        mDownloadDialog.dismiss();
+                        // 下载完成安装apk
+                        installAPK(response.getAbsolutePath());
+                    }
                 });
 
     }
@@ -239,7 +246,7 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent();
         intent.setAction("android.intent.action.VIEW");
         intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(Uri.fromFile(new File(apkPath)), "application/vnd.android.package-archive");
+        intent.setDataAndType(Uri.parse("file://" + apkPath), "application/vnd.android.package-archive");
         startActivity(intent);
     }
 

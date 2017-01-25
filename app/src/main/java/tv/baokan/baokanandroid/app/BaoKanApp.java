@@ -7,13 +7,16 @@ import android.content.pm.PackageManager;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.decoder.SimpleProgressiveJpegConfig;
+import com.zhy.http.okhttp.OkHttpUtils;
 
 import org.litepal.LitePalApplication;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.sharesdk.framework.ShareSDK;
+import okhttp3.OkHttpClient;
 import tv.baokan.baokanandroid.utils.LogUtils;
 
 public class BaoKanApp extends LitePalApplication {
@@ -43,6 +46,13 @@ public class BaoKanApp extends LitePalApplication {
         // 初始化app异常处理器 - 打包的时候开启
         CrashHandler handler = CrashHandler.getInstance();
         handler.init(getApplicationContext());
+
+//        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10000L, TimeUnit.MILLISECONDS)
+//                .readTimeout(10000L, TimeUnit.MILLISECONDS)
+//                //其他配置
+//                .build();
+//        OkHttpUtils.initClient(okHttpClient);
 
         // 初始化ShareSDK
         ShareSDK.initSDK(this);
