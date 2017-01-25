@@ -318,8 +318,9 @@
 
     <!--顶部白色透明条-->
     <View
+        android:id="@+id/v_cell_news_detail_top_bar"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="24dp"
         android:alpha="0.8"
         android:background="#ffffff"/>
 

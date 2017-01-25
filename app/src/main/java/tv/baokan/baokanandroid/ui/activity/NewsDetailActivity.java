@@ -86,6 +86,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private ArticleDetailBean detailBean;   // 新闻详情模型
     private List<CommentBean> commentBeanList; // 评论模型集合
 
+    private View mTopBar;                   // 顶部状态栏透明条
     private ViewGroup mContentView;         // 最外层视图
     private ProgressBar mProgressBar;       // 进度圈
     private ScrollView mScrollView;         // 内容载体 scrollView
@@ -117,6 +118,8 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     private AlertDialog setFontDialog;      // 设置字体的会话框
     private int fontSize;                   // 修改后的字体大小
 
+    private boolean isStatusChanged = false; // 是否已经成功修改了状态栏颜色
+
     /**
      * 便捷启动当前activity
      *
@@ -136,8 +139,9 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 将MIUI/魅族的状态栏文字图标改成暗色
-        if (!StatusUtils.setMiuiStatusBarDarkMode(this, true) && !StatusUtils.setMeizuStatusBarDarkMode(this, true)) {
-            LogUtils.d(TAG, "修改状态栏没有作用");
+        if (StatusUtils.setMiuiStatusBarDarkMode(this, true) || StatusUtils.setMeizuStatusBarDarkMode(this, true)) {
+            // 已经修改状态栏文字为深灰色
+            isStatusChanged = true;
         }
         setContentView(R.layout.activity_news_detail);
 
@@ -155,6 +159,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
      * 准备UI
      */
     private void prepareUI() {
+        mTopBar = findViewById(R.id.v_cell_news_detail_top_bar);
         mContentView = (ViewGroup) findViewById(R.id.activity_news_detail);
         mProgressBar = (ProgressBar) findViewById(R.id.pb_news_detail_progressbar);
         mScrollView = (ScrollView) findViewById(R.id.bsv_news_detail_scrollview);
@@ -173,6 +178,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         mCommentRecyclerView = (RecyclerView) findViewById(R.id.rv_news_detail_comment_recyclerview);
         mMoreCommentButton = (Button) findViewById(R.id.btn_news_detail_comment_more);
         mAdImageView = (ImageView) findViewById(R.id.iv_news_detail_ad);
+
+        // 如果未能修改掉状态栏的颜色，就修改状态栏的背景颜色
+        if (!isStatusChanged) {
+            mTopBar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            mTopBar.setAlpha(1);
+        }
 
         // 新闻正文
         WebSettings webSettings = mContentWebView.getSettings();
