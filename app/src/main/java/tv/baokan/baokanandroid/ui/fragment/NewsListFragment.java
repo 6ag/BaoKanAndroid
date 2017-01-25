@@ -72,8 +72,13 @@ public class NewsListFragment extends BaseFragment {
         // 配置recyclerView资讯列表
         setupRecyclerView();
 
-        // 配置刷新
-        setupRefresh();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 配置刷新
+                setupRefresh();
+            }
+        }, 100);
 
     }
 

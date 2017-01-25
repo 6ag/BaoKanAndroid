@@ -14,7 +14,6 @@ import tv.baokan.baokanandroid.R;
 
 /**
  * @说明： 自定义带删除按钮的EditText
- *
  */
 public class ClearEditText extends EditText implements View.OnFocusChangeListener, TextWatcher {
 
@@ -70,13 +69,13 @@ public class ClearEditText extends EditText implements View.OnFocusChangeListene
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (getCompoundDrawables()[2] != null) {
-                int x = (int)event.getX();
-                int y = (int)event.getY();
+                int x = (int) event.getX();
+                int y = (int) event.getY();
                 Rect rect = getCompoundDrawables()[2].getBounds();
                 int height = rect.height();
-                int distance = (getHeight() - height)/2;
+                int distance = (getHeight() - height) / 2;
                 boolean isInnerWidth = x > (getWidth() - getTotalPaddingRight()) && x < (getWidth() - getPaddingRight());
-                boolean isInnerHeight = y > distance && y <(distance + height);
+                boolean isInnerHeight = y > distance && y < (distance + height);
                 if (isInnerWidth && isInnerHeight) {
                     this.setText("");
                 }

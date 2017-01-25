@@ -142,7 +142,12 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
         setContentView(R.layout.activity_news_detail);
 
         prepareUI();
-        prepareData();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                prepareData();
+            }
+        }, 50);
 
     }
 
@@ -460,7 +465,7 @@ public class NewsDetailActivity extends BaseActivity implements View.OnClickList
                 inputManager.showSoftInput(commentEditText, 0);
             }
 
-        }, 500);
+        }, 250);
     }
 
     /**

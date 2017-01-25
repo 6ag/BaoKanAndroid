@@ -66,8 +66,14 @@ public class PhotoListFragment extends BaseFragment {
         // 配置recyclerView图库列表
         setupRecyclerView();
 
-        // 设置刷新监听器
-        setupRefresh();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 设置刷新监听器
+                setupRefresh();
+            }
+        }, 100);
+
     }
 
     /**

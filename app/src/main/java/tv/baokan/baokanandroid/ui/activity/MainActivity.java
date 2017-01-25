@@ -17,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -35,15 +34,12 @@ import java.util.List;
 import okhttp3.Call;
 import tv.baokan.baokanandroid.R;
 import tv.baokan.baokanandroid.app.BaoKanApp;
-import tv.baokan.baokanandroid.model.ColumnBean;
 import tv.baokan.baokanandroid.ui.fragment.BaseFragment;
 import tv.baokan.baokanandroid.ui.fragment.HotFragment;
 import tv.baokan.baokanandroid.ui.fragment.NewsFragment;
-import tv.baokan.baokanandroid.ui.fragment.NewsListFragment;
 import tv.baokan.baokanandroid.ui.fragment.PhotoFragment;
 import tv.baokan.baokanandroid.ui.fragment.ProfileFragment;
 import tv.baokan.baokanandroid.utils.APIs;
-import tv.baokan.baokanandroid.utils.LogUtils;
 import tv.baokan.baokanandroid.utils.NetworkUtils;
 import tv.baokan.baokanandroid.utils.ProgressHUD;
 
@@ -346,7 +342,6 @@ public class MainActivity extends BaseActivity {
         } else {
             removeAllActivity();
         }
-
     }
 
     @Override

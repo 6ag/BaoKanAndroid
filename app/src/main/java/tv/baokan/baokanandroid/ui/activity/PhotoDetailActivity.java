@@ -410,7 +410,7 @@ public class PhotoDetailActivity extends BaseActivity implements View.OnClickLis
                 inputManager.showSoftInput(commentEditText, 0);
             }
 
-        }, 500);
+        }, 250);
     }
 
     /**
