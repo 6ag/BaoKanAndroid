@@ -21,7 +21,7 @@
             android:background="@color/colorPrimary"
             app:tabGravity="fill"
             app:tabIndicatorColor="#FFFFFF"
-            app:tabIndicatorHeight="0dp"
+            app:tabIndicatorHeight="2dp"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="#FFFFFF"
             app:tabTextAppearance="@style/NewsTabLayoutTextAppearance"

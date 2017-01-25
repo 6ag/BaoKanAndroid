@@ -2,14 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="tv.baokan.baokanandroid">
 
-    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.media.action.IMAGE_CAPTURE" />
+    <uses-permission android:name="android.media.action.IMAGE_CAPTURE"/>
 
     <!-- 震动权限 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -29,8 +30,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!--启动页-->
         <activity
             android:name=".ui.activity.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -38,40 +41,92 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity">
+        <!--首页-->
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.NewsDetailActivity">
+        <!--资讯详情-->
+        <activity
+            android:name=".ui.activity.NewsDetailActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.PhotoDetailActivity">
+        <!--图秀详情-->
+        <activity
+            android:name=".ui.activity.PhotoDetailActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.LoginActivity">
+        <!--登录-->
+        <activity
+            android:name=".ui.activity.LoginActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.RegisterActivity">
+        <!--注册-->
+        <activity
+            android:name=".ui.activity.RegisterActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.ForgotActivity">
+        <!--忘记密码-->
+        <activity
+            android:name=".ui.activity.ForgotActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.AgreementActivity">
+        <!--协议-->
+        <activity
+            android:name=".ui.activity.AgreementActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.PhotoBrowserActivity">
+        <!--资讯详情浏览器-->
+        <activity
+            android:name=".ui.activity.PhotoBrowserActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.CommentListActivity">
+        <!--评论列表-->
+        <activity
+            android:name=".ui.activity.CommentListActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.ColumnActivity">
+        <!--栏目管理-->
+        <activity
+            android:name=".ui.activity.ColumnActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.AboutUsActivity">
+        <!--关于我们-->
+        <activity
+            android:name=".ui.activity.AboutUsActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.FeedbackActivity">
+        <!--意见反馈-->
+        <activity
+            android:name=".ui.activity.FeedbackActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.UserInfoActivity">
+        <!--用户信息-->
+        <activity
+            android:name=".ui.activity.UserInfoActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.ModifyInfoActivity">
+        <!--修改资料-->
+        <activity
+            android:name=".ui.activity.ModifyInfoActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.ModifySafeInfoActivity">
+        <!--修改密码-->
+        <activity
+            android:name=".ui.activity.ModifySafeInfoActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.CollectionRecordActivity">
+        <!--收藏记录-->
+        <activity
+            android:name=".ui.activity.CollectionRecordActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ui.activity.CommentRecordActivity">
+        <!--评论记录-->
+        <activity
+            android:name=".ui.activity.CommentRecordActivity"
+            android:screenOrientation="portrait">
         </activity>
+
         <!--ShareSDK-->
         <activity
             android:name="com.mob.tools.MobUIShell"
@@ -105,18 +160,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
-        <!--拍照-->
-        <provider
-            android:authorities="tv.baokan.baokanandroid.cameraalbum.fileprovider"
-            android:name="android.support.v4.content.FileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
-        </provider>
-
     </application>
-
 
 </manifest>

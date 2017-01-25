@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -69,8 +70,13 @@ public class MainActivity extends BaseActivity {
         prepareFragments();
         setItemListener();
 
-        // 检查版本更新
-        checkVersion();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 检查版本更新
+                checkVersion();
+            }
+        }, 250);
 
     }
 

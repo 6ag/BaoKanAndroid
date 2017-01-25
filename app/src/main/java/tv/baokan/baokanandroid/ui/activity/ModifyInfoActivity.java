@@ -19,6 +19,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -39,7 +41,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -74,7 +78,7 @@ public class ModifyInfoActivity extends BaseActivity {
     private static final int CHOOSE_PICTURE = 0;
     private static final int TAKE_PICTURE = 1;
     private static final int CROP_SMALL_PICTURE = 2;
-    private Uri tempUri;
+    private String tempPath;
 
     /**
      * 便捷启动当前activity
@@ -255,8 +259,12 @@ public class ModifyInfoActivity extends BaseActivity {
      * 使用相机拍照
      */
     private void takePhoto() {
+
+        // 图片路径
+        tempPath = Environment.getExternalStorageDirectory() + "/DCIM/" + DateFormat.format("yyyyMMdd_hhmmss", Calendar.getInstance(Locale.CHINA)) + ".jpg";
+
         // 创建拍照时的临时文件
-        File tempFile = new File(Environment.getExternalStorageDirectory(), "image.jpg");
+        File tempFile = new File(tempPath);
         try {
             if (tempFile.exists()) {
                 tempFile.delete();
@@ -266,17 +274,28 @@ public class ModifyInfoActivity extends BaseActivity {
             e.printStackTrace();
         }
 
-        if (Build.VERSION.SDK_INT >= 24) {
-            tempUri = FileProvider.getUriForFile(mContext, "tv.baokan.baokanandroid.cameraalbum.fileprovider", tempFile);
-        } else {
-            tempUri = Uri.fromFile(tempFile);
-        }
-
         // 指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
-        startActivityForResult(openCameraIntent, TAKE_PICTURE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra("return-data", false);
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+        intent.putExtra("noFaceDetection", true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+        startActivityForResult(intent, TAKE_PICTURE);
         overridePendingTransition(R.anim.column_show, R.anim.column_bottom);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("tempPath", tempPath);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (TextUtils.isEmpty(tempPath)) {
+            tempPath = savedInstanceState.getString("tempPath");
+        }
     }
 
     @Override
@@ -285,7 +304,8 @@ public class ModifyInfoActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TAKE_PICTURE:
-                    startPhotoZoom(tempUri);
+                    File tempFile = new File(tempPath);
+                    startPhotoZoom(Uri.fromFile(tempFile));
                     break;
                 case CHOOSE_PICTURE:
                     startPhotoZoom(data.getData());
@@ -302,7 +322,7 @@ public class ModifyInfoActivity extends BaseActivity {
     /**
      * 裁剪图片方法实现
      *
-     * @param uri
+     * @param uri 图片的uri
      */
     protected void startPhotoZoom(Uri uri) {
         if (uri == null) {
@@ -319,8 +339,10 @@ public class ModifyInfoActivity extends BaseActivity {
         // outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 200);
         intent.putExtra("outputY", 200);
+        intent.putExtra("scale", true);
         intent.putExtra("return-data", true);
         startActivityForResult(intent, CROP_SMALL_PICTURE);
+        overridePendingTransition(R.anim.push_enter, R.anim.push_exit);
     }
 
     /**
@@ -372,14 +394,8 @@ public class ModifyInfoActivity extends BaseActivity {
                                     UserBean.updateUserInfoFromNetwork(new UserBean.OnUpdatedUserInfoListener() {
                                         @Override
                                         public void onSuccess(UserBean userBean) {
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    hud.dismiss();
-                                                    ProgressHUD.showInfo(mContext, "修改头像成功");
-                                                    finish();
-                                                }
-                                            }, 1000);
+                                            hud.dismiss();
+                                            ProgressHUD.showInfo(mContext, "修改头像成功");
                                         }
 
                                         @Override
